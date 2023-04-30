@@ -1,23 +1,13 @@
-CC     := gcc
-CFLAGS := -Wall -O -ggdb
-CFLAGS += -DDEBUG
+all: comp
 
-main: main.c parser.tab.o scanner.o
-	$(CC) $^ -o $@ $(CFLAGS)
+comp.lex.c: comp.l
+	flex -o $@ --header-file=$(patsubst %.c,%.h,$@) --debug $<
 
-parser.tab.o: parser.tab.c
-	$(CC) -c $^  -o $@ $(CFLAGS)
+comp.tab.c: comp.y
+	bison -o $@ --defines=$(patsubst %.c,%.h,$@) --debug $<
 
-scanner.o: scanner.c
-	$(CC) -c $^ -o $@ $(CFLAGS)
-
-parser.tab.c: parser.y scanner.c
-	bison -d $<
-
-scanner.c: lexer.l
-	flex $^
+comp: main.c comp.tab.c comp.lex.c comp.h
+	$(CC) -o $@ -Wall -ggdb $(filter %.c,$^)
 
 clean:
-	-rm main scanner.* parser.tab.*
-
-.PHONY: clean
+	rm -f comp.tab.c comp.lex.c comp.tab.h comp.lex.h main

@@ -1,24 +1,28 @@
+%option outfile="comp.lex.c" header-file="comp.lex.h"
+%option warn debug perf-report
+%option reentrant bison-locations bison-bridge
+%option yylineno
+%option noyywrap
+%option interactive
+%option nodefault
+
 %{
-#include <stdio.h>
-#include "parser.tab.h"    
-#include "utils.h"
+  #include <stdlib.h>                                                           
+  #include <string.h>
+  #include "comp.tab.h"                                                   
+  #include "utils.h"
 
-#define YY_USER_ACTION yylloc->begin.line = yyget_lineno(yyscanner);
-
+  #define YY_USER_ACTION                                               \
+      yylloc->first_line = yylloc->last_line;                          \
+      yylloc->first_column = yylloc->last_column;                      \
+      if (yylloc->last_line == yylineno)                               \
+        yylloc->last_column += yyleng;                                 \
+      else {                                                           \
+        yylloc->last_line = yylineno;                                  \
+        yylloc->last_column = yytext + yyleng - strrchr(yytext, '\n'); \
+      }
 %}
 
-%option bison-bridge
-%option reentrant
-%option yylineno
-%option interactive
-%option noyywrap
-
-%option warn
-%option debug
-%option perf-report
-
-%option outfile="scanner.c"
-%option header-file="scanner.h"
 
 newline     ("\n")
 white_space (" "|"\t"|"\r"|"\v"|"\f")
