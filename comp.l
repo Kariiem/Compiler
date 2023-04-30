@@ -30,6 +30,8 @@ id          ([a-zA-Z_]+[a-zA-Z0-9?!]*)
 integer     ([0-9]+)
 real        ({integer}"."{integer})
 string      (\"[^\"\n]*\")
+left_brace  ("{"{newline}*)
+right_brace ({newline}*"}"{newline}*)
 
 /* -:-keywords-:- */
 /* module */
@@ -109,9 +111,9 @@ string      (\"[^\"\n]*\")
 "&"         {   return TOKEN_AMP;      }
 "("         {   return TOKEN_LPAREN;   }
 ")"         {   return TOKEN_RPAREN;   }
-"{"         {   return TOKEN_LBRACE;   }
-"}"         {   return TOKEN_RBRACE;   }
 
+{left_brace}    {   return TOKEN_LBRACE;   }
+{right_brace}   {   return TOKEN_RBRACE;   }
 
 {id}            { 
                     yylval->IDENTIFIER = yytext; 
@@ -131,7 +133,7 @@ string      (\"[^\"\n]*\")
                 }
 
 {newline}+      { return TOKEN_NEWLINE; }
-{white_space}+  { /*return TOKEN_WS;*/  }  
-<<EOF>>         { return TOKEN_EOF;     }
+{white_space}+    /*return TOKEN_WS;*/    
+<<EOF>>         { return YYEOF;     }
 .               { return TOKEN_UNKNOWN; }
 %%

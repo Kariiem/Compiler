@@ -1,0 +1,27 @@
+module Main
+import numpy
+import iostream
+
+val globals_are_bad: Int = 10;
+
+var globals_are_bad: Int = 10;
+val globals_are_bad: Int;
+var globals_are_bad: Int;
+
+fun fib(val n:int, var p:int) int {
+    do {
+
+
+
+
+
+
+
+
+
+
+
+    }
+
+    
+}

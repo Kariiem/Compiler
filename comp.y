@@ -11,7 +11,7 @@
   #include "ast.h"
 }
 %code {
-  int yylex(YYSTYPE* yylvalp, YYLTYPE* yyllocp, yyscan_t scanner,module_t* module);
+  int yylex(YYSTYPE* yylvalp, YYLTYPE* yyllocp, yyscan_t scanner,module_t module);
   void yyerror(YYLTYPE* yyllocp, yyscan_t unused, module_t module, const char* msg);
 }
 
@@ -37,7 +37,6 @@
 %token TOKEN_NOT
 %token TOKEN_AND
 %token TOKEN_OR
-
 
 /*-----------------------------------*/
 /* -:- arithmetic operators -:- */
@@ -106,43 +105,38 @@
 %left TOKEN_COMMA
 %right TOKEN_NOT TOKEN_EXP TOKEN_EQUAL
 %%
-
 source: 
-    module_decl top_level_decl_list
-    ;
-
-delimiter: 
-    TOKEN_SEMICOLON
-|   TOKEN_NEWLINE
+    module_decl top_level_decl_list optional_newline
     ;
 
 module_decl: 
     TOKEN_MODULE IDENTIFIER TOKEN_NEWLINE
     ;
+
 top_level_decl_list: 
     %empty
 |   top_level_decl_list top_level_decl
     ;
 top_level_decl:
-    term_decl
+    import_decl
+|   term_decl  
 |   fun_decl
 |   type_decl
-|   import_decl
     ;
 import_decl:
     TOKEN_IMPORT IDENTIFIER TOKEN_NEWLINE
     ;
 term_decl: 
-    val_or_var IDENTIFIER TOKEN_COLON IDENTIFIER optional_assignment
-|   IDENTIFIER TOKEN_EQUAL expr delimiter
+    val_or_var IDENTIFIER TOKEN_COLON IDENTIFIER optional_assignment optional_newline
+|   IDENTIFIER TOKEN_EQUAL expr TOKEN_SEMICOLON optional_newline
     ;
 val_or_var: 
     TOKEN_VAL
 |   TOKEN_VAR
     ;
 optional_assignment:
-    TOKEN_EQUAL expr delimiter
-|   delimiter
+    TOKEN_EQUAL expr TOKEN_SEMICOLON
+|   TOKEN_SEMICOLON
     ;
 expr:
     atomic_value
@@ -180,7 +174,7 @@ logical_expr:
 optional_newline:
     %empty
 |   TOKEN_NEWLINE
-    ;
+    
 compound_expr:
     if_then_else_expr
 |   for_loop_expr
@@ -210,7 +204,7 @@ until_loop_expr:
 do_block_expr:
     TOKEN_DO block 
     ;
-block:    
+block:  
     TOKEN_LBRACE block_expression_list TOKEN_RBRACE
     ;
 block_expression:
@@ -225,12 +219,12 @@ fun_decl:
     TOKEN_FUN IDENTIFIER TOKEN_LPAREN param_list TOKEN_RPAREN IDENTIFIER block
     ;
 param_list:
-    param_list optnewline_comma_optnewline param
+    %empty
 |   param
+|   param_list optnewline_comma_optnewline param
     ;
 param:
-    %empty
-|   val_or_var IDENTIFIER TOKEN_COLON IDENTIFIER
+    val_or_var IDENTIFIER TOKEN_COLON IDENTIFIER
     ;
 funcall:
     IDENTIFIER TOKEN_LPAREN arg_list TOKEN_RPAREN
@@ -260,9 +254,14 @@ record_field_list:
 optnewline_comma_optnewline:
     optional_newline TOKEN_COMMA optional_newline
     ;
+
+
 %%
 
 void yyerror(YYLTYPE* yyllocp, yyscan_t unused,module_t module, const char* msg) {
+  
+  char token_name[255];
+  
   fprintf(stderr, "[%d:%d]: %s\n",
                   yyllocp->first_line, yyllocp->first_column, msg);
 }
