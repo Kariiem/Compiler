@@ -183,7 +183,7 @@ compound_expr:
 |   do_block_expr
     ;
 if_then_else_expr:
-    TOKEN_IF logical_expr block TOKEN_ELSE block
+    TOKEN_IF expr block TOKEN_ELSE block
     ;
 for_loop_expr:
     TOKEN_FOR IDENTIFIER TOKEN_COLON range block
@@ -196,10 +196,10 @@ optional_step:
 |   TOKEN_COMMA expr
     ;
 while_loop_expr:
-    TOKEN_WHILE logical_expr block
+    TOKEN_WHILE expr block
     ;
 until_loop_expr:
-    TOKEN_UNTIL logical_expr block
+    TOKEN_UNTIL expr block
     ;
 do_block_expr:
     TOKEN_DO block 
@@ -207,13 +207,13 @@ do_block_expr:
 block:  
     TOKEN_LBRACE block_expression_list TOKEN_RBRACE
     ;
-block_expression:
-    expr
-|   term_decl
-    ;
 block_expression_list:
-    %empty
+    optional_newline
 |   block_expression_list block_expression
+    ;
+block_expression:
+    expr TOKEN_SEMICOLON optional_newline
+|   term_decl
     ;
 fun_decl:
     TOKEN_FUN IDENTIFIER TOKEN_LPAREN param_list TOKEN_RPAREN IDENTIFIER block
@@ -230,11 +230,12 @@ funcall:
     IDENTIFIER TOKEN_LPAREN arg_list TOKEN_RPAREN
     ;
 arg_list:
-    arg_list TOKEN_COMMA optional_newline expr
+    %empty
 |   expr
+|   arg_list optnewline_comma_optnewline expr
     ;
 type_decl:
-    TOKEN_TYPE IDENTIFIER TOKEN_EQUAL constructor_list
+    TOKEN_TYPE IDENTIFIER TOKEN_EQUAL constructor_list TOKEN_SEMICOLON
     ;
 constructor_list:
     constructor_list optional_newline TOKEN_PIPE constructor_field

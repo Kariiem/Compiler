@@ -25,13 +25,13 @@
 
 
 newline     ("\n")
-white_space (" "|"\t"|"\r"|"\v"|"\f")
+white_space ([[:space:]])
 id          ([a-zA-Z_]+[a-zA-Z0-9?!]*)
 integer     ([0-9]+)
 real        ({integer}"."{integer})
 string      (\"[^\"\n]*\")
-left_brace  ("{"{newline}*)
-right_brace ({newline}*"}"{newline}*)
+left_brace  ("{")
+right_brace ("}")
 
 /* -:-keywords-:- */
 /* module */

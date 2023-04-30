@@ -8,20 +8,61 @@ var globals_are_bad: Int = 10;
 val globals_are_bad: Int;
 var globals_are_bad: Int;
 
-fun fib(val n:int, var p:int) int {
+
+fun fib(val n:int, var p:int, val k:string) int {
     do {
+        do{
+            do{
+
+            };
+        };
+    };
+    1+2+5+5+5;
+    1-2-2-2;
+    true or false;
+    val i:bool = false and true;
+    function(1,
+    2,
+    3,
+    4);
+
+    if 1 {
+
+
+
+
+    } else {
 
 
 
 
 
+    };
+    while (1) {
+        if 1 {
+
+
+
+
+        } else {
 
 
 
 
 
+        };
+    };
+    for i:(1,2,4) {
 
-    }
+    };
+    until(0){
+            for i:(1,2,4) {
 
-    
+    };
+    until(0){
+
+    };
+
+    };
+
 }
