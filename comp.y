@@ -119,9 +119,9 @@ top_level_decl_list:
     ;
 top_level_decl:
     import_decl
+|   type_decl
 |   term_decl  
 |   fun_decl
-|   type_decl
     ;
 import_decl:
     TOKEN_IMPORT IDENTIFIER TOKEN_NEWLINE
@@ -238,8 +238,8 @@ type_decl:
     TOKEN_TYPE IDENTIFIER TOKEN_EQUAL constructor_list TOKEN_SEMICOLON
     ;
 constructor_list:
-    constructor_list optional_newline TOKEN_PIPE constructor_field
-|   optional_newline constructor_field
+    optional_newline constructor_field
+|   constructor_list optional_newline TOKEN_PIPE constructor_field
     ;
 constructor_field: 
     IDENTIFIER record
@@ -249,9 +249,12 @@ record:
 |   TOKEN_LBRACE record_field_list TOKEN_RBRACE
     ;
 record_field_list:
-    record_field_list optnewline_comma_optnewline IDENTIFIER TOKEN_COLON IDENTIFIER 
-|   IDENTIFIER TOKEN_COLON IDENTIFIER
+    record_field
+|   record_field_list optnewline_comma_optnewline record_field 
     ;
+record_field:
+    IDENTIFIER TOKEN_COLON IDENTIFIER
+    
 optnewline_comma_optnewline:
     optional_newline TOKEN_COMMA optional_newline
     ;

@@ -106,7 +106,6 @@ right_brace ("}")
 ":"         {   return TOKEN_COLON;    }
 "::"        {   return TOKEN_QUALIFY;  }
 ","         {   return TOKEN_COMMA;    }
-";"         {   return TOKEN_SEMICOLON;}
 "|"         {   return TOKEN_PIPE;     }
 "&"         {   return TOKEN_AMP;      }
 "("         {   return TOKEN_LPAREN;   }
@@ -115,6 +114,7 @@ right_brace ("}")
 {left_brace}    {   return TOKEN_LBRACE;   }
 {right_brace}   {   return TOKEN_RBRACE;   }
 
+";"{newline}+   {   return TOKEN_SEMICOLON;}
 {id}            { 
                     yylval->IDENTIFIER = yytext; 
                     return IDENTIFIER;
