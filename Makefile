@@ -11,4 +11,4 @@ comp: main.c comp.tab.c comp.lex.c comp.h
 	$(CC) -o $@ -Wall -ggdb $(filter %.c,$^)
 
 clean:
-	rm -f comp.tab.c comp.lex.c comp.tab.h comp.lex.h main
+	rm -f comp comp.tab.c comp.lex.c comp.tab.h comp.lex.h main

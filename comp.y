@@ -151,6 +151,7 @@ atomic_value:
 |   INTEGER
 |   REAL
 |   BOOL
+|   STRING
     ;
 arithmetic_expr:
     expr TOKEN_PLUS expr
@@ -174,13 +175,14 @@ logical_expr:
 optional_newline:
     %empty
 |   TOKEN_NEWLINE
-    
+    ;
 compound_expr:
     if_then_else_expr
 |   for_loop_expr
 |   while_loop_expr
 |   until_loop_expr
 |   do_block_expr
+|   switch_expr
     ;
 if_then_else_expr:
     TOKEN_IF expr block TOKEN_ELSE block
@@ -203,6 +205,17 @@ until_loop_expr:
     ;
 do_block_expr:
     TOKEN_DO block 
+    ;
+switch_expr:
+    TOKEN_SWITCH expr TOKEN_LBRACE case_expr_list TOKEN_RBRACE
+    ;
+case_expr_list:
+    %empty
+|   TOKEN_ELSE TOKEN_COLON block
+|   case_expr case_expr_list
+    ;
+case_expr:
+    expr TOKEN_COLON block
     ;
 block:  
     TOKEN_LBRACE block_expression_list TOKEN_RBRACE
