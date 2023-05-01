@@ -1,3 +1,13 @@
+# Team 20
+
+Osama Magdy 1 14
+
+Reem Emad 1 33
+
+Kareem Taha 2 9
+
+Yousef Gamal 2 39
+
 # How to run
 
 #### To run the test.txt file
