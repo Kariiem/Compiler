@@ -106,7 +106,7 @@
 %right TOKEN_NOT TOKEN_EXP TOKEN_EQUAL
 %%
 source: 
-    module_decl top_level_decl_list optional_newline
+    module_decl top_level_decl_list
     ;
 
 module_decl: 
@@ -127,8 +127,8 @@ import_decl:
     TOKEN_IMPORT IDENTIFIER TOKEN_NEWLINE
     ;
 term_decl: 
-    val_or_var IDENTIFIER TOKEN_COLON IDENTIFIER optional_assignment optional_newline
-|   IDENTIFIER TOKEN_EQUAL expr TOKEN_SEMICOLON optional_newline
+    val_or_var IDENTIFIER TOKEN_COLON IDENTIFIER optional_assignment
+|   IDENTIFIER TOKEN_EQUAL expr TOKEN_SEMICOLON
     ;
 val_or_var: 
     TOKEN_VAL
@@ -171,10 +171,6 @@ logical_expr:
 |   expr TOKEN_GEQ expr 
 |   expr TOKEN_EQ expr 
 |   expr TOKEN_NEQ expr 
-    ;
-optional_newline:
-    %empty
-|   TOKEN_NEWLINE
     ;
 compound_expr:
     if_then_else_expr
@@ -221,11 +217,11 @@ block:
     TOKEN_LBRACE block_expression_list TOKEN_RBRACE
     ;
 block_expression_list:
-    optional_newline
+    %empty
 |   block_expression_list block_expression
     ;
 block_expression:
-    expr TOKEN_SEMICOLON optional_newline
+    expr TOKEN_SEMICOLON
 |   term_decl
     ;
 fun_decl:
@@ -234,7 +230,7 @@ fun_decl:
 param_list:
     %empty
 |   param
-|   param_list optnewline_comma_optnewline param
+|   param_list TOKEN_COMMA param
     ;
 param:
     val_or_var IDENTIFIER TOKEN_COLON IDENTIFIER
@@ -245,14 +241,14 @@ funcall:
 arg_list:
     %empty
 |   expr
-|   arg_list optnewline_comma_optnewline expr
+|   arg_list TOKEN_COMMA expr
     ;
 type_decl:
     TOKEN_TYPE IDENTIFIER TOKEN_EQUAL constructor_list TOKEN_SEMICOLON
     ;
 constructor_list:
-    optional_newline constructor_field
-|   constructor_list optional_newline TOKEN_PIPE constructor_field
+    constructor_field
+|   constructor_list TOKEN_PIPE constructor_field
     ;
 constructor_field: 
     IDENTIFIER record
@@ -263,16 +259,11 @@ record:
     ;
 record_field_list:
     record_field
-|   record_field_list optnewline_comma_optnewline record_field 
+|   record_field_list TOKEN_COMMA record_field 
     ;
 record_field:
     IDENTIFIER TOKEN_COLON IDENTIFIER
     
-optnewline_comma_optnewline:
-    optional_newline TOKEN_COMMA optional_newline
-    ;
-
-
 %%
 
 void yyerror(YYLTYPE* yyllocp, yyscan_t unused,module_t module, const char* msg) {
