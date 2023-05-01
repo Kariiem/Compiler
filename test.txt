@@ -19,6 +19,8 @@ x = y;
 x = true;
 x = "aaa";
 
+x = funcall();
+
 fun fib(val n:int, var p:int, val k:string) int {
     do {
         do{

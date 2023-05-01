@@ -66,11 +66,11 @@ right_brace ("}")
 /* , <comma> */
 /* ; <semicolon> */
 /* &,|,(,),{,}*/
-
+%s SPECIAL
 %%
 
-"module"    {   return TOKEN_MODULE;   }
-"import"    {   return TOKEN_IMPORT;   }
+"module"    {   BEGIN(SPECIAL); return TOKEN_MODULE;   }
+"import"    {   BEGIN(SPECIAL); return TOKEN_IMPORT;   }
 "fun"       {   return TOKEN_FUN;      }
 "val"       {   return TOKEN_VAL;      }
 "var"       {   return TOKEN_VAR;      }
@@ -114,7 +114,7 @@ right_brace ("}")
 {left_brace}    {   return TOKEN_LBRACE;   }
 {right_brace}   {   return TOKEN_RBRACE;   }
 
-";"{newline}+   {   return TOKEN_SEMICOLON;}
+";"             {   return TOKEN_SEMICOLON;}
 {id}            { 
                     yylval->IDENTIFIER = yytext; 
                     return IDENTIFIER;
@@ -132,7 +132,8 @@ right_brace ("}")
                     return STRING;
                 }
 
-{newline}+      { return TOKEN_NEWLINE; }
+<SPECIAL>{newline}+      { BEGIN(INITIAL); return TOKEN_NEWLINE; }
+<INITIAL>{newline}+  /**/
 {white_space}+    /*return TOKEN_WS;*/    
 <<EOF>>         { return YYEOF;     }
 .               { return TOKEN_UNKNOWN; }
