@@ -3,9 +3,9 @@ import numpy
 import iostream
 
 type Bool = MkInt {str:int, kak:KKK}
-          | MkBool{str:int, kak:KKK}
+          | MkBoolstr:int, kak:KKK
           ;
-
+type BOOL = TRUE | FALSE | OTHER;
 val globals_are_bad: Int = 10;
 
 var globals_are_bad: Int = 10;
