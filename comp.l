@@ -21,17 +21,21 @@
         yylloc->last_line = yylineno;                                  \
         yylloc->last_column = yytext + yyleng - strrchr(yytext, '\n'); \
       }
+  
+  #define TAB_WIDTH 4
+  
+  int current_line_indent = 0;
+  int indent_level = 0;
+
 %}
 
 
 newline     ("\n")
-white_space ([[:space:]])
+white_space ([ \t])
 id          ([a-zA-Z_]+[a-zA-Z0-9?!]*)
 integer     ([0-9]+)
 real        ({integer}"."{integer})
 string      (\"[^\"\n]*\")
-left_brace  ("{")
-right_brace ("}")
 
 /* -:-keywords-:- */
 /* module */
@@ -66,8 +70,11 @@ right_brace ("}")
 /* , <comma> */
 /* ; <semicolon> */
 /* &,|,(,),{,}*/
+%x INDENT
 %s SPECIAL
+
 %%
+
 
 "module"    {   BEGIN(SPECIAL); return TOKEN_MODULE;   }
 "import"    {   BEGIN(SPECIAL); return TOKEN_IMPORT;   }
@@ -110,31 +117,65 @@ right_brace ("}")
 "&"         {   return TOKEN_AMP;      }
 "("         {   return TOKEN_LPAREN;   }
 ")"         {   return TOKEN_RPAREN;   }
+"{"         {   return TOKEN_LBRACE;   }
+"}"         {   return TOKEN_RBRACE;   }
+";"         {   return TOKEN_SEMICOLON;}
 
-{left_brace}    {   return TOKEN_LBRACE;   }
-{right_brace}   {   return TOKEN_RBRACE;   }
+{id}        { 
+                yylval->IDENTIFIER = yytext; 
+                return IDENTIFIER;
+            }
+{integer}   { 
+                yylval->INTEGER = yytext;
+                return INTEGER;
+            }
+{real}      {
+                yylval->REAL = yytext;
+                return REAL;
+            }
+{string}    { 
+                yylval->STRING = yytext;
+                return STRING;
+            }
 
-";"             {   return TOKEN_SEMICOLON;}
-{id}            { 
-                    yylval->IDENTIFIER = yytext; 
-                    return IDENTIFIER;
-                }
-{integer}       { 
-                    yylval->INTEGER = yytext;
-                    return INTEGER;
-                }
-{real}          {
-                    yylval->REAL = yytext;
-                    return REAL;
-                }
-{string}        { 
-                    yylval->STRING = yytext;
-                    return STRING;
-                }
+{white_space}+  {}
 
-<SPECIAL>{newline}+      { BEGIN(INITIAL); return TOKEN_NEWLINE; }
-<INITIAL>{newline}+  /**/
-{white_space}+    /*return TOKEN_WS;*/    
-<<EOF>>         { return YYEOF;     }
+
+<SPECIAL>{newline}+ { BEGIN(INITIAL); return TOKEN_NEWLINE; }
 .               { return TOKEN_UNKNOWN; }
+{newline}+      { BEGIN(INDENT); current_line_indent = 0;return TOKEN_NEWLINE;  }
+
+<INDENT>{newline}       { current_line_indent = 0; }
+<INDENT>{white_space}   { ++current_line_indent; }
+
+<INDENT>.               {
+                          yyless(0);//unput(*yytext);
+                          if (current_line_indent > indent_level) {
+                              ++indent_level;
+                              fprintf( yyout, "%s\n", "indent");
+                              return TOKEN_INDENT; 
+                          } else if (current_line_indent < indent_level) {
+                              --indent_level;
+                              fprintf( yyout, "%s\n", "outdent");
+                              return TOKEN_OUTDENT;
+                          } else {
+                             BEGIN(INITIAL);
+                          }
+                        }
+<INITIAL,SPECIAL><<EOF>>         { return YYEOF;     }
+<INDENT><<EOF>> {
+                  // When encountering the end of file, we want to emit an
+                  // outdent for all indents currently left.
+                  fprintf( yyout, "indent level: %d\n",indent_level );
+                  if(indent_level != 0) {
+                    --indent_level;
+                    fprintf( yyout, "%s\n", "outdent");
+                    return TOKEN_OUTDENT;
+                  } else {
+                      return YYEOF;
+                  }
+                  
+                }
+                
+
 %%

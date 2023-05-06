@@ -72,13 +72,14 @@
 %token TOKEN_RPAREN
 %token TOKEN_LBRACE
 %token TOKEN_RBRACE
+%token TOKEN_INDENT
+%token TOKEN_OUTDENT
 
 /*-----------------------------------*/
 /* -:- non-char/whitespace -:- */
 /*-----------------------------------*/
 %token TOKEN_NEWLINE
 %token TOKEN_WS
-%token TOKEN_EOF 
 %token TOKEN_UNKNOWN
 
 /*-----------------------------------*/
@@ -181,10 +182,10 @@ compound_expr:
 |   switch_expr
     ;
 if_then_else_expr:
-    TOKEN_IF expr block TOKEN_ELSE block
+    TOKEN_IF expr TOKEN_COLON TOKEN_NEWLINE  block TOKEN_ELSE TOKEN_COLON TOKEN_NEWLINE block
     ;
 for_loop_expr:
-    TOKEN_FOR IDENTIFIER TOKEN_COLON range block
+    TOKEN_FOR IDENTIFIER TOKEN_COLON range TOKEN_COLON TOKEN_NEWLINE block
     ;
 range:
     TOKEN_LPAREN expr TOKEN_COMMA expr optional_step TOKEN_RPAREN
@@ -194,16 +195,16 @@ optional_step:
 |   TOKEN_COMMA expr
     ;
 while_loop_expr:
-    TOKEN_WHILE expr block
+    TOKEN_WHILE TOKEN_COLON TOKEN_NEWLINE expr block
     ;
 until_loop_expr:
     TOKEN_UNTIL expr block
     ;
 do_block_expr:
-    TOKEN_DO block 
+    TOKEN_DO TOKEN_COLON TOKEN_NEWLINE block 
     ;
 switch_expr:
-    TOKEN_SWITCH expr TOKEN_LBRACE case_expr_list TOKEN_RBRACE
+    TOKEN_SWITCH expr TOKEN_COLON TOKEN_INDENT TOKEN_NEWLINE case_expr_list TOKEN_OUTDENT
     ;
 case_expr_list:
     %empty
@@ -214,18 +215,19 @@ case_expr:
     expr TOKEN_COLON block
     ;
 block:  
-    TOKEN_LBRACE block_expression_list TOKEN_RBRACE
+    TOKEN_INDENT block TOKEN_OUTDENT
+|   TOKEN_INDENT block_expression_list TOKEN_OUTDENT
     ;
 block_expression_list:
     %empty
 |   block_expression_list block_expression
     ;
 block_expression:
-    expr TOKEN_SEMICOLON
+    expr TOKEN_NEWLINE
 |   term_decl
     ;
 fun_decl:
-    TOKEN_FUN IDENTIFIER TOKEN_LPAREN param_list TOKEN_RPAREN IDENTIFIER block
+    TOKEN_FUN IDENTIFIER TOKEN_LPAREN param_list TOKEN_RPAREN IDENTIFIER TOKEN_COLON TOKEN_NEWLINE block
     ;
 param_list:
     %empty
@@ -267,9 +269,7 @@ record_field:
 %%
 
 void yyerror(YYLTYPE* yyllocp, yyscan_t unused,module_t module, const char* msg) {
-  
-  char token_name[255];
-  
+    
   fprintf(stderr, "[%d:%d]: %s\n",
                   yyllocp->first_line, yyllocp->first_column, msg);
 }

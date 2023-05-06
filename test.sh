@@ -2,4 +2,4 @@
 
 make clean
 make
-./comp test.txt
+./comp test.txt "$1"
