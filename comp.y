@@ -140,7 +140,7 @@ optional_assignment:
 |   TOKEN_NEWLINE
     ;
 statement:
-    expr
+    expr TOKEN_NEWLINE
 |   compound_statement
 
     ;
@@ -227,8 +227,7 @@ block_expression_list:
 |   block_expression_list block_expression
     ;
 block_expression:
-    expr TOKEN_NEWLINE
-|   compound_statement
+    statement
 |   term_decl
     ;
 fun_decl:
@@ -252,6 +251,11 @@ arg_list:
     ;
 type_decl:
     TOKEN_TYPE IDENTIFIER TOKEN_EQUAL constructor_list TOKEN_NEWLINE
+|   TOKEN_TYPE IDENTIFIER TOKEN_EQUAL TOKEN_NEWLINE block_constructor_list
+    ;
+block_constructor_list:
+    TOKEN_INDENT constructor_list TOKEN_OUTDENT
+|   TOKEN_INDENT block_constructor_list TOKEN_OUTDENT
     ;
 constructor_list:
     constructor_field

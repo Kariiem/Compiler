@@ -2,9 +2,21 @@ module Main
 import Main
 
 
+type BOOL = TRUE
+
 fun fib() int:
   do:
     val x:int = 1
     do:
         val x:int = 1
+        1
+        x+y
+
+fun fib() int:
+  do:
+    val x:int = 1
+    do:
+        val x:int = 1
+        1
+        x+y
 
