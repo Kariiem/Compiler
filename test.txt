@@ -1,9 +1,10 @@
 module Main
 import Main
 
-fun fib() int: 
- x = 1
- do:
-  val x :int =1
 
+fun fib() int:
+  do:
+    val x:int = 1
+    do:
+        val x:int = 1
 

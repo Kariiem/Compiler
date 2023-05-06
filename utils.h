@@ -26,12 +26,12 @@
   } while (0)
 
 #ifdef DEBUG
-#define DEBUG_PRINT(x, fmt)                                                    \
-  do {                                                                         \
-    printf(x, fmt);                                                            \
-  } while (0)
+  #define DEBUG_PRINT(x, fmt)                                                    \
+    do {                                                                         \
+      printf(x, fmt);                                                            \
+    } while (0)
 #else
-#define DEBUG_PRINT(x) UNIMPLEMENTED(x)
+  #define DEBUG_PRINT(x) UNIMPLEMENTED(x)
 #endif
 
 #define die(x)

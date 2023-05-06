@@ -129,22 +129,26 @@ import_decl:
     ;
 term_decl: 
     val_or_var IDENTIFIER TOKEN_COLON IDENTIFIER optional_assignment
-|   IDENTIFIER TOKEN_EQUAL expr TOKEN_SEMICOLON
+|   IDENTIFIER TOKEN_EQUAL expr TOKEN_NEWLINE
     ;
 val_or_var: 
     TOKEN_VAL
 |   TOKEN_VAR
     ;
 optional_assignment:
-    TOKEN_EQUAL expr TOKEN_SEMICOLON
-|   TOKEN_SEMICOLON
+    TOKEN_EQUAL expr TOKEN_NEWLINE
+|   TOKEN_NEWLINE
+    ;
+statement:
+    expr
+|   compound_statement
+
     ;
 expr:
     atomic_value
 |   arithmetic_expr
 |   logical_expr
 |   funcall
-|   compound_expr
 |   TOKEN_LPAREN expr TOKEN_RPAREN
     ;
 atomic_value:
@@ -173,7 +177,7 @@ logical_expr:
 |   expr TOKEN_EQ expr 
 |   expr TOKEN_NEQ expr 
     ;
-compound_expr:
+compound_statement:
     if_then_else_expr
 |   for_loop_expr
 |   while_loop_expr
@@ -195,7 +199,7 @@ optional_step:
 |   TOKEN_COMMA expr
     ;
 while_loop_expr:
-    TOKEN_WHILE TOKEN_COLON TOKEN_NEWLINE expr block
+    TOKEN_WHILE expr TOKEN_COLON TOKEN_NEWLINE  block
     ;
 until_loop_expr:
     TOKEN_UNTIL expr block
@@ -224,6 +228,7 @@ block_expression_list:
     ;
 block_expression:
     expr TOKEN_NEWLINE
+|   compound_statement
 |   term_decl
     ;
 fun_decl:
@@ -246,7 +251,7 @@ arg_list:
 |   arg_list TOKEN_COMMA expr
     ;
 type_decl:
-    TOKEN_TYPE IDENTIFIER TOKEN_EQUAL constructor_list TOKEN_SEMICOLON
+    TOKEN_TYPE IDENTIFIER TOKEN_EQUAL constructor_list TOKEN_NEWLINE
     ;
 constructor_list:
     constructor_field

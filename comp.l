@@ -70,14 +70,49 @@ string      (\"[^\"\n]*\")
 /* , <comma> */
 /* ; <semicolon> */
 /* &,|,(,),{,}*/
+
+/*
+
+*/
 %x INDENT
-%s SPECIAL
 
 %%
 
 
-"module"    {   BEGIN(SPECIAL); return TOKEN_MODULE;   }
-"import"    {   BEGIN(SPECIAL); return TOKEN_IMPORT;   }
+<INDENT>{
+  {newline}       { current_line_indent = 0; }
+  {white_space}   { ++current_line_indent; }
+  .               {
+                    yyless(0);//unput(*yytext);
+                    if (current_line_indent > indent_level) {
+                        ++indent_level;
+                        fprintf( yyout, "%s\n", "<indent>");
+                        return TOKEN_INDENT; 
+                    } else if (current_line_indent < indent_level) {
+                        --indent_level;
+                        fprintf( yyout, "%s\n", "<outdent>");
+                        return TOKEN_OUTDENT;
+                    } else {
+                       BEGIN(INITIAL);
+                    }
+                  }
+  <<EOF>>         {
+                      /* fprintf( yyout, "indentation-level [before EOF]: %d\n",indent_level ); */
+                    if( indent_level != 0) {
+                      --indent_level;
+                      /* fprintf( yyout, "indentation-level [after EOF]: %d\n",indent_level ); */
+                      fprintf( yyout, "%s\n", "<outdent>");
+                      
+                      return TOKEN_OUTDENT;
+                    } else {
+                        return YYEOF;
+                    }          
+                  }
+  
+}
+
+"module"    {   return TOKEN_MODULE;   }
+"import"    {   return TOKEN_IMPORT;   }
 "fun"       {   return TOKEN_FUN;      }
 "val"       {   return TOKEN_VAL;      }
 "var"       {   return TOKEN_VAR;      }
@@ -138,44 +173,9 @@ string      (\"[^\"\n]*\")
                 return STRING;
             }
 
-{white_space}+  {}
-
-
-<SPECIAL>{newline}+ { BEGIN(INITIAL); return TOKEN_NEWLINE; }
-.               { return TOKEN_UNKNOWN; }
-{newline}+      { BEGIN(INDENT); current_line_indent = 0;return TOKEN_NEWLINE;  }
-
-<INDENT>{newline}       { current_line_indent = 0; }
-<INDENT>{white_space}   { ++current_line_indent; }
-
-<INDENT>.               {
-                          yyless(0);//unput(*yytext);
-                          if (current_line_indent > indent_level) {
-                              ++indent_level;
-                              fprintf( yyout, "%s\n", "indent");
-                              return TOKEN_INDENT; 
-                          } else if (current_line_indent < indent_level) {
-                              --indent_level;
-                              fprintf( yyout, "%s\n", "outdent");
-                              return TOKEN_OUTDENT;
-                          } else {
-                             BEGIN(INITIAL);
-                          }
-                        }
-<INITIAL,SPECIAL><<EOF>>         { return YYEOF;     }
-<INDENT><<EOF>> {
-                  // When encountering the end of file, we want to emit an
-                  // outdent for all indents currently left.
-                  fprintf( yyout, "indent level: %d\n",indent_level );
-                  if(indent_level != 0) {
-                    --indent_level;
-                    fprintf( yyout, "%s\n", "outdent");
-                    return TOKEN_OUTDENT;
-                  } else {
-                      return YYEOF;
-                  }
-                  
-                }
-                
+{white_space}+  /* ignore whitespace*/
+{newline}       { BEGIN(INDENT); current_line_indent = 0; return TOKEN_NEWLINE; }
+.               { return TOKEN_UNKNOWN; }   
+<<EOF>>         { return YYEOF;  }
 
 %%
