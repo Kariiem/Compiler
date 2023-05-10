@@ -1,6 +1,6 @@
 #ifndef __AST_NODE_FUNCALL__
 #define __AST_NODE_FUNCALL__
-#include "../datastructres/cvector.h"
+#include "../datastructures/cvector.h"
 
 typedef struct ast_expr_t ast_expr_t;
 typedef struct ast_fun_call_t ast_fun_call_t;

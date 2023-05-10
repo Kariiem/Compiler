@@ -1,7 +1,7 @@
 #ifndef __AST_NODE_EXPR__
 #define __AST_NODE_EXPR__
 
-#include "../datastructres/cvector.h"
+#include "../datastructures/cvector.h"
 #include "bin_expr.h"
 #include "block.h"
 #include "do.h"

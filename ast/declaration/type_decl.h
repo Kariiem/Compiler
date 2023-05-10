@@ -1,7 +1,7 @@
 #ifndef __AST_NODE_TYPE_DECL__
 #define __AST_NODE_TYPE_DECL__
 
-#include "../datastructres/cvector.h"
+#include "../datastructures/cvector.h"
 #include "constructors.h"
 
 typedef struct ast_type_decl_t ast_type_decl_t;

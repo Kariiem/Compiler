@@ -1,7 +1,7 @@
 #ifndef __AST_NODE_SWITCH__
 #define __AST_NODE_SWITCH__
 
-#include "../datastructres/cvector.h"
+#include "../datastructures/cvector.h"
 #include "block.h"
 #include "case.h"
 typedef struct ast_expr_t ast_expr_t;

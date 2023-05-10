@@ -1,7 +1,7 @@
 #ifndef __AST_NODE_CASE__
 #define __AST_NODE_CASE__
 
-#include "../datastructres/cvector.h"
+#include "../datastructures/cvector.h"
 #include "block.h"
 typedef struct ast_expr_t ast_expr_t;
 typedef struct ast_case_t ast_case_t;

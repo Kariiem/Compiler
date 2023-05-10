@@ -1,7 +1,7 @@
 #ifndef __AST_NODE_BLOCK__
 #define __AST_NODE_BLOCK__
 
-#include "../datastructres/cvector.h"
+#include "../datastructures/cvector.h"
 
 typedef struct ast_term_decl_t ast_term_decl_t;
 typedef struct ast_expr_t ast_expr_t;
