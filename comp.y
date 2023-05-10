@@ -8,7 +8,7 @@
 } 
 %code requires {
   typedef void* yyscan_t;
-  #include "ast.h"
+  #include "ast/ast.h"
 }
 %code {
   int yylex(YYSTYPE* yylvalp, YYLTYPE* yyllocp, yyscan_t scanner,module_t module);
@@ -117,27 +117,33 @@ top_level_decl_list:
     %empty
 |   top_level_decl_list top_level_decl
     ;
+
 top_level_decl:
     import_decl
 |   type_decl
 |   term_decl  
 |   fun_decl
     ;
+
 import_decl:
     TOKEN_IMPORT IDENTIFIER TOKEN_NEWLINE
     ;
+
 term_decl: 
     val_or_var IDENTIFIER TOKEN_COLON IDENTIFIER optional_assignment
 |   IDENTIFIER TOKEN_EQUAL expr TOKEN_SEMICOLON
     ;
+
 val_or_var: 
     TOKEN_VAL
 |   TOKEN_VAR
     ;
+
 optional_assignment:
     TOKEN_EQUAL expr TOKEN_SEMICOLON
 |   TOKEN_SEMICOLON
     ;
+
 expr:
     atomic_value
 |   arithmetic_expr
@@ -146,6 +152,7 @@ expr:
 |   compound_expr
 |   TOKEN_LPAREN expr TOKEN_RPAREN
     ;
+
 atomic_value:
     IDENTIFIER
 |   INTEGER
@@ -153,6 +160,7 @@ atomic_value:
 |   BOOL
 |   STRING
     ;
+
 arithmetic_expr:
     expr TOKEN_PLUS expr
 |   expr TOKEN_MINUS expr
@@ -161,6 +169,7 @@ arithmetic_expr:
 |   expr TOKEN_MOD expr
 |   expr TOKEN_EXP expr
     ;
+
 logical_expr:
     TOKEN_NOT expr
 |   expr TOKEN_AND expr
@@ -172,6 +181,7 @@ logical_expr:
 |   expr TOKEN_EQ expr 
 |   expr TOKEN_NEQ expr 
     ;
+
 compound_expr:
     if_then_else_expr
 |   for_loop_expr
@@ -180,87 +190,111 @@ compound_expr:
 |   do_block_expr
 |   switch_expr
     ;
+
 if_then_else_expr:
     TOKEN_IF expr block TOKEN_ELSE block
     ;
+
 for_loop_expr:
     TOKEN_FOR IDENTIFIER TOKEN_COLON range block
     ;
+
 range:
     TOKEN_LPAREN expr TOKEN_COMMA expr optional_step TOKEN_RPAREN
     ;
+
 optional_step:
     %empty
 |   TOKEN_COMMA expr
     ;
+
 while_loop_expr:
     TOKEN_WHILE expr block
     ;
+
 until_loop_expr:
     TOKEN_UNTIL expr block
     ;
+
 do_block_expr:
     TOKEN_DO block 
     ;
+
 switch_expr:
     TOKEN_SWITCH expr TOKEN_LBRACE case_expr_list TOKEN_RBRACE
     ;
+
 case_expr_list:
     %empty
-|   TOKEN_ELSE TOKEN_COLON block
-|   case_expr case_expr_list
+|   case_expr_list case_expr
     ;
+
 case_expr:
-    expr TOKEN_COLON block
+    TOKEN_ELSE TOKEN_COLON block
+|   expr TOKEN_COLON block
     ;
+
 block:  
     TOKEN_LBRACE block_expression_list TOKEN_RBRACE
     ;
+
 block_expression_list:
     %empty
 |   block_expression_list block_expression
     ;
+
 block_expression:
     expr TOKEN_SEMICOLON
 |   term_decl
     ;
+
 fun_decl:
     TOKEN_FUN IDENTIFIER TOKEN_LPAREN param_list TOKEN_RPAREN IDENTIFIER block
     ;
+
 param_list:
     %empty
 |   param
 |   param_list TOKEN_COMMA param
     ;
+
 param:
     val_or_var IDENTIFIER TOKEN_COLON IDENTIFIER
     ;
+
 funcall:
     IDENTIFIER TOKEN_LPAREN arg_list TOKEN_RPAREN
     ;
+
 arg_list:
     %empty
 |   expr
 |   arg_list TOKEN_COMMA expr
     ;
+    
 type_decl:
     TOKEN_TYPE IDENTIFIER TOKEN_EQUAL constructor_list TOKEN_SEMICOLON
     ;
+
 constructor_list:
     constructor_field
 |   constructor_list TOKEN_PIPE constructor_field
     ;
+
 constructor_field: 
     IDENTIFIER record
     ;
+
 record:
     %empty
 |   TOKEN_LBRACE record_field_list TOKEN_RBRACE
     ;
+
 record_field_list:
     record_field
 |   record_field_list TOKEN_COMMA record_field 
     ;
+    
 record_field:
     IDENTIFIER TOKEN_COLON IDENTIFIER
     
