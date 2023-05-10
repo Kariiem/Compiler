@@ -1,15 +1,15 @@
 #ifndef __AST_NODE_EXPR__
 #define __AST_NODE_EXPR__
 
-#include "datastructres/cvector.h"
-#include "expression/bin_expr.h"
-#include "expression/block.h"
-#include "expression/do.h"
-#include "expression/for.h"
-#include "expression/funcall.h"
-#include "expression/if.h"
-#include "expression/switch.h"
-#include "expression/while.h"
+#include "../datastructres/cvector.h"
+#include "bin_expr.h"
+#include "block.h"
+#include "do.h"
+#include "for.h"
+#include "funcall.h"
+#include "if.h"
+#include "switch.h"
+#include "while.h"
 #include <gmp.h>
 #include <mpfr.h>
 #include <stdint.h>
