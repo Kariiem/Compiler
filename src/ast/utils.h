@@ -1,6 +1,7 @@
 #ifndef __UTILS__
 #define __UTILS__
-
+#include "tbassert.h"
+#include <stdio.h>
 // source: https://stackoverflow.com/a/23657072
 #define RED "\x1B[7;40;31m"
 #define GRN "\x1B[7;40;32m"
@@ -13,7 +14,7 @@
 
 #define UNIMPLEMENTED(x)                                                       \
   while (0) {                                                                  \
-    (void)(x);                                                                       \
+    (void)(x);                                                                 \
   }
 
 #define TODO(x)                                                                \
@@ -24,15 +25,5 @@
             (x), __func__, __FILE__, __LINE__);                                \
     exit(1);                                                                   \
   } while (0)
-
-#ifdef DEBUG
-#define DEBUG_PRINT(x, fmt)                                                    \
-  do {                                                                         \
-    printf(x, fmt);                                                            \
-  } while (0)
-#else
-#define DEBUG_PRINT(x) UNIMPLEMENTED(x)
-#endif
-
-#define die(x)
+#define free_simple(ptr) ((ptr) == NULL ? false : free(ptr), true)
 #endif //__UTILS__

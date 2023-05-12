@@ -8,7 +8,7 @@ comp.tab.c: comp.y
 #-Wcounterexamples 
 
 comp: main.c comp.tab.c comp.lex.c comp.h
-	$(CC) -o $@ -Wall -ggdb $(filter %.c,$^)
+	$(CC) -o $@  -Wall -ggdb $(filter %.c,$^)
 
 clean:
 	rm -f comp comp.tab.c comp.lex.c comp.tab.h comp.lex.h main

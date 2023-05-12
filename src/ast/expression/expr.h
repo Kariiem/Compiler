@@ -12,11 +12,10 @@
 #include "while.h"
 #include <gmp.h>
 #include <mpfr.h>
+#include <stdbool.h>
 #include <stdint.h>
 
 typedef struct ast_expr_t ast_expr_t;
-
-
 
 struct ast_expr_t {
   enum {
@@ -34,8 +33,7 @@ struct ast_expr_t {
     EXPR_MUL,
     EXPR_DIV,
     EXPR_MOD,
-    EXPR_EXPR,
-    EXPR_NOT,
+    EXPR_EXP,
     EXPR_AND,
     EXPR_OR,
     EXPR_LT,
@@ -44,6 +42,7 @@ struct ast_expr_t {
     EXPR_GEQ,
     EXPR_EQ,
     EXPR_NEQ,
+    EXPR_NOT,
     // function call
     EXPR_FUNCALL,
     // compound expressions
@@ -63,14 +62,17 @@ struct ast_expr_t {
     mpfr_t real;
     int64_t boolean;
     ast_bin_expr_t *binary_expr;
-    ast_fun_call_t *funcall;
+    ast_funcall_t *funcall;
     ast_if_t *if_;
     ast_for_t *for_;
     ast_while_t *while_;
     ast_switch_t *switch_;
-
+    ast_do_t *do_;
+    ast_expr_t *not_;
   } value;
 };
 
+ast_expr_t *create_ast_expr_t(int type, void *value);
+bool free_ast_expr_t(ast_expr_t **expr_ptr);
 
 #endif // __AST_NODE_EXPR__

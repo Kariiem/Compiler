@@ -11,7 +11,7 @@ struct ast_top_level_decl_t {
     ast_import_decl_t* import;
     ast_type_decl_t* type_name;
     ast_term_decl_t* term;
-    ast_fun_decl_t* fun;
+    ast_fundecl_t* fun;
   } decl;
 };
 #endif // __AST_NODE_TOP_LEVEL_DECL__
