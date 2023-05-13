@@ -12,6 +12,6 @@ struct ast_case_t {
   ast_block_t *body;
 };
 ast_case_t *create_ast_case_t(ast_expr_t *expr, ast_block_t *body);
-bool free_ast_case_t(ast_case_t **case_ptr);
+void free_ast_case_t(ast_case_t **case_ptr);
 
 #endif // __AST_NODE_CASE__

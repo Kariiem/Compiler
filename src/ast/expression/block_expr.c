@@ -6,6 +6,8 @@ ast_block_expr_t *create_ast_block_expr_t(int type, void *value) {
   ast_block_expr_t *block_expr = calloc(1, sizeof(ast_block_expr_t));
   block_expr->type = type;
   switch (type) {
+  default:
+    DEBUG_ASSERT(false, "Unkown type %d", type);
   case EXPR: {
     block_expr->value.expr = value;
     break;
@@ -18,17 +20,16 @@ ast_block_expr_t *create_ast_block_expr_t(int type, void *value) {
   return block_expr;
 }
 
-bool free_ast_block_expr_t(ast_block_expr_t **block_expr_ptr) {
+void free_ast_block_expr_t(ast_block_expr_t **block_expr_ptr) {
   DEBUG_EPRINTF("free block_expr_t");
   ast_block_expr_t *block_expr = *block_expr_ptr;
-  if (block_expr == NULL)
-    return false;
+  DEBUG_ASSERT(block_expr, "block_expr is NULL");
   switch (block_expr->type) {
   default:
     DEBUG_ASSERT(false, "Unkown type %d", block_expr->type);
 
   EXPR:
-    DEBUG_ASSERT(free_ast_expr_t(&block_expr->value.expr), "");
+    free_ast_expr_t(&block_expr->value.expr);
     break;
   DECL:
     TODO("free_ast_term_decl_t UNIMPLEMENTED");
@@ -36,5 +37,4 @@ bool free_ast_block_expr_t(ast_block_expr_t **block_expr_ptr) {
   }
   free(block_expr);
   *block_expr_ptr = NULL;
-  return true;
 }

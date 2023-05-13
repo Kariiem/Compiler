@@ -15,5 +15,5 @@ struct ast_switch_t {
 };
 ast_switch_t *create_ast_switch_t(ast_expr_t *expr,
                                   vtype(ast_case_t *) cases);
-bool free_ast_switch_t(ast_switch_t **switch_ptr);
+void free_ast_switch_t(ast_switch_t **switch_ptr);
 #endif // __AST_NODE_SWITCH__

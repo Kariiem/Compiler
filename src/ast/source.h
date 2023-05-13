@@ -15,5 +15,5 @@ ast_source_t *create_ast_source_t(ast_module_decl_t *module,
                                   vtype(ast_top_level_decl_t *)
                                       decl_list);
 
-bool free_ast_source_t(ast_source_t*source);
+void free_ast_source_t(ast_source_t**source);
 #endif // __AST_NODE_SOURCE__

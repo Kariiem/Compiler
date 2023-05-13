@@ -86,18 +86,17 @@ ast_expr_t *create_ast_expr_t(int type, void *value) {
     break;
   }
 }
-bool free_ast_expr_t(ast_expr_t **expr_ptr) {
+void free_ast_expr_t(ast_expr_t **expr_ptr) {
   DEBUG_EPRINTF("free ast_expr_t");
   ast_expr_t *expr = *expr_ptr;
-  if (expr == NULL)
-    return false;
+  DEBUG_ASSERT(expr, "expr is NULL");
 
   switch (expr->type) {
   default:
     DEBUG_ASSERT(false, "Unkown type %d", expr->type);
 
   EXPR_IDENTIFIER:
-    free(expr->value.identifier);
+    FREE_ATOM(expr->value.identifier);
     break;
   EXPR_INTEGER:
     mpz_clear(expr->value.arb_integer);
@@ -112,7 +111,7 @@ bool free_ast_expr_t(ast_expr_t **expr_ptr) {
   EXPR_BOOL:
     break;
   EXPR_STRING:
-    free(expr->value.string);
+    FREE_ATOM(expr->value.string);
     break;
   // binary expressions
   EXPR_ADD:
@@ -160,5 +159,4 @@ bool free_ast_expr_t(ast_expr_t **expr_ptr) {
   }
   free(expr);
   *expr_ptr = NULL;
-  return true;
 }

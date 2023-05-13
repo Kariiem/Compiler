@@ -1,14 +1,15 @@
 #ifndef __AST_NODES__
 #define __AST_NODES__
-#include <stdint.h>
 
+#include "declaration/top_level_decl.h"
+#include "expression/expr.h"
+#include "module_decl.h"
+#include "source.h"
 // forward declarations
 typedef void *scanner_t;
-typedef struct module *module_t;
-typedef struct ast_module *ast_module_t;
-typedef struct ast_top_level_decl *ast_top_level_decl_t;
-typedef struct ast_atom *ast_atom_t;
 
 //===================================================================
 
 #endif //__AST_NODES__
+
+#include <stdint.h>

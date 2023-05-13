@@ -25,5 +25,10 @@
             (x), __func__, __FILE__, __LINE__);                                \
     exit(1);                                                                   \
   } while (0)
-#define free_simple(ptr) ((ptr) == NULL ? false : free(ptr), true)
+#define FREE_ATOM(ptr)                                                         \
+  do {                                                                         \
+    DEBUG_ASSERT(ptr, #ptr "is NULL");                                         \
+    free((void *)ptr);                                                         \
+    (ptr) = NULL;                                                              \
+  } while (0)
 #endif //__UTILS__

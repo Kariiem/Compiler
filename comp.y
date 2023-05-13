@@ -1,18 +1,18 @@
 %define api.pure full
 %locations
 %param {yyscan_t scanner}
-%param {module_t module}
+%param {ast_source_t** source_module}
 
 %code top {
   #include <stdio.h>
 } 
 %code requires {
   typedef void* yyscan_t;
-  #include "ast/ast.h"
+  #include "src/ast/ast.h"
 }
 %code {
-  int yylex(YYSTYPE* yylvalp, YYLTYPE* yyllocp, yyscan_t scanner,module_t module);
-  void yyerror(YYLTYPE* yyllocp, yyscan_t unused, module_t module, const char* msg);
+  int yylex(YYSTYPE* yylvalp, YYLTYPE* yyllocp, yyscan_t scanner,ast_source_t** source_module);
+  void yyerror(YYLTYPE* yyllocp, yyscan_t unused, ast_source_t **source_module, const char* msg);
 }
 
 /* Generate YYSTYPE from these types: */
@@ -92,12 +92,8 @@
 /*-----------------------------------*/
 
 /* module Main */
-//%nterm <ast_module_decl>    module_decl
-/* type bool {true, false} */
-/* fun fib(n :int) {} */
-/* var size = 0; */
-/* val pi = 3.14; */
-//%nterm <ast_top_level_decl> top_level_decl_list
+%nterm <ast_module_decl_t*>    module_decl
+%nterm <ast_top_level_decl_t*> top_level_decl_list
 
 %left TOKEN_PLUS TOKEN_MINUS TOKEN_MULT TOKEN_DIV TOKEN_MOD
 %left TOKEN_AND TOKEN_OR
@@ -110,7 +106,7 @@ source:
     ;
 
 module_decl: 
-    TOKEN_MODULE IDENTIFIER TOKEN_NEWLINE
+    TOKEN_MODULE IDENTIFIER TOKEN_NEWLINE   {$$=create_ast_module_decl_t($2);}
     ;
 
 top_level_decl_list: 
@@ -300,7 +296,7 @@ record_field:
     
 %%
 
-void yyerror(YYLTYPE* yyllocp, yyscan_t unused,module_t module, const char* msg) {
+void yyerror(YYLTYPE* yyllocp, yyscan_t unused,ast_source_t **source_module, const char* msg) {
   
   char token_name[255];
   

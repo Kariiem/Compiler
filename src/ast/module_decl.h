@@ -8,5 +8,5 @@ struct ast_module_decl_t {
 
 ast_module_decl_t *create_ast_module_decl_t(char const *module_name);
 
-bool free_ast_module_decl_t(ast_module_decl_t*module);
+void free_ast_module_decl_t(ast_module_decl_t*module);
 #endif // __AST_NODE_MODULE__

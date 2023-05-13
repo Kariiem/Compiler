@@ -16,6 +16,6 @@ struct ast_block_expr_t {
 };
 
 ast_block_expr_t *create_ast_block_expr_t(int type, void *value);
-bool free_ast_block_expr_t(ast_block_expr_t **block_expr_ptr);
+void free_ast_block_expr_t(ast_block_expr_t **block_expr_ptr);
 
 #endif // __AST_NODE_BLOCK_EXPR__

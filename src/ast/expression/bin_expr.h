@@ -14,5 +14,5 @@ struct ast_bin_expr_t {
 
 ast_bin_expr_t *create_ast_bin_expr_t(ast_expr_t *left, ast_expr_t *right,
                                       int64_t op);
-bool free_ast_bin_expr_t(ast_bin_expr_t **bin_expr_ptr);
+void free_ast_bin_expr_t(ast_bin_expr_t **bin_expr_ptr);
 #endif // __AST_NODE_BIN_EXP__

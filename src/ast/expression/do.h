@@ -11,6 +11,6 @@ struct ast_do_t {
 };
 
 ast_do_t *create_ast_do_t(ast_block_t *body);
-bool free_ast_do_t(ast_do_t **do_ptr);
+void free_ast_do_t(ast_do_t **do_ptr);
 
 #endif // __AST_NODE_DO__

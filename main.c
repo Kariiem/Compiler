@@ -1,4 +1,6 @@
 #include "comp.h"
+#include "src/ast/ast.h"
+#include "src/ast/source.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,7 +12,7 @@ static int yydebug;
 int main(int argc, char *argv[]) {
   yyscan_t scanner;
   yylex_init(&scanner);
-  module_t module = {0};
+  ast_source_t *source_module = calloc(1,sizeof(ast_source_t));
   FILE *fptr;
 
   --argc, ++argv;
@@ -36,8 +38,9 @@ int main(int argc, char *argv[]) {
     break;
   } while (1);
 
-  yyparse(scanner, module);
+  yyparse(scanner, &source_module);
   yylex_destroy(scanner);
+  free_ast_source_t(&source_module);
 
   return 0;
 }

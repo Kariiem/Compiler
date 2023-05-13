@@ -13,6 +13,6 @@ struct ast_block_t {
 
 ast_block_t *create_ast_block_t(vtype(ast_block_expr_t *)
                                     block_expr_list);
-bool free_ast_block_t(ast_block_t **block_ptr);
+void free_ast_block_t(ast_block_t **block_ptr);
 
 #endif // __AST_NODE_BLOCK__

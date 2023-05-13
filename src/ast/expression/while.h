@@ -11,5 +11,5 @@ struct ast_while_t {
 };
 
 ast_while_t *create_ast_while_t(ast_expr_t *cond, ast_block_t *body);
-bool free_ast_while_t(ast_while_t **while_ptr);
+void free_ast_while_t(ast_while_t **while_ptr);
 #endif // __AST_NODE_WHILE__

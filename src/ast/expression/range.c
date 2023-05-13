@@ -9,16 +9,14 @@ ast_range_t *create_ast_range_t(ast_expr_t *start, ast_expr_t *end,
   range->step = step;
   return range;
 }
-bool free_ast_range_t(ast_range_t **range_ptr) {
+void free_ast_range_t(ast_range_t **range_ptr) {
   DEBUG_EPRINTF("free ast_range_t");
   ast_range_t *range = *range_ptr;
-  if (range == NULL)
-    return false;
-  DEBUG_ASSERT(free_ast_expr_t(&range->start), "");
-  DEBUG_ASSERT(free_ast_expr_t(&range->end), "");
+  DEBUG_ASSERT(range, "range is NULL");
+  free_ast_expr_t(&range->start);
+  free_ast_expr_t(&range->end);
   if (range->step)
-    DEBUG_ASSERT(free_ast_expr_t(&range->step), "");
+    free_ast_expr_t(&range->step);
   free(range);
   *range_ptr = NULL;
-  return true;
 }
