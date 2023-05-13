@@ -119,6 +119,7 @@ union YYSTYPE
 {
   ast_module_decl_t* module_decl;          /* module_decl  */
   ast_top_level_decl_t* top_level_decl_list; /* top_level_decl_list  */
+  vtype(ast_expr_t*) arg_list;
   char const* IDENTIFIER;                  /* IDENTIFIER  */
   char const* INTEGER;                     /* INTEGER  */
   char const* REAL;                        /* REAL  */

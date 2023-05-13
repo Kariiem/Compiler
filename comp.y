@@ -94,6 +94,8 @@
 /* module Main */
 %nterm <ast_module_decl_t*>    module_decl
 %nterm <ast_top_level_decl_t*> top_level_decl_list
+%nterm <vtype(ast_expr_t*)> arg_list
+%nterm <ast_expr_t*> expr
 
 %left TOKEN_PLUS TOKEN_MINUS TOKEN_MULT TOKEN_DIV TOKEN_MOD
 %left TOKEN_AND TOKEN_OR
@@ -263,9 +265,9 @@ funcall:
     ;
 
 arg_list:
-    %empty
-|   expr
-|   arg_list TOKEN_COMMA expr
+    %empty              {$$=NULL;}
+|   expr                {cvector_push_back($$, $1);}
+|   arg_list TOKEN_COMMA expr{$$=$1;cvector_push_back($1,$2);}
     ;
     
 type_decl:
