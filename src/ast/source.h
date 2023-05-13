@@ -8,11 +8,11 @@
 typedef struct ast_source_t ast_source_t;
 struct ast_source_t {
   ast_module_decl_t *module;
-  cvector_vector_type(ast_top_level_decl_t *) decl_list;
+  vtype(ast_top_level_decl_t *) decl_list;
 };
 
 ast_source_t *create_ast_source_t(ast_module_decl_t *module,
-                                  cvector_vector_type(ast_top_level_decl_t *)
+                                  vtype(ast_top_level_decl_t *)
                                       decl_list);
 
 bool free_ast_source_t(ast_source_t*source);

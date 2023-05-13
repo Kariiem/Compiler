@@ -9,4 +9,6 @@
     cvector_free((vec));                                                       \
     (vec) = NULL;                                                              \
   } while (0)
+
+#define vtype(type) cvector_vector_type(type)
 #endif // __CVECTOR_UTILS__

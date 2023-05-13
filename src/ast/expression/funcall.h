@@ -7,10 +7,10 @@ typedef struct ast_funcall_t ast_funcall_t;
 
 struct ast_funcall_t {
   char const *fun_name;
-  cvector_vector_type(ast_expr_t *) args;
+  vtype(ast_expr_t *) args;
 };
 ast_funcall_t *create_ast_funcall_t(char const *fun_name,
-                                    cvector_vector_type(ast_expr_t *) args);
+                                    vtype(ast_expr_t *) args);
 bool free_ast_funcall_t(ast_funcall_t **funcall_ptr);
 
 #endif // __AST_NODE_FUNCALL__

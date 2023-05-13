@@ -2,7 +2,7 @@
 #include "../utils.h"
 #include "expr.h"
 ast_funcall_t *create_ast_funcall_t(char const *fun_name,
-                                    cvector_vector_type(ast_expr_t *) args) {
+                                    vtype(ast_expr_t *) args) {
   ast_funcall_t *funcall = calloc(1, sizeof(ast_funcall_t));
   funcall->fun_name = fun_name;
   funcall->args = args;

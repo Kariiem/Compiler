@@ -8,10 +8,10 @@
 typedef struct ast_block_t ast_block_t;
 
 struct ast_block_t {
-  cvector_vector_type(ast_block_expr_t *) block_expr_list;
+  vtype(ast_block_expr_t *) block_expr_list;
 };
 
-ast_block_t *create_ast_block_t(cvector_vector_type(ast_block_expr_t *)
+ast_block_t *create_ast_block_t(vtype(ast_block_expr_t *)
                                     block_expr_list);
 bool free_ast_block_t(ast_block_t **block_ptr);
 

@@ -3,7 +3,7 @@
 #include "case.h"
 #include "expr.h"
 ast_switch_t *create_ast_switch_t(ast_expr_t *expr,
-                                  cvector_vector_type(ast_case_t *) cases) {
+                                  vtype(ast_case_t *) cases) {
   ast_switch_t *switch_ = calloc(1, sizeof(ast_switch_t));
   switch_->enum_expr = expr;
   switch_->cases = cases;

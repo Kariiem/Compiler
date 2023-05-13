@@ -5,7 +5,7 @@
 typedef struct ast_fundecl_t ast_fundecl_t;
 struct ast_fundecl_t {
   char const *fun_name;
-  cvector_vector_type(ast_fun_param_t *) param_list;
+  vtype(ast_fun_param_t *) param_list;
   char const *return_type_name;
   ast_block_t *body;
 };
