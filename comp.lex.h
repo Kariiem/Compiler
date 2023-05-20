@@ -2,9 +2,9 @@
 #define yyHEADER_H 1
 #define yyIN_HEADER 1
 
-#line 5 "comp.lex.h"
+#line 6 "comp.lex.h"
 
-#line 7 "comp.lex.h"
+#line 8 "comp.lex.h"
 
 #define  YY_INT_ALIGNED short int
 
@@ -640,6 +640,6 @@ extern int yylex \
 #line 140 "comp.l"
 
 
-#line 643 "comp.lex.h"
+#line 644 "comp.lex.h"
 #undef yyIN_HEADER
 #endif /* yyHEADER_H */

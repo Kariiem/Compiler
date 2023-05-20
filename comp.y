@@ -193,24 +193,24 @@ atomic_value:
     ;
 
 arithmetic_expr:    ////TODO: We call create_ast_bin_expr_t inside the create_ast_expr_t //
-    expr TOKEN_PLUS expr      { $$=creat_ast_expr_t(EXPR_ADD,create_ast_bin_expr_t($1, $3, $2)); }     // TODO: Assumed TOKEN_PLUS is passed as the operator directly
-|   expr TOKEN_MINUS expr     { $$=creat_ast_expr_t(EXPR_SUB,create_ast_bin_expr_t($1, $3, $2)); }     // TODO: Assumed TOKEN_PLUS is passed as the operator directly
-|   expr TOKEN_MULT expr      { $$=creat_ast_expr_t(EXPR_MUL,create_ast_bin_expr_t($1, $3, $2)); }     // TODO: Assumed TOKEN_PLUS is passed as the operator directly
-|   expr TOKEN_DIV expr       { $$=creat_ast_expr_t(EXPR_DIV,create_ast_bin_expr_t($1, $3, $2)); }     // TODO: Assumed TOKEN_PLUS is passed as the operator directly
-|   expr TOKEN_MOD expr       { $$=creat_ast_expr_t(EXPR_MOD,create_ast_bin_expr_t($1, $3, $2)); }     // TODO: Assumed TOKEN_PLUS is passed as the operator directly
-|   expr TOKEN_EXP expr       { $$=creat_ast_expr_t(EXPR_EXP,create_ast_bin_expr_t($1, $3, $2)); }     // TODO: Assumed TOKEN_PLUS is passed as the operator directly
+    expr TOKEN_PLUS expr      { $$=creat_ast_expr_t(EXPR_ADD,create_ast_bin_expr_t($1, $3, EXPR_ADD)); }
+|   expr TOKEN_MINUS expr     { $$=creat_ast_expr_t(EXPR_SUB,create_ast_bin_expr_t($1, $3, EXPR_SUB)); }
+|   expr TOKEN_MULT expr      { $$=creat_ast_expr_t(EXPR_MUL,create_ast_bin_expr_t($1, $3, EXPR_MUL)); }
+|   expr TOKEN_DIV expr       { $$=creat_ast_expr_t(EXPR_DIV,create_ast_bin_expr_t($1, $3, EXPR_DIV)); }
+|   expr TOKEN_MOD expr       { $$=creat_ast_expr_t(EXPR_MOD,create_ast_bin_expr_t($1, $3, EXPR_MOD)); }
+|   expr TOKEN_EXP expr       { $$=creat_ast_expr_t(EXPR_EXP,create_ast_bin_expr_t($1, $3, EXPR_EXP)); }
     ;
 
 logical_expr:       ////TODO: We call create_ast_bin_expr_t inside the create_ast_expr_t //
-    TOKEN_NOT expr              { $$=creat_ast_expr_t(EXPR_NOT,create_ast_bin_expr_t(NULL, $2, $1)); } ///TODO: Considered as binary expr with the left operand is NULL
-|   expr TOKEN_AND expr         { $$=creat_ast_expr_t(EXPR_AND,create_ast_bin_expr_t($1, $3, $2)); }     // TODO: Assumed TOKEN_PLUS is passed as the operator directly 
-|   expr TOKEN_OR expr          { $$=creat_ast_expr_t(EXPR_OR,create_ast_bin_expr_t($1, $3, $2)); }      // TODO: Assumed TOKEN_PLUS is passed as the operator directly
-|   expr TOKEN_LT expr          { $$=creat_ast_expr_t(EXPR_LT,create_ast_bin_expr_t($1, $3, $2)); }      // TODO: Assumed TOKEN_PLUS is passed as the operator directly
-|   expr TOKEN_GT expr          { $$=creat_ast_expr_t(EXPR_GT,create_ast_bin_expr_t($1, $3, $2)); }      // TODO: Assumed TOKEN_PLUS is passed as the operator directly
-|   expr TOKEN_LEQ expr         { $$=creat_ast_expr_t(EXPR_LEQ,create_ast_bin_expr_t($1, $3, $2)); }     // TODO: Assumed TOKEN_PLUS is passed as the operator directly
-|   expr TOKEN_GEQ expr         { $$=creat_ast_expr_t(EXPR_GEQ,create_ast_bin_expr_t($1, $3, $2)); }     // TODO: Assumed TOKEN_PLUS is passed as the operator directly
-|   expr TOKEN_EQ expr          { $$=creat_ast_expr_t(EXPR_EQ,create_ast_bin_expr_t($1, $3, $2)); }      // TODO: Assumed TOKEN_PLUS is passed as the operator directly
-|   expr TOKEN_NEQ expr         { $$=creat_ast_expr_t(EXPR_NEQ,create_ast_bin_expr_t($1, $3, $2)); }     // TODO: Assumed TOKEN_PLUS is passed as the operator directly
+    TOKEN_NOT expr              { $$=creat_ast_expr_t(EXPR_NOT,create_ast_bin_expr_t(NULL, $2 ,EXPR_NOT)); } ///TODO: Considered as binary expr with the left operand is NULL
+|   expr TOKEN_AND expr         { $$=creat_ast_expr_t(EXPR_AND,create_ast_bin_expr_t($1, $3, EXPR_AND)); } 
+|   expr TOKEN_OR expr          { $$=creat_ast_expr_t(EXPR_OR,create_ast_bin_expr_t($1, $3, EXPR_OR)); } 
+|   expr TOKEN_LT expr          { $$=creat_ast_expr_t(EXPR_LT,create_ast_bin_expr_t($1, $3, EXPR_LT)); } 
+|   expr TOKEN_GT expr          { $$=creat_ast_expr_t(EXPR_GT,create_ast_bin_expr_t($1, $3, EXPR_GT)); } 
+|   expr TOKEN_LEQ expr         { $$=creat_ast_expr_t(EXPR_LEQ,create_ast_bin_expr_t($1, $3, EXPR_LEQ)); }
+|   expr TOKEN_GEQ expr         { $$=creat_ast_expr_t(EXPR_GEQ,create_ast_bin_expr_t($1, $3, EXPR_GEQ)); }
+|   expr TOKEN_EQ expr          { $$=creat_ast_expr_t(EXPR_EQ,create_ast_bin_expr_t($1, $3, EXPR_EQ)); } 
+|   expr TOKEN_NEQ expr         { $$=creat_ast_expr_t(EXPR_NEQ,create_ast_bin_expr_t($1, $3, EXPR_NEQ)); }
     ;
 
 compound_expr:
