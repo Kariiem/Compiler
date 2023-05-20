@@ -1,6 +1,6 @@
-#line 1 "comp.lex.c"
+#line 2 "comp.lex.c"
 
-#line 3 "comp.lex.c"
+#line 4 "comp.lex.c"
 
 #define  YY_INT_ALIGNED short int
 
@@ -665,7 +665,7 @@ static const flex_int16_t yy_rule_linenum[50] =
         yylloc->last_line = yylineno;                                  \
         yylloc->last_column = yytext + yyleng - strrchr(yytext, '\n'); \
       }
-#line 668 "comp.lex.c"
+#line 669 "comp.lex.c"
 /* -:-keywords-:- */
 /* module */
 /* import */
@@ -696,7 +696,7 @@ static const flex_int16_t yy_rule_linenum[50] =
 /* ; <semicolon> */
 /* &,|,(,),{,}*/
 
-#line 699 "comp.lex.c"
+#line 700 "comp.lex.c"
 
 #define INITIAL 0
 #define SPECIAL 1
@@ -1052,7 +1052,7 @@ YY_DECL
 #line 70 "comp.l"
 
 
-#line 1055 "comp.lex.c"
+#line 1056 "comp.lex.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -1414,7 +1414,7 @@ YY_RULE_SETUP
 #line 140 "comp.l"
 YY_FATAL_ERROR( "flex scanner jammed" );
 	YY_BREAK
-#line 1417 "comp.lex.c"
+#line 1418 "comp.lex.c"
 
 	case YY_END_OF_BUFFER:
 		{
