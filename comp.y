@@ -13,6 +13,8 @@
     int yylex(YYSTYPE* yylvalp, YYLTYPE* yyllocp, yyscan_t scanner,ast_source_t** source_module);
     void yyerror(YYLTYPE* yyllocp, yyscan_t unused, ast_source_t **source_module, const char* msg);
 
+
+    #include <src/ast/ast.h>
     #define SYM_TAB_MAX 1000
     #define SYM_MAX 1000
     #define SYM_TAB_STACK_MAX 1000
@@ -20,46 +22,38 @@
     typedef enum { false, true } bool;
 
     // Struct of a single entry in the symbol table
-    typedef struct sym_tab_entry_t {
+    typedef struct symbol_t {
         char* name; // Name of the symbol
-        int type;   // Type of the symbol (int, real, bool, string, enum, record, func, void, unknown)
+        enum {
+            SYM_TY_TERM,
+            SYM_TY_FUNC,
+            SYM_TY_ENUM,
+        } type;
         char* value;  // Value of the symbol
         int line_num;   // Line number of the symbol for debugging
-        bool is_const;  // Is the symbol a constant?
-        bool is_enum;  // Is the symbol an enum?
-        bool is_func;  // Is the symbol a function?
-    } sym_tab_entry_t;
+        union {
+            ast_fundecl_t* func_val;
+            ast_term_decl_t* term_val;
+            ast_type_decl_t* type_val;
+        } val;
+    } symbol_t;
 
     // Struct of the symbol table itself
     typedef struct sym_tab_t {
-        sym_tab_entry_t* entries;
+        symbol_t* entries;
         int num_entries;
         int index;
+        sym_tab_t* parent;
     } sym_tab_t;
-
-    // Struct of a stack of symbol tables to handle scopes
-    typedef struct sym_tab_stack_t {
-        sym_tab_t** tables;
-        int num_tables;
-    } sym_tab_stack_t;
-
-
-    enum {
-        TYPE_INT,
-        TYPE_REAL,
-        TYPE_BOOL,
-        TYPE_STRING,
-        TYPE_VOID,
-    };
 
     // Symbol table functions
     sym_tab_t* sym_tab_init();
-    void add_sym(sym_tab_stack_t* stack, char* name, int type, char* value, int line_num, bool is_const, bool is_enum, bool is_func);
-    sym_tab_entry_t* get_sym(sym_tab_stack_t* stack, char* name);
-    // Symbol table stack functions
-    sym_tab_stack_t* sym_tab_stack_init();
-    void sym_tab_stack_push(sym_tab_stack_t* stack, sym_tab_t* sym_tab);
-    sym_tab_t* sym_tab_stack_pop(sym_tab_stack_t* stack);
+    void add_sym(sym_tab_t* head, int type, void* val, char* name, int line_num);
+    symbol_t* get_sym(sym_tab_t* head, char* name);
+    // Symbol table head functions
+    sym_tab_t* sym_tab_list_init();
+    void sym_tab_insert(sym_tab_t* head, sym_tab_t* sym_tab);
+    sym_tab_t* sym_tab_stack_pop(sym_tab_t* head);
 
 
 
@@ -71,9 +65,9 @@
 
     void sym_tab_free(sym_tab_t* sym_tab);
     void sym_tab_print(sym_tab_t* sym_tab);
-    void sym_tab_print_entry(sym_tab_entry_t* entry);
+    void sym_tab_print_entry(symbol_t* entry);
     void sym_tab_stack_print(sym_tab_stack_t* stack);
-    void sym_tab_stack_print_entry(sym_tab_entry_t* entry);
+    void sym_tab_stack_print_entry(symbol_t* entry);
     void sym_tab_stack_print_all(sym_tab_stack_t* stack);
     void sym_tab_stack_free(sym_tab_stack_t* stack);
     
@@ -173,7 +167,7 @@
 %right TOKEN_NOT TOKEN_EXP TOKEN_EQUAL
 %%
 source: 
-    module_decl top_level_decl_list {$$=pop_sym_tab_stack();}
+    module_decl top_level_decl_list {$$=sym_tab_stack_pop(sym_tab_stack);}
     ;
 
 module_decl: 
@@ -380,7 +374,7 @@ void yyerror(YYLTYPE* yyllocp, yyscan_t unused,ast_source_t **source_module, con
 // Symbol table functions
 sym_tab_t* sym_tab_init(){
     sym_tab_t* sym_tab = (sym_tab_t*)malloc(sizeof(sym_tab_t));
-    sym_tab->entries = cvector_create(sym_tab_entry_t, 0);
+    sym_tab->entries = cvector_create(symbol_t, 0);
     sym_tab->num_entries = 0;
     sym_tab->index = -1;
     return sym_tab;
@@ -407,7 +401,7 @@ void add_sym(sym_tab_stack_t* stack, char* name, int type, char* value, int line
     }
 
     // Create a new symbol table entry
-    sym_tab_entry_t* entry = (sym_tab_entry_t*)malloc(sizeof(sym_tab_entry_t));
+    symbol_t* entry = (symbol_t*)malloc(sizeof(symbol_t));
     entry->name = name;
     entry->type = type;
     entry->value = value;
@@ -420,7 +414,7 @@ void add_sym(sym_tab_stack_t* stack, char* name, int type, char* value, int line
     cvector_push_back(stack->tables[stack->num_tables-1]->entries, entry);
     stack->tables[stack->num_tables-1]->num_entries++;
 }
-sym_tab_entry_t* get_sym(sym_tab_stack_t* stack, char* name){
+symbol_t* get_sym(sym_tab_stack_t* stack, char* name){
     // To handle scopes we need to check if there is a symbol table in the stack
     // If there is, we add the symbol to that table
     // If there isn't, this means an error has occured because at least the global scope should be in the stack while creating the stack
