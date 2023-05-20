@@ -1,3 +1,6 @@
+SRC=$(wildcard src/*/*.c)
+OBJ=$(SRC:.c=.o)
+
 all: comp
 
 comp.lex.c: comp.l
@@ -7,8 +10,8 @@ comp.tab.c: comp.y
 	bison -o $@ --defines=$(patsubst %.c,%.h,$@) --debug $< 
 #-Wcounterexamples 
 
-comp: main.c comp.tab.c comp.lex.c comp.h
-	$(CC) -o $@  -Wall -ggdb $(filter %.c,$^)
+comp: main.c $(OBJ) comp.tab.o comp.lex.o
+	$(CC) -o $@ -Wall -ggdb $^
 
 clean:
-	rm -f comp comp.tab.c comp.lex.c comp.tab.h comp.lex.h main
+	rm -f comp comp.tab.c comp.lex.c comp.tab.h comp.lex.h main $(OBJ)

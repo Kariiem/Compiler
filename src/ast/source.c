@@ -9,6 +9,6 @@ ast_source_t *create_ast_source_t(ast_module_decl_t *module,
   return source;
 }
 
-bool free_ast_source_t(ast_source_t *source){
+void free_ast_source_t(ast_source_t **source){
     TODO("free ast_source_t");
 }

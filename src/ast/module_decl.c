@@ -8,6 +8,6 @@ ast_module_decl_t *create_ast_module_decl_t(char const *module_name) {
   return module;
 }
 
-bool free_ast_module_decl_t(ast_module_decl_t *module) {
+void free_ast_module_decl_t(ast_module_decl_t *module) {
   DEBUG_EPRINTF("free ast_module_decl_t");
 }
