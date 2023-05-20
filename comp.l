@@ -21,6 +21,13 @@
         yylloc->last_line = yylineno;                                  \
         yylloc->last_column = yytext + yyleng - strrchr(yytext, '\n'); \
       }
+
+  char* copy_str(char const * cstr){
+    char*ptr=(char*) malloc(strlen(cstr) + 1); // +1 for the null terminator
+    
+    strcpy(ptr, cstr);
+    return ptr;
+  }
 %}
 
 
@@ -85,8 +92,8 @@ right_brace ("}")
 "not"       {   return TOKEN_NOT;      }
 "and"       {   return TOKEN_AND;      }
 "or"        {   return TOKEN_OR;       }
-"true"      {   yylval->BOOL = yytext; return BOOL; }
-"false"     {   yylval->BOOL = yytext; return BOOL; }
+"true"      {   yylval->BOOL = copy_str(yytext); return BOOL; }
+"false"     {   yylval->BOOL = copy_str(yytext); return BOOL; }
 
 "+"         {   return TOKEN_PLUS;     }
 "-"         {   return TOKEN_MINUS;    }
@@ -116,19 +123,19 @@ right_brace ("}")
 
 ";"             {   return TOKEN_SEMICOLON;}
 {id}            { 
-                    yylval->IDENTIFIER = yytext; 
+                    yylval->IDENTIFIER = copy_str(yytext); 
                     return IDENTIFIER;
                 }
 {integer}       { 
-                    yylval->INTEGER = yytext;
+                    yylval->INTEGER = copy_str(yytext);
                     return INTEGER;
                 }
 {real}          {
-                    yylval->REAL = yytext;
+                    yylval->REAL = copy_str(yytext);
                     return REAL;
                 }
 {string}        { 
-                    yylval->STRING = yytext;
+                    yylval->STRING = copy_str(yytext);
                     return STRING;
                 }
 

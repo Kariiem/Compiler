@@ -88,7 +88,7 @@
 %token <char *> INTEGER
 %token <char *> REAL
 %token <char *> STRING
-%token <char *>     BOOL
+%token <char *> BOOL
 /*-----------------------------------*/
 
 /* module Main */
@@ -131,9 +131,6 @@
 %type <ast_type_decl_t*>                    type_decl
 %type <vtype(ast_constructors_t*)>          constructor_list
 %type <ast_constructors_t*>                 constructor_field
-%type <vtype(ast_record_field_t*)>          record
-%type <vtype(ast_record_field_t*)>          record_field_list
-%type <ast_record_field_t*>                 record_field
 
 
 %left TOKEN_PLUS TOKEN_MINUS TOKEN_MULT TOKEN_DIV TOKEN_MOD
@@ -144,7 +141,7 @@
 %%
 source: 
     module_decl top_level_decl_list         
-    { $$=create_ast_source_t($1, $2);*source_module=$$;}
+    { $$=create_ast_source_t($1, $2); *source_module=$$;}
     ;
 
 module_decl: 
@@ -155,7 +152,7 @@ module_decl:
 top_level_decl_list: 
     %empty                                  {$$=NULL;}
 |   top_level_decl_list top_level_decl      
-    {$$=$1; cvector_push_back($1, $2);}
+    {cvector_push_back($$, $2);}
     ;
 
 top_level_decl:
@@ -167,6 +164,8 @@ top_level_decl:
     {$$=create_ast_top_level_decl_t(DECL_TERM, $1);}
 |   fun_decl                    
     {$$=create_ast_top_level_decl_t(DECL_FUN, $1);}
+|   assignment                  
+    {$$=create_ast_top_level_decl_t(DECL_ASSIGN, $1);}
     ;
 
 import_decl:
@@ -283,7 +282,7 @@ switch_expr:
 case_expr_list:
     %empty                          { $$=NULL; }
 |   case_expr_list case_expr        
-    { $$=$1; cvector_push_back($1, $2); }
+    { cvector_push_back($$, $2); }
     ;
 
 case_expr:
@@ -299,12 +298,13 @@ block:
 
 block_expression_list:
     %empty                                      { $$=NULL; }
-|   block_expression_list block_expression      { $$=$1; cvector_push_back($1, $2); }
+|   block_expression_list block_expression      { cvector_push_back($$, $2); }
     ;
 
 block_expression:
     expr TOKEN_SEMICOLON                    { $$=create_ast_block_expr_t(EXPR, $1); }
 |   term_decl                               { $$=create_ast_block_expr_t(DECL, $1); }
+|   assignment                              { $$=create_ast_block_expr_t(ASSIGN, $1); }
     ;
 
 fun_decl:
@@ -313,8 +313,8 @@ fun_decl:
 
 param_list:
     %empty                              {$$=NULL;}
-|   param                               {cvector_push_back($$, $1);}         ////TODO: Check if this is correct as it was done by copilot//// I know this should be similar to line 295 but think about it. If this is right, then change line 295
-|   param_list TOKEN_COMMA param        {cvector_push_back($1, $3);}
+|   param                               {$$=NULL; cvector_push_back($$, $1);}
+|   param_list TOKEN_COMMA param        {cvector_push_back($$, $3);}
     ;
 
 param:
@@ -327,8 +327,8 @@ funcall:
 
 arg_list:
     %empty              {$$=NULL;}
-|   expr                {cvector_push_back($$, $1);}
-|   arg_list TOKEN_COMMA expr{$$=$1;cvector_push_back($1,$3);}
+|   expr                {$$=NULL; cvector_push_back($$, $1);}
+|   arg_list TOKEN_COMMA expr{cvector_push_back($$,$3);}
     ;
     
 type_decl:
@@ -336,26 +336,14 @@ type_decl:
     ;
 
 constructor_list:
-    constructor_field                                   { cvector_push_back($$, $1); }         ////TODO: Check if this is correct as it was done by copilot//// I know this should be similar to line 295 but think about it. If this is right, then change line 295
-|   constructor_list TOKEN_PIPE constructor_field       { cvector_push_back($1, $3); }
+    constructor_field                                   { $$=NULL; cvector_push_back($$, $1); }
+|   constructor_list TOKEN_PIPE constructor_field       { cvector_push_back($$, $3); }
     ;
 
 constructor_field: 
-    IDENTIFIER record                              { $$=create_ast_constructors_t($1, $2); }
+    IDENTIFIER                                          { $$=create_ast_constructors_t($1, NULL); }
     ;
 
-record:
-    %empty                                          { $$=NULL; }
-|   TOKEN_LBRACE record_field_list TOKEN_RBRACE     { $$=$2; }
-    ;
-
-record_field_list:
-    record_field                                    { cvector_push_back($$, $1); }           ////TODO: Check if this is correct as it was done by copilot//// I know this should be similar to line 295 but think about it. If this is right, then change line 295
-|   record_field_list TOKEN_COMMA record_field      { cvector_push_back($1, $3); }
-    ;
-    
-record_field:
-    IDENTIFIER TOKEN_COLON IDENTIFIER               { $$=create_ast_record_field_t($1, $3); }
     
 %%
 

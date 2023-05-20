@@ -10,7 +10,7 @@ ast_case_t *create_ast_case_t(ast_expr_t *expr, ast_block_t *body) {
   return case_;
 }
 void free_ast_case_t(ast_case_t **case_ptr) {
-  DEBUG_EPRINTF("free ast_case_t");
+  DEBUG_EPRINTF("free ast_case_t\n");
   ast_case_t *case_ = *case_ptr;
   DEBUG_ASSERT(case_, "case is NULL");
   free_ast_expr_t(&case_->case_expr);

@@ -1,11 +1,22 @@
 module Main
 import numpy
-import iostream
+import numpy
+import hello
 
-val globals_are_bad: Int = 10;
 
-var globals_are_bad: Int = 10;
+type BOOL = TRUE | FALSE;
 
-val globals_are_bad: Int;
-var globals_are_bad: Int;
+var x:int;
+var x:int=10;
 
+val y:bool;
+
+x = 10;
+x = 1.0;
+x = y;
+x = true;
+x = "aaa";
+
+x = funcall();
+
+x = 1+2;

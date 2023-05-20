@@ -27,9 +27,10 @@ YACC_C = $(patsubst %.y,$(SRC_DIR)/%.tab.c,$(YACC_SRCS))
 
 ALL_SRCS = $(SRCS) $(LEX_C) $(YACC_C) $(AST_SRCS) $(DS_SRCS) $(DECL_SRCS) $(EXPR_SRCS)
 
+ifeq ($(NDEBUG),1)
+	CFLAGS += -DNDEBUG
+endif
 all: comp
-
-
 
 $(LEX_C): $(LEX_SRCS)
 	flex -o $@ --header-file=$(patsubst %.c,%.h,$@) --debug $<

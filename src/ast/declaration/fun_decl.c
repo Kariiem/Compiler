@@ -12,7 +12,7 @@ ast_fundecl_t *create_ast_fundecl_t(char const *fun_name,
   return fundecl;
 }
 void free_ast_fundecl_t(ast_fundecl_t **fundecl_ptr) {
-  DEBUG_EPRINTF("free ast_fundecl_t");
+  DEBUG_EPRINTF("free ast_fundecl_t\n");
   ast_fundecl_t *fundecl = *fundecl_ptr;
   DEBUG_ASSERT(fundecl, "fundecl is NULL");
   FREE_ATOM(fundecl->fun_name);

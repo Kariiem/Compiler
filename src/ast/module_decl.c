@@ -8,6 +8,18 @@ ast_module_decl_t *create_ast_module_decl_t(char const *module_name) {
   return module;
 }
 
-void free_ast_module_decl_t(ast_module_decl_t *module) {
-  DEBUG_EPRINTF("free ast_module_decl_t");
+void free_ast_module_decl_t(ast_module_decl_t **module_ptr) {
+  DEBUG_EPRINTF("free ast_module_decl_t\n");
+  ast_module_decl_t *module_decl = *module_ptr;
+  DEBUG_ASSERT(module_decl, "module_decl is NULL");
+  FREE_ATOM(module_decl->module_name);
+  free(module_decl);
+  *module_ptr = NULL;
+}
+
+void print_ast_module_decl_t(ast_module_decl_t const *module, int indent) {
+  INDENT(indent);
+  printf("ast_module_decl_t\n");
+  INDENT(indent+1);
+  printf("module_name: %s\n", module->module_name);
 }

@@ -6,7 +6,7 @@
 #include "if.h"
 #include "switch.h"
 #include "while.h"
-#include <gmp.h>
+// #include <gmp.h>
 
 ast_expr_t *create_ast_expr_t(int type, void *value) {
   ast_expr_t *expr = calloc(1, sizeof(ast_expr_t));
@@ -14,149 +14,214 @@ ast_expr_t *create_ast_expr_t(int type, void *value) {
 
   switch (type) {
   default:
-    DEBUG_ASSERT(false, "Unkown type %d", type);
+    DEBUG_ASSERT(false, "Unkown type %d\n", type);
     break;
-  EXPR_IDENTIFIER:
+  case EXPR_IDENTIFIER:
     expr->value.identifier = value;
     break;
-  EXPR_INTEGER:
-    TODO("EXPR_INTEGER UNIMPLEMENTED");
-    break;
-  EXPR_INT:
-    TODO("EXPR_INT UNIMPLEMENTED");
-    break;
-  EXPR_REAL:
-    TODO("EXPR_REAL UNIMPLEMENTED");
-    break;
-  EXPR_DOUBLE:
-    TODO("EXPR_DOUBLE UNIMPLEMENTED");
-    break;
-  EXPR_BOOL:
-    TODO("EXPR_BOOL UNIMPLEMENTED");
-    break;
-  EXPR_STRING:
+  case EXPR_INTEGER:
+    // TODO("EXPR_INTEGER UNIMPLEMENTED");
+  case EXPR_INT:
+    // TODO("EXPR_INT UNIMPLEMENTED");
+  case EXPR_REAL:
+    // TODO("EXPR_REAL UNIMPLEMENTED");
+  case EXPR_DOUBLE:
+    // TODO("EXPR_DOUBLE UNIMPLEMENTED");
+  case EXPR_BOOL:
+    // TODO("EXPR_BOOL UNIMPLEMENTED");
+  case EXPR_STRING:
     expr->value.string = value;
     break;
   // binary expressions
-  EXPR_ADD:
-  EXPR_SUB:
-  EXPR_MUL:
-  EXPR_DIV:
-  EXPR_MOD:
-  EXPR_EXP:
-  EXPR_AND:
-  EXPR_OR:
-  EXPR_LT:
-  EXPR_GT:
-  EXPR_LEQ:
-  EXPR_GEQ:
-  EXPR_EQ:
-  EXPR_NEQ:
+  case EXPR_ADD:
+  case EXPR_SUB:
+  case EXPR_MUL:
+  case EXPR_DIV:
+  case EXPR_MOD:
+  case EXPR_EXP:
+  case EXPR_AND:
+  case EXPR_OR:
+  case EXPR_LT:
+  case EXPR_GT:
+  case EXPR_LEQ:
+  case EXPR_GEQ:
+  case EXPR_EQ:
+  case EXPR_NEQ:
     expr->value.binary_expr = value;
     // This maybe redundant
     expr->value.binary_expr->op = type;
     break;
-  EXPR_NOT:
+  case EXPR_NOT:
     expr->value.not_ = value;
     break;
   // function call
-  EXPR_FUNCALL:
+  case EXPR_FUNCALL:
     expr->value.funcall = value;
     break;
   // compound expressions
-  EXPR_IF:
+  case EXPR_IF:
     expr->value.if_ = value;
     break;
-  EXPR_FOR:
+  case EXPR_FOR:
     expr->value.for_ = value;
     break;
-  EXPR_WHILE:
+  case EXPR_WHILE:
     expr->value.while_ = value;
     break;
-  EXPR_UNTIL:
+  case EXPR_UNTIL:
     expr->value.while_ = value;
     expr->value.while_->cond =
         create_ast_expr_t(EXPR_NOT, expr->value.while_->cond);
     break;
-  EXPR_DO:
+  case EXPR_DO:
     expr->value.do_ = value;
     break;
-  EXPR_SWITCH:
+  case EXPR_SWITCH:
     expr->value.switch_ = value;
     break;
   }
 }
 void free_ast_expr_t(ast_expr_t **expr_ptr) {
-  DEBUG_EPRINTF("free ast_expr_t");
+  DEBUG_EPRINTF("free ast_expr_t\n");
   ast_expr_t *expr = *expr_ptr;
-  DEBUG_ASSERT(expr, "expr is NULL");
+  DEBUG_ASSERT(expr, "expr is NULL\n");
 
   switch (expr->type) {
   default:
-    DEBUG_ASSERT(false, "Unkown type %d", expr->type);
+    DEBUG_ASSERT(false, "Unkown type %d\n", expr->type);
 
-  EXPR_IDENTIFIER:
+  case EXPR_IDENTIFIER:
     FREE_ATOM(expr->value.identifier);
     break;
-  EXPR_INTEGER:
-    mpz_clear(expr->value.arb_integer);
-    break;
-  EXPR_INT:
-    break;
-  EXPR_REAL:
-    mpfr_clear(expr->value.real);
-    break;
-  EXPR_DOUBLE:
-    break;
-  EXPR_BOOL:
-    break;
-  EXPR_STRING:
+  case EXPR_INTEGER:
+    // mpz_clear(expr->value.arb_integer);
+  case EXPR_INT:
+  case EXPR_REAL:
+    // mpfr_clear(expr->value.real);
+  case EXPR_DOUBLE:
+  case EXPR_BOOL:
+  case EXPR_STRING:
     FREE_ATOM(expr->value.string);
     break;
   // binary expressions
-  EXPR_ADD:
-  EXPR_SUB:
-  EXPR_MUL:
-  EXPR_DIV:
-  EXPR_MOD:
-  EXPR_EXP:
-  EXPR_AND:
-  EXPR_OR:
-  EXPR_LT:
-  EXPR_GT:
-  EXPR_LEQ:
-  EXPR_GEQ:
-  EXPR_EQ:
-  EXPR_NEQ:
+  case EXPR_ADD:
+  case EXPR_SUB:
+  case EXPR_MUL:
+  case EXPR_DIV:
+  case EXPR_MOD:
+  case EXPR_EXP:
+  case EXPR_AND:
+  case EXPR_OR:
+  case EXPR_LT:
+  case EXPR_GT:
+  case EXPR_LEQ:
+  case EXPR_GEQ:
+  case EXPR_EQ:
+  case EXPR_NEQ:
     free_ast_bin_expr_t(&expr->value.binary_expr);
     break;
-  EXPR_NOT:
+  case EXPR_NOT:
     free_ast_expr_t(&expr->value.not_);
     break;
   // function call
-  EXPR_FUNCALL:
+  case EXPR_FUNCALL:
     free_ast_funcall_t(&expr->value.funcall);
     break;
   // compound expressions
-  EXPR_IF:
+  case EXPR_IF:
     free_ast_if_t(&expr->value.if_);
     break;
-  EXPR_FOR:
+  case EXPR_FOR:
     free_ast_for_t(&expr->value.for_);
     break;
-  EXPR_WHILE:
+  case EXPR_WHILE:
     free_ast_while_t(&expr->value.while_);
     break;
-  EXPR_UNTIL:
+  case EXPR_UNTIL:
     free_ast_while_t(&expr->value.while_);
     break;
-  EXPR_DO:
+  case EXPR_DO:
     free_ast_do_t(&expr->value.do_);
     break;
-  EXPR_SWITCH:
+  case EXPR_SWITCH:
     free_ast_switch_t(&expr->value.switch_);
     break;
   }
   free(expr);
   *expr_ptr = NULL;
+}
+
+void print_ast_expr_t(ast_expr_t const *expr, int indent) {
+  INDENT(indent);
+  printf("ast_expr_t\n");
+  INDENT(indent+1);
+  switch (expr->type) {
+  default:
+    DEBUG_ASSERT(false, "Unkown type %d", expr->type);
+
+  case EXPR_IDENTIFIER:
+    printf("identifier: %s\n", expr->value.identifier);
+    break;
+  case EXPR_INTEGER:
+    printf("integer: %s\n", expr->value.string);
+    break;
+  case EXPR_INT:
+    printf("int: %s\n", expr->value.string);
+    break;
+  case EXPR_REAL:
+    printf("real: %s\n", expr->value.string);
+    break;
+  case EXPR_DOUBLE:
+    printf("double: %s\n", expr->value.string);
+    break;
+  case EXPR_BOOL:
+    printf("bool: %s\n", expr->value.string);
+    break;
+  case EXPR_STRING:
+    printf("string: %s\n", expr->value.string);
+    break;
+  // binary expressions
+  case EXPR_ADD:
+  case EXPR_SUB:
+  case EXPR_MUL:
+  case EXPR_DIV:
+  case EXPR_MOD:
+  case EXPR_EXP:
+  case EXPR_AND:
+  case EXPR_OR:
+  case EXPR_LT:
+  case EXPR_GT:
+  case EXPR_LEQ:
+  case EXPR_GEQ:
+  case EXPR_EQ:
+  case EXPR_NEQ:
+    // print_ast_bin_expr_t(expr->value.binary_expr, indent);
+    break;
+  case EXPR_NOT:
+    // print_ast_expr_t(expr->value.not_, indent);
+    break;
+  // function call
+  case EXPR_FUNCALL:
+    // print_ast_funcall_t(expr->value.funcall, indent);
+    break;
+  // compound expressions
+  case EXPR_IF:
+    // print_ast_if_t(expr->value.if_, indent);
+    break;
+  case EXPR_FOR:
+    // print_ast_for_t(expr->value.for_, indent);
+    break;
+  case EXPR_WHILE:
+    // print_ast_while_t(expr->value.while_, indent);
+    break;
+  case EXPR_UNTIL:
+    // print_ast_while_t(expr->value.while_, indent);
+    break;
+  case EXPR_DO:
+    // print_ast_do_t(expr->value.do_, indent);
+    break;
+  case EXPR_SWITCH:
+    // print_ast_switch_t(expr->value.switch_, indent);
+    break;
+  }
 }

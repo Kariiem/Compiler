@@ -74,5 +74,5 @@ struct ast_expr_t {
 
 ast_expr_t *create_ast_expr_t(int type, void *value);
 void free_ast_expr_t(ast_expr_t **expr_ptr);
-
+void print_ast_expr_t(ast_expr_t const *expr, int indent);
 #endif // __AST_NODE_EXPR__

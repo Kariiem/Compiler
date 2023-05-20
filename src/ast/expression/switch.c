@@ -9,7 +9,7 @@ ast_switch_t *create_ast_switch_t(ast_expr_t *expr, vtype(ast_case_t *) cases) {
   return switch_;
 }
 void free_ast_switch_t(ast_switch_t **switch_ptr) {
-  DEBUG_EPRINTF("free ast_switch_t");
+  DEBUG_EPRINTF("free ast_switch_t\n");
   ast_switch_t *switch_ = *switch_ptr;
   DEBUG_ASSERT(switch_, "switch is NULL");
   free_ast_expr_t(&switch_->enum_expr);

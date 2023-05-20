@@ -12,7 +12,7 @@ static int yydebug;
 int main(int argc, char *argv[]) {
   yyscan_t scanner;
   yylex_init(&scanner);
-  ast_source_t *source_module = calloc(1,sizeof(ast_source_t));
+  ast_source_t *source_module;
   FILE *fptr;
 
   --argc, ++argv;
@@ -40,6 +40,8 @@ int main(int argc, char *argv[]) {
 
   yyparse(scanner, &source_module);
   yylex_destroy(scanner);
+
+  print_ast_source_t(source_module, 0);
   free_ast_source_t(&source_module);
 
   return 0;

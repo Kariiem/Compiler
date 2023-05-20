@@ -8,6 +8,7 @@
 
 ast_top_level_decl_t *create_ast_top_level_decl_t(int type, void *value) {
   ast_top_level_decl_t *top_decl = calloc(1, sizeof(ast_top_level_decl_t));
+  top_decl->type = type;
   switch (type) {
   default:
     DEBUG_ASSERT(false, "Unkown type %d", type);
@@ -23,11 +24,14 @@ ast_top_level_decl_t *create_ast_top_level_decl_t(int type, void *value) {
   case DECL_FUN:
     top_decl->value.fun = value;
     break;
+  case DECL_ASSIGN:
+    top_decl->value.assign = value;
+    break;
   }
   return top_decl;
 }
 void free_ast_top_level_decl_t(ast_top_level_decl_t **top_level_decl_ptr) {
-  DEBUG_EPRINTF("free ast_top_level_decl_t");
+  DEBUG_EPRINTF("free ast_top_level_decl_t\n");
   ast_top_level_decl_t *top_decl = *top_level_decl_ptr;
   DEBUG_ASSERT(top_decl, "top_decl is NULL");
   switch (top_decl->type) {
@@ -45,7 +49,34 @@ void free_ast_top_level_decl_t(ast_top_level_decl_t **top_level_decl_ptr) {
   case DECL_FUN:
     free_ast_fundecl_t(&top_decl->value.fun);
     break;
+  case DECL_ASSIGN:
+    free_ast_assignment_t(&top_decl->value.assign);
+    break;
   }
   free(top_decl);
   *top_level_decl_ptr = NULL;
+}
+
+void print_ast_top_level_decl_t(ast_top_level_decl_t const *top_level_decl, int indent){
+  INDENT(indent);
+  printf("ast_top_level_decl_t\n");
+  switch (top_level_decl->type) {
+  default:
+    DEBUG_ASSERT(false, "Unkown type %d", top_level_decl->type);
+  case DECL_IMPORT:
+    print_ast_import_decl_t(top_level_decl->value.import, indent+1);
+    break;
+  case DECL_TYPE:
+    // print_ast_type_decl_t(top_level_decl->value.type_name);
+    break;
+  case DECL_TERM:
+    print_ast_term_decl_t(top_level_decl->value.term,indent+1);
+    break;
+  case DECL_FUN:
+    // print_ast_fundecl_t(top_level_decl->value.fun);
+    break;
+  case DECL_ASSIGN:
+    // print_ast_assignment_t(top_level_decl->value.assign);
+    break;
+  }
 }

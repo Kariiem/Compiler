@@ -7,7 +7,7 @@ ast_do_t *create_ast_do_t(ast_block_t *body) {
   return do_;
 }
 void free_ast_do_t(ast_do_t **do_ptr) {
-  DEBUG_EPRINTF("free do_");
+  DEBUG_EPRINTF("free ast_do_t\n");
   ast_do_t *do_ = *do_ptr;
   DEBUG_ASSERT(do_, "do is NULL");
   free_ast_block_t(&do_->body);

@@ -13,7 +13,7 @@ ast_term_decl_t *create_ast_term_decl_t(int type, char const *decl_name,
   return term;
 }
 void free_ast_term_decl_t(ast_term_decl_t **term_decl_ptr) {
-  DEBUG_EPRINTF("free ast_term_decl_t");
+  DEBUG_EPRINTF("free ast_term_decl_t\n");
   ast_term_decl_t *term = *term_decl_ptr;
   DEBUG_ASSERT(term, "term is NULL");
   FREE_ATOM(term->decl_name);
@@ -22,4 +22,22 @@ void free_ast_term_decl_t(ast_term_decl_t **term_decl_ptr) {
     free_ast_expr_t(&term->value);
   free(term);
   *term_decl_ptr = NULL;
+}
+
+void print_ast_term_decl_t(ast_term_decl_t const *term_decl, int indent) {
+  INDENT(indent);
+  printf("ast_term_decl_t\n");
+  INDENT(indent + 1);
+  printf("decl_qualifier:%s\n", term_decl->type == TERM_VAR ? "var" : "val");
+  INDENT(indent + 1);
+  printf("decl_name: %s\n", term_decl->decl_name);
+  INDENT(indent + 1);
+  printf("decl_type: %s\n", term_decl->decl_type);
+  if (term_decl->value) {
+    print_ast_expr_t(term_decl->value, indent + 1);
+  }
+  else {
+    INDENT(indent);
+    printf("value: NULL\n");
+  }
 }

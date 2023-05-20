@@ -47,7 +47,7 @@ sym_tab_t *create_sym_tab_t() {
 }
 
 void free_sym_tab_t(sym_tab_t *sym_tab) {
-  DEBUG_EPRINTF("free ast_fundecl_t");
+  DEBUG_EPRINTF("free ast_fundecl_t\n");
   CVECTOR_FREE(sym_tab->entries, free_symbol_t);
   free(sym_tab);
 }

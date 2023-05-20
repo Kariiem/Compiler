@@ -11,7 +11,7 @@ ast_for_t *create_ast_for_t(char const *loop_var, ast_range_t *range,
   return for_;
 }
 void free_ast_for_t(ast_for_t **for_ptr) {
-  DEBUG_EPRINTF("free ast_for_t");
+  DEBUG_EPRINTF("free ast_for_t\n");
   ast_for_t *for_ = *for_ptr;
   DEBUG_ASSERT(for_, "for is NULL");
   FREE_ATOM(for_->loop_var);

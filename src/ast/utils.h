@@ -27,8 +27,15 @@
   } while (0)
 #define FREE_ATOM(ptr)                                                         \
   do {                                                                         \
-    DEBUG_ASSERT(ptr, #ptr "is NULL");                                         \
+    DEBUG_ASSERT(ptr, #ptr " is NULL\n");                                      \
     free((void *)ptr);                                                         \
     (ptr) = NULL;                                                              \
+  } while (0)
+
+#define INDENT(indent)                                                         \
+  do {                                                                         \
+    for (int i = 0; i < indent; i++) {                                         \
+      printf("  ");                                                             \
+    }                                                                          \
   } while (0)
 #endif //__UTILS__
