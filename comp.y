@@ -66,6 +66,9 @@
 
     extern int line_num; // Line number of the current token for debugging
 
+    // Create a stack of symbol tables for global scope
+    sym_tab_stack_t* sym_tab_stack = sym_tab_stack_init();
+
     void sym_tab_free(sym_tab_t* sym_tab);
     void sym_tab_print(sym_tab_t* sym_tab);
     void sym_tab_print_entry(sym_tab_entry_t* entry);
