@@ -8,83 +8,15 @@
 } 
 %code requires {
   typedef void* yyscan_t;
+  #include "src/ast/ast.h"
 }
 %code {
-    int yylex(YYSTYPE* yylvalp, YYLTYPE* yyllocp, yyscan_t scanner,ast_source_t** source_module);
-    void yyerror(YYLTYPE* yyllocp, yyscan_t unused, ast_source_t **source_module, const char* msg);
-
-
-    #include <src/ast/ast.h>
-    #define SYM_TAB_MAX 1000
-    #define SYM_MAX 1000
-    #define SYM_TAB_STACK_MAX 1000
-
-    typedef enum { false, true } bool;
-
-    // Struct of a single entry in the symbol table
-    typedef struct symbol_t {
-        char* name; // Name of the symbol
-        enum {
-            SYM_TY_TERM,
-            SYM_TY_FUNC,
-            SYM_TY_ENUM,
-        } type;
-        char* value;  // Value of the symbol
-        int line_num;   // Line number of the symbol for debugging
-        union {
-            ast_fundecl_t* func_val;
-            ast_term_decl_t* term_val;
-            ast_type_decl_t* type_val;
-        } val;
-    } symbol_t;
-
-    // Struct of the symbol table itself
-    typedef struct sym_tab_t {
-        symbol_t* entries;
-        int num_entries;
-        int index;
-        sym_tab_t* parent;
-    } sym_tab_t;
-
-    // Symbol table functions
-    sym_tab_t* sym_tab_init();
-    void add_sym(sym_tab_t* head, int type, void* val, char* name, int line_num);
-    symbol_t* get_sym(sym_tab_t* head, char* name);
-    // Symbol table head functions
-    sym_tab_t* sym_tab_list_init();
-    void sym_tab_insert(sym_tab_t* head, sym_tab_t* sym_tab);
-    sym_tab_t* sym_tab_stack_pop(sym_tab_t* head);
-
-
-
-
-    extern int line_num; // Line number of the current token for debugging
-
-    // Create a stack of symbol tables for global scope
-    sym_tab_stack_t* sym_tab_stack = sym_tab_stack_init();
-
-    void sym_tab_free(sym_tab_t* sym_tab);
-    void sym_tab_print(sym_tab_t* sym_tab);
-    void sym_tab_print_entry(symbol_t* entry);
-    void sym_tab_stack_print(sym_tab_stack_t* stack);
-    void sym_tab_stack_print_entry(symbol_t* entry);
-    void sym_tab_stack_print_all(sym_tab_stack_t* stack);
-    void sym_tab_stack_free(sym_tab_stack_t* stack);
-    
-
+  int yylex(YYSTYPE* yylvalp, YYLTYPE* yyllocp, yyscan_t scanner,ast_source_t** source_module);
+  void yyerror(YYLTYPE* yyllocp, yyscan_t unused, ast_source_t **source_module, const char* msg);
 }
 
-
-%union{
-    char* id;
-    int integer;
-    double real;
-    char* string;
-    bool boolean;
-    void* unknownVal;
-    void* unknownType;
-}
-
+/* Generate YYSTYPE from these types: */
+%define api.value.type union
 
 /*-----------------------------------*/
 /* -:- keywords -:- */
@@ -152,14 +84,52 @@
 /*-----------------------------------*/
 /* -:- atoms -:- */
 /*-----------------------------------*/
-%token <id> IDENTIFIER
-%token <integer> INTEGER
-%token <real> REAL
-%token <string> STRING
-%token <boolean>     BOOL
+%token <char const*> IDENTIFIER
+%token <char const*> INTEGER
+%token <char const*> REAL
+%token <char const*> STRING
+%token <int64_t>     BOOL
 /*-----------------------------------*/
 
 /* module Main */
+%nterm <ast_module_decl_t*>    module_decl
+%nterm <vtype(ast_top_level_decl_t*)> top_level_decl_list
+%nterm <ast_top_level_decl_t*> top_level_decl
+%nterm <ast_import_decl_t*> import_decl
+%nterm <ast_term_decl_t*> term_decl
+%nterm <int64_t*> val_or_var        ////TODO: The nterm here is guessed
+%nterm <ast_expr_t*> optional_assignment    ////TODO: The nterm here is guessed
+%nterm <ast_expr_t*> expr
+%nterm <ast_expr_t*> atomic_value   ////TODO: I created a separate %nterm for each expr in the grammar/////
+%nterm <ast_expr_t*> arithmetic_expr    /////TODO: The nterm is of expr type as we will create a bin_expr inside/////
+%nterm <ast_expr_t*> logical_expr       /////TODO: The nterm is of expr type as we will create a bin_expr inside/////
+%nterm <ast_expr_t*> compound_expr      /////TODO: The nterm is of expr type as we will create diffferent types of expr inside/////
+%nterm <ast_if_t*> if_then_else_expr
+%nterm <ast_for_t*> for_loop_expr
+%nterm <ast_range_t*> range
+%nterm <ast_expr_t> optional_step
+%nterm <ast_while_t*> while_loop_expr
+%nterm <ast_while_t*> until_loop_expr   ////TODO: Assumed the while is the same as until/////
+%nterm <ast_do_t*> do_block_expr
+%nterm <ast_switch_t*> switch_expr
+%nterm <vtype(ast_case_t*)> case_expr_list
+%nterm <ast_case_t*> case_expr
+%nterm <ast_block_t*> block
+%nterm <vtype(ast_block_expr_t*)> block_expression_list
+%nterm <ast_block_expr_t*> block_expression
+%nterm <ast_fundecl_t*> fun_decl
+%nterm <vtype(ast_fun_param_t*)> param_list
+%nterm <ast_fun_param_t*> param
+%nterm <ast_funcall_t*> funcall
+%nterm <vtype(ast_expr_t*)> arg_list
+%nterm <ast_type_decl_t*> type_decl
+%nterm <vtype(ast_constructors_t*)> constructor_list
+%nterm <ast_constructors_t*> constructor_field
+%nterm <vtype(ast_record_field_t*)> record   ////TODO: The nterm here is guessed
+%nterm <vtype(ast_record_field_t*)> record_field_list
+%nterm <ast_record_field_t*> record_field
+
+
 %left TOKEN_PLUS TOKEN_MINUS TOKEN_MULT TOKEN_DIV TOKEN_MOD
 %left TOKEN_AND TOKEN_OR
 %left TOKEN_EQ TOKEN_NEQ TOKEN_GT TOKEN_GEQ TOKEN_LT TOKEN_LEQ
@@ -167,7 +137,7 @@
 %right TOKEN_NOT TOKEN_EXP TOKEN_EQUAL
 %%
 source: 
-    module_decl top_level_decl_list {$$=sym_tab_stack_pop(sym_tab_stack);}
+    module_decl top_level_decl_list
     ;
 
 module_decl: 
@@ -368,99 +338,3 @@ void yyerror(YYLTYPE* yyllocp, yyscan_t unused,ast_source_t **source_module, con
   fprintf(stderr, "[%d:%d]: %s\n",
                   yyllocp->first_line, yyllocp->first_column, msg);
 }
-
-
-
-// Symbol table functions
-sym_tab_t* sym_tab_init(){
-    sym_tab_t* sym_tab = (sym_tab_t*)malloc(sizeof(sym_tab_t));
-    sym_tab->entries = cvector_create(symbol_t, 0);
-    sym_tab->num_entries = 0;
-    sym_tab->index = -1;
-    return sym_tab;
-}
-
-void add_sym(sym_tab_stack_t* stack, char* name, int type, char* value, int line_num, bool is_const, bool is_enum, bool is_func){
-    
-    // To handle scopes we need to check if there is a symbol table in the stack
-    // If there is, we add the symbol to that table
-    // If there isn't, this means an error has occured because at least the global scope should be in the stack while creating the stack
-    if(stack->num_tables == 0){
-        printf("Error: No symbol table in stack\n");
-        exit(1);
-    }
-    // Get the symbol table at the top of the stack
-    sym_tab_t* sym_tab = stack->tables[stack->num_tables-1];
-
-    // Check if the symbol already exists in the symbol table
-    for(int i = 0; i < sym_tab->num_entries; i++){
-        if(strcmp(sym_tab->entries[i]->name, name) == 0){
-            printf("Error: Symbol %s already exists in symbol table\n", name);
-            exit(1);
-        }
-    }
-
-    // Create a new symbol table entry
-    symbol_t* entry = (symbol_t*)malloc(sizeof(symbol_t));
-    entry->name = name;
-    entry->type = type;
-    entry->value = value;
-    entry->line_num = line_num;
-    entry->is_const = is_const;
-    entry->is_enum = is_enum;
-    entry->is_func = is_func;
-
-    // Add the entry to the symbol table
-    cvector_push_back(stack->tables[stack->num_tables-1]->entries, entry);
-    stack->tables[stack->num_tables-1]->num_entries++;
-}
-symbol_t* get_sym(sym_tab_stack_t* stack, char* name){
-    // To handle scopes we need to check if there is a symbol table in the stack
-    // If there is, we add the symbol to that table
-    // If there isn't, this means an error has occured because at least the global scope should be in the stack while creating the stack
-    if(stack->num_tables == 0){
-        printf("Error: No symbol table in stack\n");
-        exit(1);
-    }
-    // Get the symbol table at the top of the stack
-    sym_tab_t* sym_tab = stack->tables[stack->num_tables-1];
-
-    // Check if the symbol already exists in the symbol table
-    for(int i = 0; i < sym_tab->num_entries; i++){
-        if(strcmp(sym_tab->entries[i]->name, name) == 0){
-            return sym_tab->entries[i];
-        }
-    }
-    return NULL;
-}
-
-
-// Symbol table stack functions
-sym_tab_stack_t* sym_tab_stack_init(){
-    sym_tab_stack_t* stack = (sym_tab_stack_t*)malloc(sizeof(sym_tab_stack_t));
-    // We create the global scope and add it to the stack
-    stack->tables = cvector_create(sym_tab_init(), 1);
-    stack->num_tables = 1;
-    return stack;
-}
-
-
-void sym_tab_stack_push(sym_tab_stack_t* stack, sym_tab_t* sym_tab){
-    cvector_push_back(stack->tables, sym_tab);
-    stack->num_tables++;
-}
-
-
-sym_tab_t* sym_tab_stack_pop(sym_tab_stack_t* stack){
-    if(stack->num_tables == 0){
-        printf("Error: No symbol table in stack\n");
-        exit(1);
-    }
-    sym_tab_t* sym_tab = stack->tables[stack->num_tables-1];
-    cvector_pop_back(stack->tables);
-    stack->num_tables--;
-    return sym_tab;
-}
-
-
-
