@@ -1,2 +1,2 @@
-#include "comp.tab.h"
-#include "comp.lex.h"
+#include "src/comp.tab.h"
+#include "src/comp.lex.h"

@@ -1,4 +1,4 @@
-%option outfile="comp.lex.c" header-file="comp.lex.h"
+/*%option outfile="comp.lex.c" header-file="comp.lex.h"*/
 %option warn debug perf-report
 %option reentrant bison-locations bison-bridge
 %option yylineno
@@ -85,8 +85,8 @@ right_brace ("}")
 "not"       {   return TOKEN_NOT;      }
 "and"       {   return TOKEN_AND;      }
 "or"        {   return TOKEN_OR;       }
-"true"      {   yylval->BOOL = 1; return BOOL; }
-"false"     {   yylval->BOOL = 0; return BOOL; }
+"true"      {   yylval->BOOL = yytext; return BOOL; }
+"false"     {   yylval->BOOL = yytext; return BOOL; }
 
 "+"         {   return TOKEN_PLUS;     }
 "-"         {   return TOKEN_MINUS;    }

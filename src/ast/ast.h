@@ -5,6 +5,7 @@
 #include "expression/expr.h"
 #include "module_decl.h"
 #include "source.h"
+#include "assignment.h"
 // forward declarations
 typedef void *scanner_t;
 
