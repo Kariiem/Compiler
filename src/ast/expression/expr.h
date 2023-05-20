@@ -56,11 +56,11 @@ struct ast_expr_t {
   union {
     char const *identifier;
     char const *string;
-    int64_t fixed_integer;
-    double fixed_double;
-    mpz_t arb_integer;
-    mpfr_t real;
-    int64_t boolean;
+    // int64_t fixed_integer;
+    // double fixed_double;
+    // mpz_t arb_integer;
+    // mpfr_t real;
+    // int64_t boolean;
     ast_bin_expr_t *binary_expr;
     ast_funcall_t *funcall;
     ast_if_t *if_;
@@ -72,7 +72,7 @@ struct ast_expr_t {
   } value;
 };
 
-ast_expr_t *create_ast_expr_t(int type, void *value);
+ast_expr_t *create_ast_expr_t(int const type, void *value);
 void free_ast_expr_t(ast_expr_t **expr_ptr);
 void print_ast_expr_t(ast_expr_t const *expr, int indent);
 #endif // __AST_NODE_EXPR__

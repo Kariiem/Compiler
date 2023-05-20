@@ -8,7 +8,7 @@
 #include "while.h"
 // #include <gmp.h>
 
-ast_expr_t *create_ast_expr_t(int type, void *value) {
+ast_expr_t *create_ast_expr_t(int const type, void *value) {
   ast_expr_t *expr = calloc(1, sizeof(ast_expr_t));
   expr->type = type;
 
@@ -48,8 +48,6 @@ ast_expr_t *create_ast_expr_t(int type, void *value) {
   case EXPR_EQ:
   case EXPR_NEQ:
     expr->value.binary_expr = value;
-    // This maybe redundant
-    expr->value.binary_expr->op = type;
     break;
   case EXPR_NOT:
     expr->value.not_ = value;
@@ -66,12 +64,8 @@ ast_expr_t *create_ast_expr_t(int type, void *value) {
     expr->value.for_ = value;
     break;
   case EXPR_WHILE:
-    expr->value.while_ = value;
-    break;
   case EXPR_UNTIL:
     expr->value.while_ = value;
-    expr->value.while_->cond =
-        create_ast_expr_t(EXPR_NOT, expr->value.while_->cond);
     break;
   case EXPR_DO:
     expr->value.do_ = value;
@@ -135,8 +129,6 @@ void free_ast_expr_t(ast_expr_t **expr_ptr) {
     free_ast_for_t(&expr->value.for_);
     break;
   case EXPR_WHILE:
-    free_ast_while_t(&expr->value.while_);
-    break;
   case EXPR_UNTIL:
     free_ast_while_t(&expr->value.while_);
     break;
@@ -195,7 +187,7 @@ void print_ast_expr_t(ast_expr_t const *expr, int indent) {
   case EXPR_GEQ:
   case EXPR_EQ:
   case EXPR_NEQ:
-    // print_ast_bin_expr_t(expr->value.binary_expr, indent);
+    print_ast_bin_expr_t(expr->value.binary_expr, indent+1);
     break;
   case EXPR_NOT:
     // print_ast_expr_t(expr->value.not_, indent);

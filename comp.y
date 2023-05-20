@@ -219,7 +219,7 @@ arithmetic_expr:    ////TODO: We call create_ast_bin_expr_t inside the create_as
     ;
 
 logical_expr:       ////TODO: We call create_ast_bin_expr_t inside the create_ast_expr_t //
-    TOKEN_NOT expr              { $$=create_ast_expr_t(EXPR_NOT,create_ast_bin_expr_t(NULL, $2 ,EXPR_NOT)); } ///TODO: Considered as binary expr with the left operand is NULL
+    TOKEN_NOT expr              { $$=create_ast_expr_t(EXPR_NOT,$2); } 
 |   expr TOKEN_AND expr         { $$=create_ast_expr_t(EXPR_AND,create_ast_bin_expr_t($1, $3, EXPR_AND)); } 
 |   expr TOKEN_OR expr          { $$=create_ast_expr_t(EXPR_OR,create_ast_bin_expr_t($1, $3, EXPR_OR)); } 
 |   expr TOKEN_LT expr          { $$=create_ast_expr_t(EXPR_LT,create_ast_bin_expr_t($1, $3, EXPR_LT)); } 
@@ -266,7 +266,7 @@ while_loop_expr:
 
 until_loop_expr:
     TOKEN_UNTIL expr block    
-    { $$=create_ast_while_t($2, $3); }
+    { $$=create_ast_while_t(create_ast_expr_t(EXPR_NOT,$2), $3); }
     ;
 
 do_block_expr:
