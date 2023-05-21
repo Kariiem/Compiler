@@ -1,9 +1,8 @@
 #include "symbol.h"
 #include <stdio.h>
-#include "ast/utils.h"
 // Symbol
 
-symbol_t *create_symbol_t(char *name, int type, void *value, int line_num) {
+symbol_t *create_symbol_t(char *name, int type, void *value, int id) {
   symbol_t *symbol = (symbol_t *)calloc(1, sizeof(symbol_t));
   symbol->name = name;
   symbol->type = type;
@@ -17,8 +16,14 @@ symbol_t *create_symbol_t(char *name, int type, void *value, int line_num) {
   case SYM_TY_TYPE:
     symbol->value.type_val = value;
     break;
+  case SYM_TY_FUNC_PARAM:
+    symbol->value.func_param_val = value;
+    break;
+  case SYM_TY_ENUM_CONS:
+    symbol->value.enum_cons_val = value;
+    break;
   }
-  symbol->line_num = line_num;
+  symbol->id = id;
   return symbol;
 }
 
@@ -32,6 +37,12 @@ void free_symbol_t(symbol_t *symbol) {
     break;
   case SYM_TY_TYPE:
     free_ast_type_decl_t(&symbol->value.type_val);
+    break;
+  case SYM_TY_FUNC_PARAM:
+    free_ast_fun_param_t(&symbol->value.func_param_val);
+    break;
+  case SYM_TY_ENUM_CONS:
+    free_ast_constructors_t(&symbol->value.enum_cons_val);
     break;
   }
   free(symbol);
@@ -53,17 +64,17 @@ void free_sym_tab_t(sym_tab_t *sym_tab) {
 }
 
 void insert_symbol(sym_tab_t *head, int type, void *val, char *name,
-                   int line_num) {
+                   int id) {
   if (get_symbol(head, name) != NULL) {
     fprintf(stderr, "Error: line %d, Symbol %s already exists in this scope\n",
-            line_num, name);
+            id, name);
     exit(1);
   }
-  symbol_t *symbol = create_symbol_t(name, type, val, line_num);
+  symbol_t *symbol = create_symbol_t(name, type, val, id);
   cvector_push_back(head->entries, symbol);
 }
 
-symbol_t *get_symbol(sym_tab_t *head, char *name) {
+symbol_t *get_symbol(sym_tab_t *head, const char *name) {
   sym_tab_t *iterator = head;
   while (iterator != NULL) {
     for (int i = 0; i < cvector_size(iterator->entries); i++) {
@@ -76,14 +87,158 @@ symbol_t *get_symbol(sym_tab_t *head, char *name) {
   return NULL;
 }
 
-void push_scope(sym_tab_t **head) {
+sym_tab_t * push_scope(sym_tab_t const * head) {
   sym_tab_t *new_scope = create_sym_tab_t();
-  new_scope->parent = *head;
-  *head = new_scope;
+  new_scope->parent = head;
+  return new_scope;
 }
 
-void pop_scope(sym_tab_t **head) {
-  sym_tab_t *temp = *head;
-  *head = (*head)->parent;
-  free_sym_tab_t(temp);
+sym_tab_t * pop_scope(sym_tab_t const *head) {
+  sym_tab_t *parent = head->parent;
+  free_sym_tab_t(head);
+  return parent;
+}
+
+
+
+// Define a function that will traverse the AST with inorder traversal
+// The function will take two arguments
+// The arguemnts are the root of the AST (ast_source_t *) and the symbol table which is initially empty (sym_tab_t *)
+// The function will open a file and create the assembly code for the program in the file
+// It will create a symbol entry for each type declaration, function declaration and variable declaration node in the AST
+// For each function call node, it will check if the function is defined in the symbol table
+// If the function is not defined, it will print an error message and exit
+// If the function is defined, it will check if the number of arguments passed to the function is equal to the number of parameters in the function declaration
+// If the number of arguments is not equal to the number of parameters, it will print an error message and exit
+// If the number of arguments is equal to the number of parameters, it will check if the type of each argument is equal to the type of the corresponding parameter
+// If the type of any argument is not equal to the type of the corresponding parameter, it will print an error message and exit
+// If the type of each argument is equal to the type of the corresponding parameter, it will create assembly code for the function call
+// For each variable declaration node, it will check if the variable is already defined in the symbol table
+// If the variable is already defined, it will print an error message and exit
+// If the variable is not defined, it will create a new symbol entry for the variable in the symbol table
+// For each variable reference node, it will check if the variable is defined in the symbol table
+// If the variable is not defined, it will print an error message and exit
+// If the variable is defined, it will check if the type of the variable is equal to the type of the expression
+// If the type of the variable is not equal to the type of the expression, it will print an error message and exit
+// If the type of the variable is equal to the type of the expression, it will create a new assembly code for the variable reference
+// For each type declaration node, it will check if the type is already defined in the symbol table
+// If the type is already defined, it will print an error message and exit
+// If the type is not defined, it will create a new symbol entry for the type in the symbol table
+// For each type reference node, it will check if the type is defined in the symbol table
+// If the type is not defined, it will print an error message and exit
+// If the type is defined, it will create a new assembly code for the type reference
+// For each function declaration node, it will check if the function is already defined in the symbol table
+// If the function is already defined, it will print an error message and exit
+// If the function is not defined, it will create a new symbol entry for the function in the symbol table and create assembly code for the function declaration
+
+
+void traverse_ast(ast_source_t *root, sym_tab_t *sym_tab) {
+  if (root == NULL) {
+    return;
+  }
+
+  int id = 0;
+  // ast_source_t *root contains decl_list vtype of ast_top_level_decl_t *
+
+  for (int i = 0; i < cvector_size(root->decl_list); i++) {
+    ast_top_level_decl_t *decl = root->decl_list[i];
+    switch (decl->type) {
+    case DECL_FUN:
+      {
+        ast_fundecl_t *fundecl = decl->value.fun;
+        if (get_symbol(sym_tab, fundecl->fun_name) != NULL) {
+          fprintf(stderr, "Error: Function %s already exists in this scope\n",
+                  , fundecl->name);
+          exit(1);
+        }
+        id++;
+        symbol_t *symbol = create_symbol_t(fundecl->fun_name, SYM_TY_FUNC, fundecl, id);
+        cvector_push_back(sym_tab->entries, symbol);
+        break;
+      }
+    case DECL_TYPE:
+      {
+        ast_type_decl_t *type_decl = decl->value.type_decl;
+        if (get_symbol(sym_tab, type_decl->name) != NULL) {
+          fprintf(stderr, "Error: line %d, Type %s already exists in this scope\n",
+                  type_decl->line_num, type_decl->name);
+          exit(1);
+        }
+        symbol_t *symbol = create_symbol_t(type_decl->name, SYM_TY_TYPE, type_decl, type_decl->line_num);
+        cvector_push_back(sym_tab->entries, symbol);
+        break;
+      }
+    case DECL_TERM:
+      {
+        ast_term_decl_t *term_decl = decl->value.term_decl;
+        if (get_symbol(sym_tab, term_decl->name) != NULL) {
+          fprintf(stderr, "Error: line %d, Variable %s already exists in this scope\n",
+                  term_decl->line_num, term_decl->name);
+          exit(1);
+        }
+        symbol_t *symbol = create_symbol_t(term_decl->name, SYM_TY_TERM, term_decl, term_decl->line_num);
+        cvector_push_back(sym_tab->entries, symbol);
+        break;
+      }
+    case DECL_IMPORT:
+    break;
+    case DECL_ASSIGN:
+    break;
+    default:
+    DEBUG_ASSERT(false, "Unkonwn decl type %d\n", decl->type);
+    break;
+    }
+  }
+
+
+}
+
+
+
+
+
+
+
+
+void traverse_ast_func_decl(ast_fundecl_t* func_decl, sym_tab_t *parent, int* id )
+{
+  sym_tab_t *sym_tab = push_scope(parent);
+
+  // add parameters to symbol table
+  for (int i = 0; i < cvector_size(func_decl->param_list); i++) {
+    ast_fun_param_t *param = func_decl->param_list[i];
+    if (get_symbol(sym_tab, param->param_name) != NULL) {
+      fprintf(stderr, "Error: Variable %s already defined in the list of params\n",
+              param->param_name);
+      exit(1);
+    }
+    *id = *id + 1;
+    symbol_t *symbol = create_symbol_t(param->param_name, SYM_TY_FUNC_PARAM, param, *id);
+    cvector_push_back(sym_tab->entries, symbol);
+  }
+
+  //iterate through the body of the function (type ast_block_t*)
+  for (int i = 0; i < cvector_size(func_decl->body->block_expr_list); i++) {
+    ast_block_expr_t *stmt = func_decl->body->block_expr_list[i];
+    switch (stmt->type) {
+    case ASSIGN:
+      {
+        ast_assignment_t *assign = stmt->value.assign;
+        symbol_t *symbol = get_symbol(sym_tab, assign->identifier);
+        if (symbol == NULL || symbol->type != SYM_TY_TERM) {
+          fprintf(stderr, "Error: Variable %s is not present in this scope\n",
+                  assign->identifier);
+          exit(1);
+        }
+        while (assign->value->type == EXPR_IDENTIFIER ) {
+          
+        }
+        symbol->value.term_val->value = assign->value;
+        break;
+      }
+  }
+
+}
+
+
 }
