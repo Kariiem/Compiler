@@ -1,4 +1,5 @@
 #include "source.h"
+#include "../symbol.h"
 #include "datastructures/cvector_utils.h"
 #include "datastructures/utils.h"
 #include "declaration/top_level_decl.h"
@@ -21,12 +22,22 @@ void free_ast_source_t(ast_source_t **source) {
   *source = NULL;
 }
 
-void print_ast_source_t(ast_source_t const *source,int indent) {
+void print_ast_source_t(ast_source_t const *source, int indent) {
   printf("ast_source_t\n");
-  print_ast_module_decl_t(source->module,indent+1);
+  print_ast_module_decl_t(source->module, indent + 1);
 
   ast_top_level_decl_t **it;
   cvector_for_each_in(it, source->decl_list) {
-    print_ast_top_level_decl_t(*it,indent+1);
+    print_ast_top_level_decl_t(*it, indent + 1);
+  }
+}
+
+void walk_ast_source_t(ast_source_t const *source, symbol_table_t *sym_tab) {
+  DEBUG_EPRINTF("walk ast_source_t\n");
+  walk_ast_module_decl_t(source->module, sym_tab);
+
+  ast_top_level_decl_t **it;
+  cvector_for_each_in(it, source->decl_list) {
+    walk_ast_top_level_decl_t(*it, sym_tab);
   }
 }

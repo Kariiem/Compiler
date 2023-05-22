@@ -16,6 +16,7 @@
 #include <stdint.h>
 
 typedef struct ast_expr_t ast_expr_t;
+typedef struct symbol_table_t symbol_table_t; // forward declaration
 
 struct ast_expr_t {
   enum {
@@ -75,4 +76,5 @@ struct ast_expr_t {
 ast_expr_t *create_ast_expr_t(int const type, void *value);
 void free_ast_expr_t(ast_expr_t **expr_ptr);
 void print_ast_expr_t(ast_expr_t const *expr, int indent);
+void walk_ast_expr_t(ast_expr_t const *expr, symbol_table_t *sym_tab);
 #endif // __AST_NODE_EXPR__

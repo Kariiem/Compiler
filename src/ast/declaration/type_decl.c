@@ -11,6 +11,7 @@ ast_type_decl_t *create_ast_type_decl_t(char const *type_name,
   type->constructor_list = constructor_list;
   return type;
 }
+
 void free_ast_type_decl_t(ast_type_decl_t **type_decl_ptr) {
   DEBUG_EPRINTF("free ast_type_decl_t\n");
   ast_type_decl_t *type = *type_decl_ptr;
@@ -19,4 +20,19 @@ void free_ast_type_decl_t(ast_type_decl_t **type_decl_ptr) {
   CVECTOR_FREE(type->constructor_list, free_ast_constructors_t);
   free(type);
   *type_decl_ptr = NULL;
+}
+
+void print_ast_type_decl_t(ast_type_decl_t const *type_decl, int indent) {
+  INDENT(indent);
+  printf("ast_type_decl_t\n");
+  INDENT(indent + 1);
+  printf("type_name: %s\n", type_decl->type_name);
+  INDENT(indent + 1);
+  printf("constructor_list:\n");
+  // cvector_for_each(type_decl->constructor_list, print_ast_constructors_t,
+  //                  indent + 2);
+}
+void walk_ast_type_decl_t(ast_type_decl_t const *type_decl,
+                          symbol_table_t *sym_tab) {
+  DEBUG_EPRINTF("walk ast_type_decl_t\n");
 }

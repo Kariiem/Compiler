@@ -7,6 +7,8 @@
 #include "../assignment.h"
 
 typedef struct ast_top_level_decl_t ast_top_level_decl_t;
+typedef struct symbol_table_t symbol_table_t;
+
 struct ast_top_level_decl_t {
   enum { DECL_IMPORT, DECL_TYPE, DECL_TERM, DECL_FUN,DECL_ASSIGN } type;
   union {
@@ -23,4 +25,7 @@ void free_ast_top_level_decl_t(ast_top_level_decl_t **top_level_decl_ptr);
 
 void print_ast_top_level_decl_t(ast_top_level_decl_t const *top_level_decl,
                                 int indent);
+
+void walk_ast_top_level_decl_t(ast_top_level_decl_t const *top_level_decl,
+                               symbol_table_t *sym_tab);
 #endif // __AST_NODE_TOP_LEVEL_DECL__

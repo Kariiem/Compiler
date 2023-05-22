@@ -21,3 +21,7 @@ void print_ast_import_decl_t(ast_import_decl_t const *import, int indent) {
   INDENT(indent+1);
   printf("import_name: %s\n", import->import_name);
 }
+
+void walk_ast_import_decl_t(ast_import_decl_t const *import, symbol_table_t *sym_tab){
+  DEBUG_EPRINTF("walk ast_import_decl_t\n");
+}

@@ -1,7 +1,7 @@
 #include "term_decl.h"
 #include "../utils.h"
 #include <stdlib.h>
-
+#include "../../symbol.h"
 ast_term_decl_t *create_ast_term_decl_t(int type, char const *decl_name,
                                         char const *decl_type,
                                         ast_expr_t *value) {
@@ -39,5 +39,13 @@ void print_ast_term_decl_t(ast_term_decl_t const *term_decl, int indent) {
   else {
     INDENT(indent);
     printf("value: NULL\n");
+  }
+}
+
+void walk_ast_term_decl_t(ast_term_decl_t const *term_decl,
+                          symbol_table_t *sym_tab) {
+  DEBUG_EPRINTF("walk ast_term_decl_t\n");
+  if (term_decl->value) {
+    walk_ast_expr_t(term_decl->value, sym_tab);
   }
 }

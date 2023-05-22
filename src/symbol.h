@@ -6,7 +6,7 @@
 
 
 typedef struct symbol_t symbol_t;
-typedef struct sym_tab_t sym_tab_t;
+typedef struct symbol_table_t symbol_table_t;
 
 // Struct of a single entry in the symbol table
 struct symbol_t {
@@ -29,27 +29,27 @@ struct symbol_t {
 };
 
 // Struct of the symbol table itself
-struct sym_tab_t {
+struct symbol_table_t {
   vtype(symbol_t *) entries;
   int index;
-  sym_tab_t *parent;
+  symbol_table_t *parent;
 };
 
 // create and free , for a symbol
 symbol_t *create_symbol_t(char *name, int type, void *value, int id);
-void free_symbol_t(symbol_t *symbol);
+void free_symbol_t(symbol_t **symbol_ptr);
 
 // create and free , for a symbol table
-sym_tab_t *create_sym_tab_t();
-void free_sym_tab_t(sym_tab_t *sym_tab);
+symbol_table_t *create_sym_tab_t();
+void free_sym_tab_t(symbol_table_t **sym_tab_ptr);
 
 // insert symbol into the current symbol table (scope)
-void insert_symbol(sym_tab_t *head, int type, void *val, char *name,
+void insert_symbol(symbol_table_t *head, int type, void *val, char *name,
                    int id);
-symbol_t *get_symbol(sym_tab_t *head, char const  *name);
+symbol_t *get_symbol(symbol_table_t *head, char const  *name);
 
 // create new local scope
-void push_scope(sym_tab_t **head);
-void pop_scope(sym_tab_t **head);
+void push_scope(symbol_table_t **head);
+void pop_scope(symbol_table_t **head);
 
 #endif // __SYMBOL_H__

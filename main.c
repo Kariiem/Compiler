@@ -2,7 +2,6 @@
 #include "src/ast/ast.h"
 #include "src/ast/source.h"
 #include "src/symbol.h"
-#include "src/symbol.c"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

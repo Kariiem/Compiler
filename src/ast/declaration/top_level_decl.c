@@ -30,6 +30,7 @@ ast_top_level_decl_t *create_ast_top_level_decl_t(int type, void *value) {
   }
   return top_decl;
 }
+
 void free_ast_top_level_decl_t(ast_top_level_decl_t **top_level_decl_ptr) {
   DEBUG_EPRINTF("free ast_top_level_decl_t\n");
   ast_top_level_decl_t *top_decl = *top_level_decl_ptr;
@@ -77,6 +78,29 @@ void print_ast_top_level_decl_t(ast_top_level_decl_t const *top_level_decl, int 
     break;
   case DECL_ASSIGN:
     // print_ast_assignment_t(top_level_decl->value.assign);
+    break;
+  }
+}
+
+void walk_ast_top_level_decl_t(const ast_top_level_decl_t *top_level_decl, symbol_table_t *sym_tab){
+  DEBUG_EPRINTF("walk ast_top_level_decl_t\n");
+  switch (top_level_decl->type) {
+  default:
+    DEBUG_ASSERT(false, "Unkown type %d", top_level_decl->type);
+  case DECL_IMPORT:
+    walk_ast_import_decl_t(top_level_decl->value.import, sym_tab);
+    break;
+  case DECL_TYPE:
+    walk_ast_type_decl_t(top_level_decl->value.type_name, sym_tab);
+    break;
+  case DECL_TERM:
+    walk_ast_term_decl_t(top_level_decl->value.term, sym_tab);
+    break;
+  case DECL_FUN:
+    walk_ast_fundecl_t(top_level_decl->value.fun, sym_tab);
+    break;
+  case DECL_ASSIGN:
+    walk_ast_assignment_t(top_level_decl->value.assign, sym_tab);
     break;
   }
 }

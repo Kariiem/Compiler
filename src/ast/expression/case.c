@@ -9,6 +9,7 @@ ast_case_t *create_ast_case_t(ast_expr_t *expr, ast_block_t *body) {
   case_->body = body;
   return case_;
 }
+
 void free_ast_case_t(ast_case_t **case_ptr) {
   DEBUG_EPRINTF("free ast_case_t\n");
   ast_case_t *case_ = *case_ptr;
@@ -18,4 +19,17 @@ void free_ast_case_t(ast_case_t **case_ptr) {
   free_ast_block_t(&case_->body);
   free(case_);
   *case_ptr = NULL;
+}
+
+void print_ast_case_t(ast_case_t const *case_, int indent){
+  INDENT(indent);
+  printf("ast_case_t\n");
+  print_ast_expr_t(case_->case_expr, indent+1);
+  print_ast_block_t(case_->body, indent+1);
+}
+
+void walk_ast_case_t(ast_case_t const *case_, symbol_table_t *sym_tab){
+  DEBUG_EPRINTF("walk ast_case_t\n");
+  walk_ast_expr_t(case_->case_expr, sym_tab);
+  walk_ast_block_t(case_->body, sym_tab);
 }

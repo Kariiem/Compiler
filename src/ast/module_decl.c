@@ -1,4 +1,5 @@
 #include "module_decl.h"
+#include "../symbol.h"
 #include "tbassert.h"
 #include "utils.h"
 
@@ -20,6 +21,11 @@ void free_ast_module_decl_t(ast_module_decl_t **module_ptr) {
 void print_ast_module_decl_t(ast_module_decl_t const *module, int indent) {
   INDENT(indent);
   printf("ast_module_decl_t\n");
-  INDENT(indent+1);
+  INDENT(indent + 1);
   printf("module_name: %s\n", module->module_name);
+}
+
+void walk_ast_module_decl_t(ast_module_decl_t const *module,
+                            symbol_table_t *sym_tab) {
+  DEBUG_EPRINTF("walk ast_module_decl_t\n");
 }

@@ -27,3 +27,9 @@ void print_ast_bin_expr_t(ast_bin_expr_t const *bin_expr, int indent){
   print_ast_expr_t(bin_expr->left, indent+1);
   print_ast_expr_t(bin_expr->right, indent+1);
 }
+
+void walk_ast_bin_expr_t(ast_bin_expr_t const *bin_expr, symbol_table_t *sym_tab){
+  DEBUG_EPRINTF("walk ast_bin_expr_t\n");
+  walk_ast_expr_t(bin_expr->left, sym_tab);
+  walk_ast_expr_t(bin_expr->right, sym_tab);
+}

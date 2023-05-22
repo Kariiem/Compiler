@@ -4,10 +4,10 @@
 #include "../datastructures/cvector.h"
 #include "block.h"
 #include "case.h"
-#include <stdbool.h>
 
 typedef struct ast_expr_t ast_expr_t;
 typedef struct ast_switch_t ast_switch_t;
+typedef struct symbol_table_t symbol_table_t;
 
 struct ast_switch_t {
   ast_expr_t *enum_expr;
@@ -16,4 +16,6 @@ struct ast_switch_t {
 ast_switch_t *create_ast_switch_t(ast_expr_t *expr,
                                   vtype(ast_case_t *) cases);
 void free_ast_switch_t(ast_switch_t **switch_ptr);
+void print_ast_switch_t(ast_switch_t const *switch_, int indent);
+void walk_ast_switch_t(ast_switch_t const *switch_, symbol_table_t *sym_tab);
 #endif // __AST_NODE_SWITCH__

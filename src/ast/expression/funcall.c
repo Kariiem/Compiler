@@ -17,3 +17,19 @@ void free_ast_funcall_t(ast_funcall_t **funcall_ptr) {
   free(funcall);
   *funcall_ptr = NULL;
 }
+
+void print_ast_funcall_t(ast_funcall_t const *funcall, int indent) {
+  INDENT(indent);
+  printf("ast_funcall_t\n");
+  INDENT(indent + 1);
+  printf("fun_name: %s\n", funcall->fun_name);
+  INDENT(indent + 1);
+  printf("args:\n");
+  ast_expr_t **it;
+  cvector_for_each_in(it, funcall->args) { print_ast_expr_t(*it, indent + 2); }
+}
+
+void walk_ast_funcall_t(ast_funcall_t const *funcall, symbol_table_t *sym_tab) {
+  DEBUG_EPRINTF("walk ast_funcall_t\n");
+  
+}
