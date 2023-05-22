@@ -29,9 +29,9 @@ void print_ast_case_t(ast_case_t const *case_, int indent) {
   print_ast_block_t(case_->body, indent + 1);
 }
 
-void walk_ast_case_t(ast_case_t const *case_, symbol_table_t *sym_tab) {
+void walk_ast_case_t(ast_case_t const *case_, symbol_table_t *sym_tab, int id) {
   DEBUG_EPRINTF("walk ast_case_t\n");
   if (case_->case_expr)
-    walk_ast_expr_t(case_->case_expr, sym_tab);
-  walk_ast_block_t(case_->body, sym_tab);
+    walk_ast_expr_t(case_->case_expr, sym_tab,id);
+  walk_ast_block_t(case_->body, sym_tab, id);
 }

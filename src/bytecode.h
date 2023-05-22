@@ -1,6 +1,7 @@
 #ifndef __BYTECODE_GEN_H__
 #define __BYTECODE_GEN_H__
 
+#include <stdio.h>
 typedef struct {
   enum {
     OP_CODE_LABEL,
@@ -32,5 +33,22 @@ typedef struct {
   int unique_id;
   char *anottation;
 } Bytecode;
+
+#define GEN_INSTRUCTIONS(str)                                                  \
+  do {                                                                         \
+    fprintf(instructions, "%s\n", str);                                        \
+  } while (0)
+#define GEN_FUNCTIONS(str)                                                     \
+  do {                                                                         \
+    fprintf(functions, "%s\n", str);                                           \
+  } while (0)
+#define GEN_CALL_STACK(str)                                                    \
+  do {                                                                         \
+    fprintf(call_stack, "%s\n", str);                                          \
+  } while (0)
+#define GEN_TYPES(str)                                                         \
+  do {                                                                         \
+    fprintf(types, "%s\n", str);                                               \
+  } while (0)
 
 #endif // __BYTECODE_GEN_H__

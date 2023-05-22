@@ -3,6 +3,7 @@
 #include "datastructures/cvector_utils.h"
 #include "datastructures/utils.h"
 #include "declaration/top_level_decl.h"
+#include "tbassert.h"
 #include "utils.h"
 ast_source_t *create_ast_source_t(ast_module_decl_t *module,
                                   vtype(ast_top_level_decl_t *) decl_list) {
@@ -32,12 +33,13 @@ void print_ast_source_t(ast_source_t const *source, int indent) {
   }
 }
 
-void walk_ast_source_t(ast_source_t const *source, symbol_table_t *sym_tab) {
+void walk_ast_source_t(ast_source_t const *source, symbol_table_t *sym_tab,
+                       int id) {
   DEBUG_EPRINTF("walk ast_source_t\n");
-  walk_ast_module_decl_t(source->module, sym_tab);
-
+  DEBUG_ASSERT(sym_tab, "sym_tab is NULL\n");
+  walk_ast_module_decl_t(source->module, sym_tab, id);
   ast_top_level_decl_t **it;
   cvector_for_each_in(it, source->decl_list) {
-    walk_ast_top_level_decl_t(*it, sym_tab);
+    walk_ast_top_level_decl_t(*it, sym_tab, id);
   }
 }

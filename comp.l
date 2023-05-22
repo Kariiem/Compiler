@@ -22,13 +22,13 @@
         yylloc->last_column = yytext + yyleng - strrchr(yytext, '\n'); \
       }
 
-  // char* copy_str(char const * cstr){
-    // char*ptr=(char*) malloc(strlen(cstr) + 1); // +1 for the null terminator
-    // 
-    // strcpy(ptr, cstr);
-    // return ptr;
-  // }
-  #define copy_str(cstr) (cstr)
+  char* copy_str(char const * cstr){
+    char*ptr=(char*) malloc(strlen(cstr) + 1); // +1 for the null terminator
+    
+    strcpy(ptr, cstr);
+    return ptr;
+  }
+  // #define copy_str(cstr) (cstr)
 %}
 
 

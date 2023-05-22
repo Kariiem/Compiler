@@ -31,11 +31,11 @@ void print_ast_switch_t(ast_switch_t const *switch_, int indent){
   }
 }
 
-void walk_ast_switch_t(ast_switch_t const *switch_, symbol_table_t *sym_tab){
+void walk_ast_switch_t(ast_switch_t const *switch_, symbol_table_t *sym_tab, int id){
   DEBUG_EPRINTF("walk ast_switch_t\n");
-  walk_ast_expr_t(switch_->enum_expr, sym_tab);
+  walk_ast_expr_t(switch_->enum_expr, sym_tab,id);
   ast_case_t **it;
   cvector_for_each_in(it,switch_->cases) {
-    walk_ast_case_t(*it, sym_tab);
+    walk_ast_case_t(*it, sym_tab,id);
   }
 }

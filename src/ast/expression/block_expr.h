@@ -20,5 +20,5 @@ ast_block_expr_t *create_ast_block_expr_t(int type, void *value);
 void free_ast_block_expr_t(ast_block_expr_t **block_expr_ptr);
 void print_ast_block_expr_t(ast_block_expr_t const *block_expr, int indent);
 void walk_ast_block_expr_t(ast_block_expr_t const *block_expr,
-                           symbol_table_t *sym_tab);
+                           symbol_table_t *sym_tab, int id);
 #endif // __AST_NODE_BLOCK_EXPR__

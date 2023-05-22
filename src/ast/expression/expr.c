@@ -220,7 +220,7 @@ void print_ast_expr_t(ast_expr_t const *expr, int indent) {
   }
 }
 
-void walk_ast_expr_t(ast_expr_t const *expr, symbol_table_t *sym_tab){
+void walk_ast_expr_t(ast_expr_t const *expr, symbol_table_t *sym_tab, int id){
   DEBUG_EPRINTF("walk ast_expr_t\n");
   switch (expr->type) {
   default:
@@ -249,33 +249,33 @@ void walk_ast_expr_t(ast_expr_t const *expr, symbol_table_t *sym_tab){
   case EXPR_GEQ:
   case EXPR_EQ:
   case EXPR_NEQ:
-    walk_ast_bin_expr_t(expr->value.binary_expr, sym_tab);
+    walk_ast_bin_expr_t(expr->value.binary_expr, sym_tab, id);
     break;
   case EXPR_NOT:
-    walk_ast_expr_t(expr->value.not_, sym_tab);
+    walk_ast_expr_t(expr->value.not_, sym_tab,id);
     break;
   // function call
   case EXPR_FUNCALL:
-    walk_ast_funcall_t(expr->value.funcall, sym_tab);
+    walk_ast_funcall_t(expr->value.funcall, sym_tab,id);
     break;
   // compound expressions
   case EXPR_IF:
-    walk_ast_if_t(expr->value.if_, sym_tab);
+    walk_ast_if_t(expr->value.if_, sym_tab,id);
     break;
   case EXPR_FOR:
-    walk_ast_for_t(expr->value.for_, sym_tab);
+    walk_ast_for_t(expr->value.for_, sym_tab,id);
     break;
   case EXPR_WHILE:
-    walk_ast_while_t(expr->value.while_, sym_tab);
+    walk_ast_while_t(expr->value.while_, sym_tab,id);
     break;
   case EXPR_UNTIL:
-    walk_ast_while_t(expr->value.while_, sym_tab);
+    walk_ast_while_t(expr->value.while_, sym_tab,id);
     break;
   case EXPR_DO:
-    walk_ast_do_t(expr->value.do_, sym_tab);
+    walk_ast_do_t(expr->value.do_, sym_tab,id);
     break;
   case EXPR_SWITCH:
-    walk_ast_switch_t(expr->value.switch_, sym_tab);
+    walk_ast_switch_t(expr->value.switch_, sym_tab,id);
     break;
   }
 }

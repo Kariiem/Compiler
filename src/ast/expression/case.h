@@ -14,5 +14,5 @@ struct ast_case_t {
 ast_case_t *create_ast_case_t(ast_expr_t *expr, ast_block_t *body);
 void free_ast_case_t(ast_case_t **case_ptr);
 void print_ast_case_t(ast_case_t const *case_, int indent);
-void walk_ast_case_t(ast_case_t const *case_, symbol_table_t *sym_tab);
+void walk_ast_case_t(ast_case_t const *case_, symbol_table_t *sym_tab, int id);
 #endif // __AST_NODE_CASE__

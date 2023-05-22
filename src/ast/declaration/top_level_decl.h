@@ -27,5 +27,5 @@ void print_ast_top_level_decl_t(ast_top_level_decl_t const *top_level_decl,
                                 int indent);
 
 void walk_ast_top_level_decl_t(ast_top_level_decl_t const *top_level_decl,
-                               symbol_table_t *sym_tab);
+                               symbol_table_t *sym_tab,int id);
 #endif // __AST_NODE_TOP_LEVEL_DECL__

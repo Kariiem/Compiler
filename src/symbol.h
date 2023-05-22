@@ -4,6 +4,12 @@
 #include "ast/ast.h"
 #include "ast/utils.h"
 
+extern FILE *instructions;
+extern FILE *functions; 
+extern FILE *call_stack;
+extern FILE *types;
+#include "bytecode.h"
+
 
 typedef struct symbol_t symbol_t;
 typedef struct symbol_table_t symbol_table_t;
@@ -36,16 +42,15 @@ struct symbol_table_t {
 };
 
 // create and free , for a symbol
-symbol_t *create_symbol_t(char *name, int type, void *value, int id);
+symbol_t *create_symbol_t(char const *name, int type, void *value, int id);
 void free_symbol_t(symbol_t **symbol_ptr);
 
 // create and free , for a symbol table
-symbol_table_t *create_sym_tab_t();
-void free_sym_tab_t(symbol_table_t **sym_tab_ptr);
+symbol_table_t *create_symbol_table_t();
+void free_symbol_table_t(symbol_table_t **sym_tab_ptr);
 
 // insert symbol into the current symbol table (scope)
-void insert_symbol(symbol_table_t *head, int type, void *val, char *name,
-                   int id);
+void insert_symbol(symbol_table_t *head, symbol_t *symbol);
 symbol_t *get_symbol(symbol_table_t *head, char const  *name);
 
 // create new local scope

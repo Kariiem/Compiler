@@ -34,7 +34,7 @@ void print_ast_assignment_t(ast_assignment_t const *assignment, int indent) {
   }
 }
 void walk_ast_assignment_t(ast_assignment_t const *assignment,
-                           symbol_table_t *sym_tab) {
+                           symbol_table_t *sym_tab,int id) {
   DEBUG_EPRINTF("walk ast_assignment_t\n");
-  walk_ast_expr_t(assignment->value, sym_tab);
+  walk_ast_expr_t(assignment->value, sym_tab,id);
 }

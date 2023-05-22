@@ -43,9 +43,9 @@ void print_ast_term_decl_t(ast_term_decl_t const *term_decl, int indent) {
 }
 
 void walk_ast_term_decl_t(ast_term_decl_t const *term_decl,
-                          symbol_table_t *sym_tab) {
+                          symbol_table_t *sym_tab,int id) {
   DEBUG_EPRINTF("walk ast_term_decl_t\n");
   if (term_decl->value) {
-    walk_ast_expr_t(term_decl->value, sym_tab);
+    walk_ast_expr_t(term_decl->value, sym_tab,id);
   }
 }

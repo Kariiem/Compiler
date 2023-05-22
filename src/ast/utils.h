@@ -2,6 +2,7 @@
 #define __UTILS__
 #include "tbassert.h"
 #include <stdio.h>
+//
 // source: https://stackoverflow.com/a/23657072
 #define RED "\x1B[7;40;31m"
 #define GRN "\x1B[7;40;32m"
@@ -31,12 +32,13 @@
     free((void *)ptr);                                                         \
     (ptr) = NULL;                                                              \
   } while (0)
-#undef FREE_ATOM
-#define FREE_ATOM(ptr)
+// #undef FREE_ATOM
+// #define FREE_ATOM(ptr)
 #define INDENT(indent)                                                         \
   do {                                                                         \
     for (int i = 0; i < indent; i++) {                                         \
       printf("  ");                                                            \
     }                                                                          \
   } while (0)
+
 #endif //__UTILS__

@@ -1,9 +1,10 @@
 #include "symbol.h"
 #include "ast/utils.h"
 #include <stdio.h>
-// Symbol
 
-symbol_t *create_symbol_t(char *name, int type, void *value, int id) {
+
+// Symbol
+symbol_t *create_symbol_t(char const *name, int type, void *value, int id) {
   symbol_t *symbol = (symbol_t *)calloc(1, sizeof(symbol_t));
   symbol->name = name;
   symbol->type = type;
@@ -48,7 +49,7 @@ void free_symbol_t(symbol_t **symbol_ptr) {
 }
 
 // Symbol table functions
-symbol_table_t *create_sym_tab_t() {
+symbol_table_t *create_symbol_table_t() {
   symbol_table_t *sym_tab = (symbol_table_t *)calloc(1, sizeof(symbol_table_t));
   sym_tab->entries = NULL;
   sym_tab->index = -1;
@@ -56,7 +57,7 @@ symbol_table_t *create_sym_tab_t() {
   return sym_tab;
 }
 
-void free_sym_tab_t(symbol_table_t **sym_tab_ptr) {
+void free_symbol_table_t(symbol_table_t **sym_tab_ptr) {
   DEBUG_EPRINTF("free ast_fundecl_t\n");
   symbol_table_t *sym_tab = *sym_tab_ptr;
   DEBUG_ASSERT(sym_tab, "sym_tab is NULL");
@@ -65,14 +66,8 @@ void free_sym_tab_t(symbol_table_t **sym_tab_ptr) {
   *sym_tab_ptr = NULL;
 }
 
-void insert_symbol(symbol_table_t *head, int type, void *val, char *name,
-                   int line_num) {
-  if (get_symbol(head, name) != NULL) {
-    fprintf(stderr, "Error: line %d, Symbol %s already exists in this scope\n",
-            line_num, name);
-    exit(1);
-  }
-  symbol_t *symbol = create_symbol_t(name, type, val, line_num);
+void insert_symbol(symbol_table_t *head, symbol_t *symbol) {
+  DEBUG_ASSERT(head, "head is NULL\n");
   cvector_push_back(head->entries, symbol);
 }
 
@@ -90,7 +85,7 @@ symbol_t *get_symbol(symbol_table_t *head, char const *name) {
 }
 
 void push_scope(symbol_table_t **head) {
-  symbol_table_t *new_scope = create_sym_tab_t();
+  symbol_table_t *new_scope = create_symbol_table_t();
   new_scope->parent = *head;
   *head = new_scope;
 }
@@ -98,5 +93,5 @@ void push_scope(symbol_table_t **head) {
 void pop_scope(symbol_table_t **head) {
   symbol_table_t *temp = *head;
   *head = (*head)->parent;
-  free_sym_tab_t(&temp);
+  free_symbol_table_t(&temp);
 }

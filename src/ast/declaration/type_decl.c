@@ -1,6 +1,7 @@
 #include "type_decl.h"
 #include "../utils.h"
 #include "constructors.h"
+#include "../../symbol.h"
 #include <stdlib.h>
 
 ast_type_decl_t *create_ast_type_decl_t(char const *type_name,
@@ -33,6 +34,9 @@ void print_ast_type_decl_t(ast_type_decl_t const *type_decl, int indent) {
   //                  indent + 2);
 }
 void walk_ast_type_decl_t(ast_type_decl_t const *type_decl,
-                          symbol_table_t *sym_tab) {
+                          symbol_table_t *sym_tab, int id) {
   DEBUG_EPRINTF("walk ast_type_decl_t\n");
+  symbol_t* type_sym = create_symbol_t(type_decl->type_name, SYM_TY_TYPE,type_decl,0);
+  insert_symbol(sym_tab, type_sym);
+  GEN_TYPES(type_decl->type_name);
 }
