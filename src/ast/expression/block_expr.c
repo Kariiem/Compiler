@@ -49,7 +49,7 @@ void free_ast_block_expr_t(ast_block_expr_t **block_expr_ptr) {
 }
 
 void print_ast_block_expr_t(ast_block_expr_t const *block_expr, int indent) {
-  
+
   switch (block_expr->type) {
   default:
     DEBUG_ASSERT(false, "Unkown type %d", block_expr->type);
@@ -67,6 +67,20 @@ void print_ast_block_expr_t(ast_block_expr_t const *block_expr, int indent) {
 }
 
 void walk_ast_block_expr_t(ast_block_expr_t const *block_expr,
-                           symbol_table_t *sym_tab, int* id) {
+                           symbol_table_t *sym_tab, int *id) {
   DEBUG_EPRINTF("walk ast_block_expr_t\n");
+  switch (block_expr->type) {
+  default:
+    DEBUG_ASSERT(false, "Unkown type %d", block_expr->type);
+  case EXPR:
+    walk_ast_expr_t(block_expr->value.expr, sym_tab, id);
+    break;
+  case DECL:
+    ++(*id);
+    walk_ast_term_decl_t(block_expr->value.decl, sym_tab, id);
+    break;
+  case ASSIGN:
+    walk_ast_assignment_t(block_expr->value.assign, sym_tab, id);
+    break;
+  }
 }

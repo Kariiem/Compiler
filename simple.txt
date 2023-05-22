@@ -4,11 +4,11 @@ import numpy
 import hello
 
 
+var y:int = 0;
 
-var x:int = 10;
-
-var y:int = x;
-
-var z:int = x + y+y;
-
-var d:bool= x<1;
+var x:int = 
+    if true { 
+        1;
+    } else { 
+        1;
+    };

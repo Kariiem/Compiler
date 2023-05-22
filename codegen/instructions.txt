@@ -1,15 +1,11 @@
 _start:
-PUSH 10
-PUSH_MEM $1
-POP_MEM $1
-PUSH_MEM $2
-POP_MEM $1
-POP_MEM $2
-ADD
-POP_MEM $2
-ADD
-PUSH_MEM $3
-POP_MEM $1
-PUSH 1
-LT
-PUSH_MEM $4
+	PUSH 0
+	PUSH_MEM $1
+	PUSH true
+	JMPF _if_3_
+	PUSH 1
+	JMP _if_end_3_
+_if_3_:
+	PUSH 1
+_if_end_3_:
+	PUSH_MEM $3

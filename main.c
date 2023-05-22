@@ -18,8 +18,8 @@ FILE *functions;
 FILE *types;
 
 void insert_builtin_types(symbol_table_t *global_symbol_table) {
-  char *builtin_types[] = {"int", "float", "bool", "string"};
-  for (int i = 0; i < 4; i++) {
+  char *builtin_types[] = {"unit", "int", "double", "bool", "string"};
+  for (int i = 0; i < 5; i++) {
     symbol_t *type_sym =
         create_symbol_t(builtin_types[i], SYM_TY_TYPE, NULL, i);
     insert_symbol(global_symbol_table, type_sym);
@@ -27,8 +27,8 @@ void insert_builtin_types(symbol_table_t *global_symbol_table) {
 }
 
 void free_builtin_types(symbol_table_t *global_symbol_table) {
-  char *builtin_types[] = {"int", "float", "bool", "string"};
-  for (int i = 0; i < 4; i++) {
+  char *builtin_types[] = {"int", "float", "bool", "string", "unit"};
+  for (int i = 0; i < 5; i++) {
     symbol_t *type_sym = get_symbol(global_symbol_table, builtin_types[i]);
     free_symbol_t(&type_sym);
   }
