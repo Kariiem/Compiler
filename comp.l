@@ -1,10 +1,3 @@
-%option outfile="comp.lex.c" header-file="comp.lex.h"
-%option warn debug perf-report
-%option reentrant bison-locations bison-bridge
-%option yylineno
-%option noyywrap
-%option interactive
-%option nodefault
 
 %{
   #include <stdlib.h>                                                           
@@ -12,15 +5,14 @@
   #include "comp.tab.h"                                                   
   #include "utils.h"
 
-  #define YY_USER_ACTION                                               \
-      yylloc->first_line = yylloc->last_line;                          \
-      yylloc->first_column = yylloc->last_column;                      \
-      if (yylloc->last_line == yylineno)                               \
-        yylloc->last_column += yyleng;                                 \
-      else {                                                           \
-        yylloc->last_line = yylineno;                                  \
-        yylloc->last_column = yytext + yyleng - strrchr(yytext, '\n'); \
-      }
+  void yyerror (char *s); 
+  // called by the parser whenever it needs a token. This is where the lexical analyzer is called. 
+  int yylex();
+  int line=1;
+  #include <stdio.h>
+  #include <stdarg.h>
+  #define SHOW_LOGS 0
+
 %}
 
 
@@ -85,8 +77,8 @@ right_brace ("}")
 "not"       {   return TOKEN_NOT;      }
 "and"       {   return TOKEN_AND;      }
 "or"        {   return TOKEN_OR;       }
-"true"      {   yylval->BOOL = 1; return BOOL; }
-"false"     {   yylval->BOOL = 0; return BOOL; }
+"true"      {   yylval.boolean = 1; return BOOL; }
+"false"     {   yylval.boolean = 0; return BOOL; }
 
 "+"         {   return TOKEN_PLUS;     }
 "-"         {   return TOKEN_MINUS;    }
@@ -116,25 +108,28 @@ right_brace ("}")
 
 ";"             {   return TOKEN_SEMICOLON;}
 {id}            { 
-                    yylval->IDENTIFIER = yytext; 
+                    yylval.id = yytext; 
                     return IDENTIFIER;
                 }
 {integer}       { 
-                    yylval->INTEGER = yytext;
+                    yylval.string = yytext;
                     return INTEGER;
                 }
 {real}          {
-                    yylval->REAL = yytext;
+                    yylval.string = yytext;
                     return REAL;
                 }
 {string}        { 
-                    yylval->STRING = yytext;
+                    yylval.string = yytext;
                     return STRING;
                 }
 
 <SPECIAL>{newline}+      { BEGIN(INITIAL); return TOKEN_NEWLINE; }
 <INITIAL>{newline}+  /**/
 {white_space}+    /*return TOKEN_WS;*/    
-<<EOF>>         { return YYEOF;     }
+<<EOF>>         { return 0;     }
 .               { return TOKEN_UNKNOWN; }
 %%
+// C code
+// The wrapper function yywrap() 
+int yywrap (void) {return 1;}
