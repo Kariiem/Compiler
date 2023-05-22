@@ -8,17 +8,22 @@
   void yyerror (char *s); 
   // called by the parser whenever it needs a token. This is where the lexical analyzer is called. 
   int yylex();
-  int line=1;
+  int line_num=1;
   #include <stdio.h>
   #include <stdarg.h>
   #define SHOW_LOGS 0
-
+  char* copy_str(char const * cstr){
+    char*ptr=(char*) malloc(strlen(cstr) + 1); // +1 for the null terminator
+    
+    strcpy(ptr, cstr);
+    return ptr;
+  }
 %}
 
 
 newline     ("\n")
 white_space ([[:space:]])
-id          ([a-zA-Z_]+[a-zA-Z0-9?!]*)
+id          ([a-zA-Z_][a-zA-Z0-9_]*)
 integer     ([0-9]+)
 real        ({integer}"."{integer})
 string      (\"[^\"\n]*\")
@@ -108,25 +113,27 @@ right_brace ("}")
 
 ";"             {   return TOKEN_SEMICOLON;}
 {id}            { 
-                    yylval.id = yytext; 
+                    yylval.id = copy_str(yytext); 
                     return IDENTIFIER;
                 }
 {integer}       { 
-                    yylval.string = yytext;
+                    // Convert the string to an integer and return the token
+                    yylval.integer = atoi(copy_str(yytext));
                     return INTEGER;
                 }
 {real}          {
-                    yylval.string = yytext;
+                    // Convert the string to a float and return the token   
+                    yylval.real = atof(copy_str(yytext));
                     return REAL;
                 }
 {string}        { 
-                    yylval.string = yytext;
+                    yylval.string = copy_str(yytext);
                     return STRING;
                 }
 
-<SPECIAL>{newline}+      { BEGIN(INITIAL); return TOKEN_NEWLINE; }
-<INITIAL>{newline}+  /**/
-{white_space}+    /*return TOKEN_WS;*/    
+<SPECIAL>{newline}+      { BEGIN(INITIAL); line_num++; return TOKEN_NEWLINE; }
+<INITIAL>{newline}+  /**/ {line_num++;}
+{white_space}+   {;} /*return TOKEN_WS;*/    
 <<EOF>>         { return 0;     }
 .               { return TOKEN_UNKNOWN; }
 %%

@@ -62,11 +62,11 @@
                 return stack;
         }
 
+        void push_symbol_table(SymbolTableStack *stack, SymbolTable *table);
+        void pop_symbol_table(SymbolTableStack *stack);
 
         void add_symbol(SymbolTableStack *stack, char *name, int type, char* value, int line, bool is_const, bool is_enum, bool is_func);
         Symbol *get_symbol(SymbolTableStack *stack, char *name);
-        void push_symbol_table(SymbolTableStack *stack, SymbolTable *table);
-        void pop_symbol_table(SymbolTableStack *stack);
 
 
 
