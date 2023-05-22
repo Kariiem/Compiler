@@ -12,7 +12,8 @@ ast_module_decl_t *create_ast_module_decl_t(char const *module_name) {
 void free_ast_module_decl_t(ast_module_decl_t **module_ptr) {
   DEBUG_EPRINTF("free ast_module_decl_t\n");
   ast_module_decl_t *module_decl = *module_ptr;
-  DEBUG_ASSERT(module_decl, "module_decl is NULL");
+  if(module_decl==NULL) return;
+  // DEBUG_ASSERT(module_decl, "module_decl is NULL");
   FREE_ATOM(module_decl->module_name);
   free(module_decl);
   *module_ptr = NULL;

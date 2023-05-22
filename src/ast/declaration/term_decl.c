@@ -16,7 +16,8 @@ ast_term_decl_t *create_ast_term_decl_t(int type, char const *decl_name,
 void free_ast_term_decl_t(ast_term_decl_t **term_decl_ptr) {
   DEBUG_EPRINTF("free ast_term_decl_t\n");
   ast_term_decl_t *term = *term_decl_ptr;
-  DEBUG_ASSERT(term, "term is NULL");
+  // DEBUG_ASSERT(term, "term is NULL");
+  if(term==NULL) return;
   FREE_ATOM(term->decl_name);
   FREE_ATOM(term->decl_type);
   if (term->value)

@@ -34,7 +34,8 @@ ast_top_level_decl_t *create_ast_top_level_decl_t(int type, void *value) {
 void free_ast_top_level_decl_t(ast_top_level_decl_t **top_level_decl_ptr) {
   DEBUG_EPRINTF("free ast_top_level_decl_t\n");
   ast_top_level_decl_t *top_decl = *top_level_decl_ptr;
-  DEBUG_ASSERT(top_decl, "top_decl is NULL");
+  // DEBUG_ASSERT(top_decl, "top_decl is NULL");
+  if(top_decl==NULL) return;
   switch (top_decl->type) {
   default:
     DEBUG_ASSERT(false, "Unkown type %d", top_decl->type);

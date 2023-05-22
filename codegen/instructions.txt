@@ -4,7 +4,7 @@ _start:
 	PUSH true
 	JMPF _if_3_
 	PUSH 10
-	PUSH_MEM $4
+	PUSH_MEM $1
 	PUSH 10
 	PUSH_MEM $6
 	PUSH 1

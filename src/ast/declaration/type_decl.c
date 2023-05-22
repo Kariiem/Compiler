@@ -16,7 +16,8 @@ ast_type_decl_t *create_ast_type_decl_t(char const *type_name,
 void free_ast_type_decl_t(ast_type_decl_t **type_decl_ptr) {
   DEBUG_EPRINTF("free ast_type_decl_t\n");
   ast_type_decl_t *type = *type_decl_ptr;
-  DEBUG_ASSERT(type, "type is NULL");
+  if(type == NULL) return;
+  // DEBUG_ASSERT(type, "type is NULL");
   FREE_ATOM(type->type_name);
   CVECTOR_FREE(type->constructor_list, free_ast_constructors_t);
   free(type);

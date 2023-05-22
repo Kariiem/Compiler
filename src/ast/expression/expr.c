@@ -83,7 +83,8 @@ ast_expr_t *create_ast_expr_t(int const type, void *value) {
 void free_ast_expr_t(ast_expr_t **expr_ptr) {
   DEBUG_EPRINTF("free ast_expr_t\n");
   ast_expr_t *expr = *expr_ptr;
-  DEBUG_ASSERT(expr, "expr is NULL\n");
+  if(expr==NULL) return;
+  // DEBUG_ASSERT(expr, "expr is NULL\n");
 
   switch (expr->type) {
   default:

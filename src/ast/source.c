@@ -16,7 +16,8 @@ ast_source_t *create_ast_source_t(ast_module_decl_t *module,
 void free_ast_source_t(ast_source_t **source) {
   DEBUG_EPRINTF("free ast_source_t\n");
   ast_source_t *source_ptr = *source;
-  DEBUG_ASSERT(source_ptr, "source is NULL");
+  if(source_ptr==NULL) return;
+  // DEBUG_ASSERT(source_ptr, "source is NULL");
   free_ast_module_decl_t(&source_ptr->module);
   CVECTOR_FREE(source_ptr->decl_list, free_ast_top_level_decl_t);
   free(source_ptr);

@@ -15,7 +15,8 @@ ast_range_t *create_ast_range_t(ast_expr_t *start, ast_expr_t *end,
 void free_ast_range_t(ast_range_t **range_ptr) {
   DEBUG_EPRINTF("free ast_range_t\n");
   ast_range_t *range = *range_ptr;
-  DEBUG_ASSERT(range, "range is NULL");
+  if(range==NULL) return;
+  // DEBUG_ASSERT(range, "range is NULL");
   free_ast_expr_t(&range->start);
   free_ast_expr_t(&range->end);
   if (range->step)

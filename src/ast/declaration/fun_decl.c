@@ -16,7 +16,8 @@ ast_fundecl_t *create_ast_fundecl_t(char const *fun_name,
 void free_ast_fundecl_t(ast_fundecl_t **fundecl_ptr) {
   DEBUG_EPRINTF("free ast_fundecl_t\n");
   ast_fundecl_t *fundecl = *fundecl_ptr;
-  DEBUG_ASSERT(fundecl, "fundecl is NULL");
+  if(fundecl==NULL) return;
+  // DEBUG_ASSERT(fundecl, "fundecl is NULL");
   FREE_ATOM(fundecl->fun_name);
   CVECTOR_FREE(fundecl->param_list, free_ast_fun_param_t);
   FREE_ATOM(fundecl->return_type_name);

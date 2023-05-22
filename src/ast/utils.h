@@ -28,7 +28,7 @@
   } while (0)
 #define FREE_ATOM(ptr)                                                         \
   do {                                                                         \
-    DEBUG_ASSERT(ptr, #ptr " is NULL\n");                                      \
+    /* DEBUG_ASSERT(ptr, #ptr " is NULL\n");*/                                 \
     free((void *)ptr);                                                         \
     (ptr) = NULL;                                                              \
   } while (0)

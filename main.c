@@ -69,8 +69,7 @@ int main(int argc, char *argv[]) {
   int parser_exit_status = yyparse(scanner, &source_module);
   if (parser_exit_status != 0) {
     fprintf(stderr, "");
-    free_ast_source_t(&source_module);
-    free_symbol_table_t(&global_symbol_table);
+    // free_symbol_table_t(&global_symbol_table);
     yylex_destroy(scanner);
     exit(1);
   }
@@ -81,8 +80,8 @@ int main(int argc, char *argv[]) {
   int intial_memory_address = 0;
 
   walk_ast_source_t(source_module, global_symbol_table, &intial_memory_address);
-  free_ast_source_t(&source_module);
-  free_symbol_table_t(&global_symbol_table);
+
+  // free_symbol_table_t(&global_symbol_table);
   yylex_destroy(scanner);
   return 0;
 }

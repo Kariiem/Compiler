@@ -11,7 +11,8 @@ ast_block_t *create_ast_block_t(vtype(ast_block_expr_t *) block_expr_list) {
 void free_ast_block_t(ast_block_t **block_ptr) {
   DEBUG_EPRINTF("free ast_block_t\n");
   ast_block_t *block = *block_ptr;
-  DEBUG_ASSERT(block, "block is NULL");
+  if(block==NULL) return;
+  // DEBUG_ASSERT(block, "block is NULL");
   CVECTOR_FREE(block->block_expr_list, free_ast_block_expr_t);
   free(block);
   *block_ptr = NULL;

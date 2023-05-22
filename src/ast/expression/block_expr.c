@@ -29,7 +29,8 @@ ast_block_expr_t *create_ast_block_expr_t(int type, void *value) {
 void free_ast_block_expr_t(ast_block_expr_t **block_expr_ptr) {
   DEBUG_EPRINTF("free block_expr_t\n");
   ast_block_expr_t *block_expr = *block_expr_ptr;
-  DEBUG_ASSERT(block_expr, "block_expr is NULL");
+  if(block_expr==NULL) return;
+  // DEBUG_ASSERT(block_expr, "block_expr is NULL");
   switch (block_expr->type) {
   default:
     DEBUG_ASSERT(false, "Unkown type %d", block_expr->type);
@@ -75,10 +76,32 @@ void walk_ast_block_expr_t(ast_block_expr_t const *block_expr,
   case EXPR:
     walk_ast_expr_t(block_expr->value.expr, sym_tab, id);
     break;
-  case DECL:
+  case DECL: {
     ++(*id);
-    walk_ast_term_decl_t(block_expr->value.decl, sym_tab, id);
+    ast_term_decl_t *term_decl = block_expr->value.decl;
+
+    if (get_symbol(sym_tab, term_decl->decl_type) == NULL) {
+      REPORT_ERROR("Error: %s does not name a type\n", term_decl->decl_type);
+    }
+
+    symbol_t *term_sym =
+        create_symbol_t(term_decl->decl_name, SYM_TY_TERM, term_decl, *id);
+    if (term_decl->value) {
+      char const *term_sym_value_type =
+          get_ast_expr_type(term_sym->value.term_val->value, sym_tab);
+
+      if (strcmp(term_sym_value_type, term_decl->decl_type)) {
+        REPORT_ERROR(RED "type mismatch:" GRN "can not assign %s to %s\n" RESET,
+                     term_sym_value_type, term_decl->decl_type);
+        exit(1);
+      }
+
+      walk_ast_expr_t(term_decl->value, sym_tab, id);
+      GEN_INSTRUCTIONS("\tPUSH_MEM $%d\n", *id);
+    }
+    insert_symbol(sym_tab, term_sym);
     break;
+  }
   case ASSIGN:
     ++(*id);
     walk_ast_assignment_t(block_expr->value.assign, sym_tab, id);

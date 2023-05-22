@@ -11,7 +11,8 @@ ast_record_field_t *create_ast_record_field_t(char const *field_name,
 void free_ast_record_field_t(ast_record_field_t **record_field_ptr) {
   DEBUG_EPRINTF("free ast_record_field_t\n");
   ast_record_field_t *record_field = *record_field_ptr;
-  DEBUG_ASSERT(record_field, "record_field is NULL");
+  if(record_field==NULL) return;
+  // DEBUG_ASSERT(record_field, "record_field is NULL");
   FREE_ATOM(record_field->field_name);
   FREE_ATOM(record_field->field_type);
   free(record_field);

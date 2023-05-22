@@ -11,7 +11,8 @@ ast_fun_param_t *create_ast_fun_param_t(int type, char const *param_name,
 void free_ast_fun_param_t(ast_fun_param_t **fun_param_ptr) {
   DEBUG_EPRINTF("free ast_fun_param_t\n");
   ast_fun_param_t *fun_param = *fun_param_ptr;
-  DEBUG_ASSERT(fun_param, "fun_param is NULL");
+  if(fun_param==NULL) return;
+  // DEBUG_ASSERT(fun_param, "fun_param is NULL");
   FREE_ATOM(fun_param->param_name);
   FREE_ATOM(fun_param->param_type);
   free(fun_param);
