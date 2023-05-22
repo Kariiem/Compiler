@@ -80,6 +80,7 @@ void walk_ast_block_expr_t(ast_block_expr_t const *block_expr,
     walk_ast_term_decl_t(block_expr->value.decl, sym_tab, id);
     break;
   case ASSIGN:
+    ++(*id);
     walk_ast_assignment_t(block_expr->value.assign, sym_tab, id);
     break;
   }

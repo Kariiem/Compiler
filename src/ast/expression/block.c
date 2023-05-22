@@ -34,14 +34,12 @@ void walk_ast_block_t(ast_block_t const *block, symbol_table_t *sym_tab,
   }
 }
 
-ast_expr_t *find_last_expr(ast_block_t *block_expr) {
-  ast_expr_t *expr = NULL;
-  ast_block_expr_t **it;
-  cvector_for_each_in(it, block_expr->block_expr_list) {
-    if ((*it)->type == EXPR) {
-      expr = (*it)->value.expr;
-    }
+ast_expr_t *get_last_block_expr(ast_block_t *block_expr) {
+  int vsize = cvector_size(block_expr->block_expr_list);
+  if ( block_expr->block_expr_list[vsize - 1]->type == EXPR) {
+    printf("last block expr is expr\n");
+    print_ast_expr_t(block_expr->block_expr_list[vsize - 1]->value.expr,5);
+    return block_expr->block_expr_list[vsize - 1]->value.expr;
   }
-
-  return expr;
+  return NULL;
 }

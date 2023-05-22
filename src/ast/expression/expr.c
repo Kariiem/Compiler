@@ -281,10 +281,11 @@ void walk_ast_expr_t(ast_expr_t const *expr, symbol_table_t *sym_tab, int *id) {
     walk_ast_funcall_t(expr->value.funcall, sym_tab, id);
     break;
   // compound expressions
-  case EXPR_IF:
+  case EXPR_IF: {
     ++(*id);
     walk_ast_if_t(expr->value.if_, sym_tab, id);
     break;
+  }
   case EXPR_FOR:
     ++(*id);
     walk_ast_for_t(expr->value.for_, sym_tab, id);
@@ -343,7 +344,10 @@ char const *map_int_to_operators(int i) {
 
 char const *get_ast_expr_type(ast_expr_t *expr, symbol_table_t *sym_tab) {
   if (expr == NULL) {
-    return "unit";
+
+    REPORT_ERROR(RED
+                 "The last statement in a block must be an expression\n" RESET);
+    exit(1);
   }
   switch (expr->type) {
   default:
@@ -401,27 +405,28 @@ char const *get_ast_expr_type(ast_expr_t *expr, symbol_table_t *sym_tab) {
   }
   // compound expressions
   case EXPR_IF: {
-    ast_expr_t *last_expr = find_last_expr(expr->value.if_->then_branch);
-    printf(BLU "%p" RESET,last_expr);
+    ast_expr_t *last_expr = get_last_block_expr(expr->value.if_->then_branch);
+
     char const *e = get_ast_expr_type(last_expr, sym_tab);
-    printf(BLU "%s" RESET,e);
+
     return e;
   }
   case EXPR_FOR: {
-    ast_expr_t *last_expr = find_last_expr(expr->value.for_->body);
+    ast_expr_t *last_expr = get_last_block_expr(expr->value.for_->body);
     return get_ast_expr_type(last_expr, sym_tab);
   }
   case EXPR_WHILE:
   case EXPR_UNTIL: {
-    ast_expr_t *last_expr = find_last_expr(expr->value.while_->body);
+    ast_expr_t *last_expr = get_last_block_expr(expr->value.while_->body);
     return get_ast_expr_type(last_expr, sym_tab);
   }
   case EXPR_DO: {
-    ast_expr_t *last_expr = find_last_expr(expr->value.do_->body);
+    ast_expr_t *last_expr = get_last_block_expr(expr->value.do_->body);
     return get_ast_expr_type(last_expr, sym_tab);
   }
   case EXPR_SWITCH: {
-    ast_expr_t *last_expr = find_last_expr(expr->value.switch_->cases[0]->body);
+    ast_expr_t *last_expr =
+        get_last_block_expr(expr->value.switch_->cases[0]->body);
     return get_ast_expr_type(last_expr, sym_tab);
   }
   }

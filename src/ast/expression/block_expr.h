@@ -8,7 +8,7 @@ typedef struct ast_assignment_t ast_assignment_t;
 typedef struct symbol_table_t symbol_table_t;
 
 struct ast_block_expr_t {
-  enum { ASSIGN,EXPR, DECL } type;
+  enum { EXPR=10, ASSIGN, DECL } type;
   union {
     ast_term_decl_t *decl;
     ast_expr_t *expr;

@@ -1,8 +1,8 @@
 #include "term_decl.h"
 #include "../../symbol.h"
 #include "../utils.h"
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 ast_term_decl_t *create_ast_term_decl_t(int type, char const *decl_name,
                                         char const *decl_type,
                                         ast_expr_t *value) {
@@ -46,7 +46,7 @@ void walk_ast_term_decl_t(ast_term_decl_t const *term_decl,
                           symbol_table_t *sym_tab, int *id) {
   DEBUG_EPRINTF("walk ast_term_decl_t\n");
   DEBUG_ASSERT(sym_tab, "sym_tab is NULL");
-  
+
   if (get_symbol(sym_tab, term_decl->decl_name)) {
     REPORT_ERROR("Error: %s has been declared\n", term_decl->decl_name);
   }
@@ -54,19 +54,19 @@ void walk_ast_term_decl_t(ast_term_decl_t const *term_decl,
   if (get_symbol(sym_tab, term_decl->decl_type) == NULL) {
     REPORT_ERROR("Error: %s does not name a type\n", term_decl->decl_type);
   }
+
   symbol_t *term_sym =
       create_symbol_t(term_decl->decl_name, SYM_TY_TERM, term_decl, *id);
-
-  char const *term_sym_value_type =
-      get_ast_expr_type(term_sym->value.term_val->value, sym_tab);
-  
-  if (strcmp(term_sym_value_type, term_decl->decl_type)) {
-    REPORT_ERROR(RED"type mismatch:" GRN "can not assign %s to %s\n" RESET, term_sym_value_type,
-                 term_decl->decl_type);
-    exit(1);
-  }
-
   if (term_decl->value) {
+    char const *term_sym_value_type =
+        get_ast_expr_type(term_sym->value.term_val->value, sym_tab);
+
+    if (strcmp(term_sym_value_type, term_decl->decl_type)) {
+      REPORT_ERROR(RED "type mismatch:" GRN "can not assign %s to %s\n" RESET,
+                   term_sym_value_type, term_decl->decl_type);
+      exit(1);
+    }
+
     walk_ast_expr_t(term_decl->value, sym_tab, id);
     GEN_INSTRUCTIONS("\tPUSH_MEM $%d\n", *id);
   }
