@@ -41,12 +41,12 @@ int main(int argc, char *argv[]) {
   } while (1);
 
   yyparse(scanner, &source_module);
-  yylex_destroy(scanner);
 
   print_ast_source_t(source_module, 0);
 
   walk_ast_source_t(source_module, NULL);
 
   free_ast_source_t(&source_module);
+  yylex_destroy(scanner);
   return 0;
 }
