@@ -21,15 +21,17 @@ void free_ast_case_t(ast_case_t **case_ptr) {
   *case_ptr = NULL;
 }
 
-void print_ast_case_t(ast_case_t const *case_, int indent){
+void print_ast_case_t(ast_case_t const *case_, int indent) {
   INDENT(indent);
   printf("ast_case_t\n");
-  print_ast_expr_t(case_->case_expr, indent+1);
-  print_ast_block_t(case_->body, indent+1);
+  if (case_->case_expr)
+    print_ast_expr_t(case_->case_expr, indent + 1);
+  print_ast_block_t(case_->body, indent + 1);
 }
 
-void walk_ast_case_t(ast_case_t const *case_, symbol_table_t *sym_tab){
+void walk_ast_case_t(ast_case_t const *case_, symbol_table_t *sym_tab) {
   DEBUG_EPRINTF("walk ast_case_t\n");
-  walk_ast_expr_t(case_->case_expr, sym_tab);
+  if (case_->case_expr)
+    walk_ast_expr_t(case_->case_expr, sym_tab);
   walk_ast_block_t(case_->body, sym_tab);
 }

@@ -6,10 +6,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
 #if !YYDEBUG
 static int yydebug;
 #endif
-
 
 int main(int argc, char *argv[]) {
   yyscan_t scanner;
@@ -44,7 +44,9 @@ int main(int argc, char *argv[]) {
   yylex_destroy(scanner);
 
   print_ast_source_t(source_module, 0);
-  free_ast_source_t(&source_module);
 
+  walk_ast_source_t(source_module, NULL);
+
+  free_ast_source_t(&source_module);
   return 0;
 }
