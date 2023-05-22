@@ -184,10 +184,16 @@
 
     int while_label_counter = 0; // Counter for the WHILE labels
 
+    int for_label_counter = 0; // Counter for the FOR labels
+
+    int switch_label_counter = 0; // Counter for the SWITCH labels
+
+    int case_label_counter = 0; // Counter for the CASE labels
+
     int identifier_flag = 0; // Flag to check if the current token is an identifier
 
 
-#line 191 "comp.tab.c"
+#line 197 "comp.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -290,7 +296,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 126 "comp.y"
+#line 132 "comp.y"
 
     char* id;
     int integer;
@@ -300,7 +306,7 @@ union YYSTYPE
     void* voidVal;
     void* symbolval;
 
-#line 304 "comp.tab.c"
+#line 310 "comp.tab.c"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -619,16 +625,16 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  5
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   362
+#define YYLAST   286
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  51
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  43
+#define YYNNTS  51
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  88
+#define YYNRULES  96
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  164
+#define YYNSTATES  173
 
 #define YYUNDEFTOK  2
 #define YYMAXUTOK   305
@@ -680,15 +686,16 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,   224,   224,   224,   228,   233,   234,   239,   241,   243,
-     245,   247,   252,   257,   286,   307,   308,   312,   313,   317,
-     318,   319,   320,   321,   322,   326,   340,   349,   358,   367,
-     379,   380,   381,   382,   383,   384,   388,   389,   390,   391,
-     392,   393,   394,   395,   396,   400,   401,   402,   403,   404,
-     405,   410,   424,   440,   409,   475,   480,   485,   486,   490,
-     502,   490,   536,   541,   546,   551,   552,   557,   559,   564,
-     564,   580,   581,   585,   586,   587,   591,   595,   596,   597,
-     601,   605,   609,   610,   611,   615,   619,   620,   624
+       0,   231,   231,   231,   235,   240,   241,   246,   248,   250,
+     252,   254,   259,   264,   293,   314,   315,   319,   320,   324,
+     325,   326,   327,   328,   329,   333,   347,   356,   365,   374,
+     386,   387,   388,   389,   390,   391,   395,   396,   397,   398,
+     399,   400,   401,   402,   403,   407,   408,   409,   410,   411,
+     412,   417,   431,   447,   416,   483,   510,   528,   482,   591,
+     603,   610,   622,   610,   656,   668,   656,   702,   707,   716,
+     707,   740,   741,   747,   746,   780,   779,   835,   835,   851,
+     852,   856,   857,   858,   862,   866,   867,   868,   872,   876,
+     880,   881,   882,   886,   890,   891,   895
 };
 #endif
 
@@ -711,12 +718,13 @@ static const char *const yytname[] =
   "module_decl", "top_level_decl_list", "top_level_decl", "import_decl",
   "term_decl", "assignment", "val_or_var", "optional_assignment", "expr",
   "atomic_value", "arithmetic_expr", "logical_expr", "compound_expr",
-  "if_then_else_expr", "$@2", "$@3", "$@4", "for_loop_expr", "range",
-  "optional_step", "while_loop_expr", "$@5", "$@6", "until_loop_expr",
-  "do_block_expr", "switch_expr", "case_expr_list", "case_expr", "block",
-  "$@7", "block_expression_list", "block_expression", "fun_decl",
-  "param_list", "param", "funcall", "arg_list", "type_decl",
-  "constructor_list", "constructor_field", YY_NULLPTR
+  "if_then_else_expr", "$@2", "$@3", "$@4", "for_loop_expr", "$@5", "$@6",
+  "$@7", "for_var", "while_loop_expr", "$@8", "$@9", "until_loop_expr",
+  "$@10", "$@11", "do_block_expr", "switch_expr", "$@12", "$@13",
+  "case_expr_list", "case_expr", "$@14", "$@15", "block", "$@16",
+  "block_expression_list", "block_expression", "fun_decl", "param_list",
+  "param", "funcall", "arg_list", "type_decl", "constructor_list",
+  "constructor_field", YY_NULLPTR
 };
 #endif
 
@@ -734,7 +742,7 @@ static const yytype_int16 yytoknum[] =
 };
 # endif
 
-#define YYPACT_NINF (-67)
+#define YYPACT_NINF (-148)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -748,23 +756,24 @@ static const yytype_int16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int16 yypact[] =
 {
-       7,   -33,    26,   -67,    -6,   -67,   -67,   -67,    10,    -9,
-      -8,   -67,   -67,    -7,    27,   -67,   -67,   -67,   -67,    13,
-     -67,   -67,    24,    31,    45,   118,    51,   -67,     2,    38,
-      46,   118,    44,   -67,   118,   118,   118,   118,    53,   -67,
-     -67,   -67,   -67,   223,   -67,   -67,   -67,   -67,   -67,   -67,
-     -67,   -67,   -67,   -67,   -67,    47,    49,   -14,   -67,   -67,
-     -12,   -67,   -67,   -67,   332,    68,   118,   152,   176,    78,
-     200,   118,   118,   118,   118,   118,   118,   118,   118,   118,
-     118,   118,   118,   118,   118,   118,   -67,   -24,    70,     2,
-      57,   -67,    38,   -67,    46,    79,   332,   -67,   -67,   -67,
-     332,    23,    52,    52,     4,     4,     4,     4,    78,     4,
-      78,    78,    78,    78,    78,    78,   118,   -67,   -67,    72,
-     -67,    46,   -67,    58,   -67,   118,    46,    46,   100,   118,
-     -67,   242,   -67,   -67,   -67,   -19,   -67,   -67,   261,   -67,
-     108,   280,   -67,   -67,    88,   -67,   316,   -67,   332,   -67,
-     -67,   -67,   118,    46,    46,    46,   298,   -67,   -67,   -67,
-     118,    83,   332,   -67
+       8,   -19,    32,  -148,    19,  -148,  -148,  -148,     9,    24,
+      29,  -148,  -148,    38,    55,  -148,  -148,  -148,  -148,    41,
+    -148,  -148,    46,    51,    59,   126,    61,  -148,    23,    45,
+      54,   126,    49,  -148,  -148,  -148,   126,   126,    58,  -148,
+    -148,  -148,  -148,   183,  -148,  -148,  -148,  -148,  -148,  -148,
+    -148,  -148,  -148,  -148,  -148,    53,    56,   -30,  -148,  -148,
+       3,  -148,  -148,  -148,   256,    65,   126,   126,   126,    77,
+     160,   126,   126,   126,   126,   126,   126,   126,   126,   126,
+     126,   126,   126,   126,   126,   126,  -148,   -23,    69,    23,
+      57,  -148,    45,  -148,    54,    66,   256,   256,   256,  -148,
+     256,    -8,    -5,    -5,    39,    39,    39,    39,    77,    39,
+      77,    77,    77,    77,    77,    77,   126,  -148,  -148,    60,
+    -148,    54,  -148,    67,  -148,    12,    54,    54,    70,   126,
+    -148,   202,  -148,  -148,  -148,   -28,  -148,  -148,   221,  -148,
+      96,  -148,  -148,  -148,  -148,  -148,  -148,   256,  -148,  -148,
+    -148,    75,   113,    54,    12,    79,  -148,   240,  -148,  -148,
+      78,  -148,  -148,  -148,    54,    54,    12,  -148,  -148,    80,
+    -148,    54,  -148
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -774,41 +783,44 @@ static const yytype_int8 yydefact[] =
 {
        0,     0,     0,     2,     0,     1,     5,     4,     3,     0,
        0,    15,    16,     0,     0,     6,     7,     9,    11,     0,
-      10,     8,     0,     0,     0,     0,     0,    12,    77,     0,
-       0,     0,     0,    59,     0,     0,     0,     0,    25,    26,
+      10,     8,     0,     0,     0,     0,     0,    12,    85,     0,
+       0,     0,     0,    61,    64,    68,     0,     0,    25,    26,
       27,    29,    28,     0,    19,    20,    21,    23,    45,    46,
-      47,    48,    49,    50,    22,     0,     0,     0,    78,    88,
-       0,    86,    69,    63,    51,     0,     0,     0,     0,    36,
-       0,    82,     0,     0,     0,     0,     0,     0,     0,     0,
+      47,    48,    49,    50,    22,     0,     0,     0,    86,    96,
+       0,    94,    77,    67,    51,     0,     0,     0,     0,    36,
+       0,    90,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,    14,     0,     0,     0,
-       0,    85,     0,    71,     0,     0,    60,    62,    65,    24,
-      83,     0,    37,    38,    30,    31,    32,    33,    35,    34,
+       0,    93,     0,    79,     0,     0,    62,    65,    69,    24,
+      91,     0,    37,    38,    30,    31,    32,    33,    35,    34,
       39,    40,    41,    42,    43,    44,     0,    18,    13,     0,
-      79,     0,    87,     0,    52,     0,     0,     0,     0,     0,
-      81,     0,    80,    76,    70,    25,    74,    75,     0,    72,
-       0,     0,    55,    61,     0,    64,     0,    66,    84,    17,
-      73,    53,     0,     0,     0,     0,    57,    67,    68,    54,
-       0,     0,    58,    56
+      87,     0,    95,     0,    52,     0,     0,     0,     0,     0,
+      89,     0,    88,    84,    78,    25,    82,    83,     0,    80,
+       0,    59,    60,    55,    63,    66,    71,    92,    17,    81,
+      53,     0,     0,     0,     0,     0,    70,     0,    72,    54,
+       0,    73,    75,    56,     0,     0,     0,    74,    76,     0,
+      57,     0,    58
 };
 
   /* YYPGOTO[NTERM-NUM].  */
-static const yytype_int8 yypgoto[] =
+static const yytype_int16 yypgoto[] =
 {
-     -67,   -67,   -67,   -67,   -67,   -67,   -67,     0,     1,   -26,
-     -67,   -31,   -67,   -67,   -67,   -67,   -67,   -67,   -67,   -67,
-     -67,   -67,   -67,   -67,   -67,   -67,   -67,   -67,   -67,   -67,
-     -67,   -66,   -67,   -67,   -67,   -67,   -67,    36,   -67,   -67,
-     -67,   -67,    34
+    -148,  -148,  -148,  -148,  -148,  -148,  -148,    -3,     7,   -26,
+    -148,   -31,  -148,  -148,  -148,  -148,  -148,  -148,  -148,  -148,
+    -148,  -148,  -148,  -148,  -147,  -148,  -148,  -148,  -148,  -148,
+    -148,  -148,  -148,  -148,  -148,  -148,  -148,  -148,  -148,   -93,
+    -148,  -148,  -148,  -148,  -148,    42,  -148,  -148,  -148,  -148,
+      26
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int16 yydefgoto[] =
 {
       -1,     2,     6,     3,     8,    15,    16,    17,    18,    19,
-     118,    43,    44,    45,    46,    47,    48,    94,   140,   155,
-      49,   126,   161,    50,    66,   127,    51,    52,    53,   128,
-     147,    63,    93,   123,   139,    20,    57,    58,    54,   101,
-      21,    60,    61
+     118,    43,    44,    45,    46,    47,    48,    94,   140,   153,
+      49,   151,   166,   171,   143,    50,    66,   126,    51,    67,
+     127,    52,    53,    68,   128,   152,   158,   164,   165,    63,
+      93,   123,   139,    20,    57,    58,    54,   101,    21,    60,
+      61
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -816,69 +828,57 @@ static const yytype_int16 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_uint8 yytable[] =
 {
-      64,    97,    56,    67,    68,    69,    70,   116,    11,    12,
-       1,   117,    25,     4,     9,    10,    11,    12,    13,    71,
-      89,    72,    73,    91,    92,    90,     5,    78,   124,    80,
-      81,    82,    83,    84,    85,    96,     7,    22,    23,    24,
+      64,   124,    56,    25,    89,    69,    70,   160,   116,    90,
+      71,     1,   117,     9,    10,    11,    12,    13,    78,   169,
+      80,    81,    82,    83,    84,    85,   129,     4,   133,    11,
+      12,   130,     5,   144,   145,    96,    97,    98,    91,    92,
      100,   102,   103,   104,   105,   106,   107,   108,   109,   110,
-     111,   112,   113,   114,   115,   133,    14,   129,    25,    26,
-     142,   143,   130,    56,    11,    12,    27,    30,    31,    28,
-      32,    33,    34,    35,    36,    78,    29,    80,    81,    82,
-      83,    84,    85,    55,    59,   131,    62,   157,   158,   159,
-      65,    71,   138,    87,   141,    88,    37,   146,   148,   134,
-      95,    78,   119,   121,   135,    39,    40,    41,    42,    30,
-      31,   144,    32,    33,    34,    35,    36,   125,   132,   151,
-     153,   156,   163,   136,   137,   120,   122,    30,    31,   162,
-      32,    33,    34,    35,    36,     0,     0,     0,    37,     0,
-       0,   145,     0,     0,     0,     0,    38,    39,    40,    41,
-      42,     0,     0,     0,     0,     0,    37,     0,     0,     0,
-       0,     0,     0,     0,    38,    39,    40,    41,    42,    72,
-      73,    74,    75,    76,    77,    78,    79,    80,    81,    82,
-      83,    84,    85,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,    62,    72,    73,    74,    75,    76,    77,    78,
-      79,    80,    81,    82,    83,    84,    85,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,    98,    72,    73,    74,
+     111,   112,   113,   114,   115,    14,    72,    73,   141,   142,
+     159,     7,    78,    56,    80,    81,    82,    83,    84,    85,
+      22,   167,   168,    11,    12,    23,    30,    31,   172,    32,
+      33,    34,    35,    36,    24,   131,    25,    26,    27,    28,
+      29,    59,   138,    55,    62,    65,    71,    95,   147,    87,
+      78,   119,    88,   121,   125,    37,   132,   150,   134,   154,
+     146,   161,   163,   135,    39,    40,    41,    42,   122,   170,
+     136,   157,    30,    31,   155,    32,    33,    34,    35,    36,
+     137,   120,     0,     0,     0,    30,    31,     0,    32,    33,
+      34,    35,    36,     0,     0,     0,     0,     0,     0,     0,
+       0,    37,     0,     0,   156,     0,     0,     0,     0,    38,
+      39,    40,    41,    42,    37,     0,     0,     0,     0,     0,
+       0,     0,    38,    39,    40,    41,    42,    72,    73,    74,
       75,    76,    77,    78,    79,    80,    81,    82,    83,    84,
       85,     0,     0,     0,     0,     0,     0,     0,     0,    99,
       72,    73,    74,    75,    76,    77,    78,    79,    80,    81,
       82,    83,    84,    85,     0,     0,     0,     0,    86,    72,
       73,    74,    75,    76,    77,    78,    79,    80,    81,    82,
-      83,    84,    85,     0,     0,     0,     0,   149,    72,    73,
+      83,    84,    85,     0,     0,     0,     0,   148,    72,    73,
       74,    75,    76,    77,    78,    79,    80,    81,    82,    83,
-      84,    85,     0,     0,     0,     0,   150,    72,    73,    74,
+      84,    85,     0,     0,     0,     0,   149,    72,    73,    74,
       75,    76,    77,    78,    79,    80,    81,    82,    83,    84,
-      85,     0,     0,     0,   152,    72,    73,    74,    75,    76,
-      77,    78,    79,    80,    81,    82,    83,    84,    85,     0,
-       0,     0,   160,    72,    73,    74,    75,    76,    77,    78,
-      79,    80,    81,    82,    83,    84,    85,     0,   154,    72,
-      73,    74,    75,    76,    77,    78,    79,    80,    81,    82,
-      83,    84,    85
+      85,     0,   162,    72,    73,    74,    75,    76,    77,    78,
+      79,    80,    81,    82,    83,    84,    85
 };
 
 static const yytype_int16 yycheck[] =
 {
-      31,    67,    28,    34,    35,    36,    37,    31,     6,     7,
-       3,    35,    31,    46,     4,     5,     6,     7,     8,    38,
-      34,    17,    18,    35,    36,    39,     0,    23,    94,    25,
-      26,    27,    28,    29,    30,    66,    42,    46,    46,    46,
+      31,    94,    28,    31,    34,    36,    37,   154,    31,    39,
+      38,     3,    35,     4,     5,     6,     7,     8,    23,   166,
+      25,    26,    27,    28,    29,    30,    34,    46,   121,     6,
+       7,    39,     0,   126,   127,    66,    67,    68,    35,    36,
       71,    72,    73,    74,    75,    76,    77,    78,    79,    80,
-      81,    82,    83,    84,    85,   121,    46,    34,    31,    46,
-     126,   127,    39,    89,     6,     7,    42,     9,    10,    38,
-      12,    13,    14,    15,    16,    23,    31,    25,    26,    27,
-      28,    29,    30,    32,    46,   116,    40,   153,   154,   155,
-      46,    38,   123,    46,   125,    46,    38,   128,   129,    41,
-      32,    23,    32,    46,    46,    47,    48,    49,    50,     9,
-      10,    11,    12,    13,    14,    15,    16,    38,    46,    11,
-      32,   152,    39,   123,   123,    89,    92,     9,    10,   160,
-      12,    13,    14,    15,    16,    -1,    -1,    -1,    38,    -1,
-      -1,    41,    -1,    -1,    -1,    -1,    46,    47,    48,    49,
-      50,    -1,    -1,    -1,    -1,    -1,    38,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    46,    47,    48,    49,    50,    17,
-      18,    19,    20,    21,    22,    23,    24,    25,    26,    27,
-      28,    29,    30,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    40,    17,    18,    19,    20,    21,    22,    23,
-      24,    25,    26,    27,    28,    29,    30,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    40,    17,    18,    19,
+      81,    82,    83,    84,    85,    46,    17,    18,    46,    47,
+     153,    42,    23,    89,    25,    26,    27,    28,    29,    30,
+      46,   164,   165,     6,     7,    46,     9,    10,   171,    12,
+      13,    14,    15,    16,    46,   116,    31,    46,    42,    38,
+      31,    46,   123,    32,    40,    46,    38,    32,   129,    46,
+      23,    32,    46,    46,    38,    38,    46,    11,    41,    34,
+      40,    32,    34,    46,    47,    48,    49,    50,    92,    39,
+     123,   152,     9,    10,    11,    12,    13,    14,    15,    16,
+     123,    89,    -1,    -1,    -1,     9,    10,    -1,    12,    13,
+      14,    15,    16,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    38,    -1,    -1,    41,    -1,    -1,    -1,    -1,    46,
+      47,    48,    49,    50,    38,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    46,    47,    48,    49,    50,    17,    18,    19,
       20,    21,    22,    23,    24,    25,    26,    27,    28,    29,
       30,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    39,
       17,    18,    19,    20,    21,    22,    23,    24,    25,    26,
@@ -888,12 +888,8 @@ static const yytype_int16 yycheck[] =
       19,    20,    21,    22,    23,    24,    25,    26,    27,    28,
       29,    30,    -1,    -1,    -1,    -1,    35,    17,    18,    19,
       20,    21,    22,    23,    24,    25,    26,    27,    28,    29,
-      30,    -1,    -1,    -1,    34,    17,    18,    19,    20,    21,
-      22,    23,    24,    25,    26,    27,    28,    29,    30,    -1,
-      -1,    -1,    34,    17,    18,    19,    20,    21,    22,    23,
-      24,    25,    26,    27,    28,    29,    30,    -1,    32,    17,
-      18,    19,    20,    21,    22,    23,    24,    25,    26,    27,
-      28,    29,    30
+      30,    -1,    32,    17,    18,    19,    20,    21,    22,    23,
+      24,    25,    26,    27,    28,    29,    30
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
@@ -902,21 +898,22 @@ static const yytype_int8 yystos[] =
 {
        0,     3,    52,    54,    46,     0,    53,    42,    55,     4,
        5,     6,     7,     8,    46,    56,    57,    58,    59,    60,
-      86,    91,    46,    46,    46,    31,    46,    42,    38,    31,
+      94,    99,    46,    46,    46,    31,    46,    42,    38,    31,
        9,    10,    12,    13,    14,    15,    16,    38,    46,    47,
       48,    49,    50,    62,    63,    64,    65,    66,    67,    71,
-      74,    77,    78,    79,    89,    32,    60,    87,    88,    46,
-      92,    93,    40,    82,    62,    46,    75,    62,    62,    62,
+      76,    79,    82,    83,    97,    32,    60,    95,    96,    46,
+     100,   101,    40,    90,    62,    46,    77,    80,    84,    62,
       62,    38,    17,    18,    19,    20,    21,    22,    23,    24,
       25,    26,    27,    28,    29,    30,    35,    46,    46,    34,
-      39,    35,    36,    83,    68,    32,    62,    82,    40,    39,
-      62,    90,    62,    62,    62,    62,    62,    62,    62,    62,
+      39,    35,    36,    91,    68,    32,    62,    62,    62,    39,
+      62,    98,    62,    62,    62,    62,    62,    62,    62,    62,
       62,    62,    62,    62,    62,    62,    31,    35,    61,    32,
-      88,    46,    93,    84,    82,    38,    72,    76,    80,    34,
-      39,    62,    46,    82,    41,    46,    58,    59,    62,    85,
-      69,    62,    82,    82,    11,    41,    62,    81,    62,    35,
-      35,    11,    34,    32,    32,    70,    62,    82,    82,    82,
-      34,    73,    62,    39
+      96,    46,   101,    92,    90,    38,    78,    81,    85,    34,
+      39,    62,    46,    90,    41,    46,    58,    59,    62,    93,
+      69,    46,    47,    75,    90,    90,    40,    62,    35,    35,
+      11,    72,    86,    70,    34,    11,    41,    62,    87,    90,
+      75,    32,    32,    34,    88,    89,    73,    90,    90,    75,
+      39,    74,    90
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
@@ -927,10 +924,11 @@ static const yytype_int8 yyr1[] =
       62,    62,    62,    62,    62,    63,    63,    63,    63,    63,
       64,    64,    64,    64,    64,    64,    65,    65,    65,    65,
       65,    65,    65,    65,    65,    66,    66,    66,    66,    66,
-      66,    68,    69,    70,    67,    71,    72,    73,    73,    75,
-      76,    74,    77,    78,    79,    80,    80,    81,    81,    83,
-      82,    84,    84,    85,    85,    85,    86,    87,    87,    87,
-      88,    89,    90,    90,    90,    91,    92,    92,    93
+      66,    68,    69,    70,    67,    72,    73,    74,    71,    75,
+      75,    77,    78,    76,    80,    81,    79,    82,    84,    85,
+      83,    86,    86,    88,    87,    89,    87,    91,    90,    92,
+      92,    93,    93,    93,    94,    95,    95,    95,    96,    97,
+      98,    98,    98,    99,   100,   100,   101
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
@@ -941,10 +939,11 @@ static const yytype_int8 yyr2[] =
        1,     1,     1,     1,     3,     1,     1,     1,     1,     1,
        3,     3,     3,     3,     3,     3,     2,     3,     3,     3,
        3,     3,     3,     3,     3,     1,     1,     1,     1,     1,
-       1,     0,     0,     0,     8,     5,     6,     0,     2,     0,
-       0,     5,     3,     2,     5,     0,     2,     3,     3,     0,
-       4,     0,     2,     2,     1,     1,     7,     0,     1,     3,
-       4,     4,     0,     1,     3,     5,     1,     3,     1
+       1,     0,     0,     0,     8,     0,     0,     0,    14,     1,
+       1,     0,     0,     5,     0,     0,     5,     2,     0,     0,
+       7,     0,     2,     0,     4,     0,     4,     0,     4,     0,
+       2,     2,     1,     1,     7,     0,     1,     3,     4,     4,
+       0,     1,     3,     5,     1,     3,     1
 };
 
 
@@ -1640,73 +1639,73 @@ yyreduce:
   switch (yyn)
     {
   case 2:
-#line 224 "comp.y"
+#line 231 "comp.y"
                 {printf("Kak_BEGINE\n");}
-#line 1646 "comp.tab.c"
+#line 1645 "comp.tab.c"
     break;
 
   case 3:
-#line 224 "comp.y"
+#line 231 "comp.y"
                                                                    {printf("Kak_END\n");}
-#line 1652 "comp.tab.c"
+#line 1651 "comp.tab.c"
     break;
 
   case 4:
-#line 229 "comp.y"
+#line 236 "comp.y"
     {}
-#line 1658 "comp.tab.c"
+#line 1657 "comp.tab.c"
     break;
 
   case 5:
-#line 233 "comp.y"
+#line 240 "comp.y"
                                             {}
-#line 1664 "comp.tab.c"
+#line 1663 "comp.tab.c"
     break;
 
   case 6:
-#line 235 "comp.y"
+#line 242 "comp.y"
     {}
-#line 1670 "comp.tab.c"
+#line 1669 "comp.tab.c"
     break;
 
   case 7:
-#line 240 "comp.y"
+#line 247 "comp.y"
     {}
-#line 1676 "comp.tab.c"
+#line 1675 "comp.tab.c"
     break;
 
   case 8:
-#line 242 "comp.y"
+#line 249 "comp.y"
     {}
-#line 1682 "comp.tab.c"
+#line 1681 "comp.tab.c"
     break;
 
   case 9:
-#line 244 "comp.y"
+#line 251 "comp.y"
     {}
-#line 1688 "comp.tab.c"
+#line 1687 "comp.tab.c"
     break;
 
   case 10:
-#line 246 "comp.y"
+#line 253 "comp.y"
     {}
-#line 1694 "comp.tab.c"
+#line 1693 "comp.tab.c"
     break;
 
   case 11:
-#line 248 "comp.y"
+#line 255 "comp.y"
     {}
-#line 1700 "comp.tab.c"
+#line 1699 "comp.tab.c"
     break;
 
   case 12:
-#line 253 "comp.y"
+#line 260 "comp.y"
     {}
-#line 1706 "comp.tab.c"
+#line 1705 "comp.tab.c"
     break;
 
   case 13:
-#line 258 "comp.y"
+#line 265 "comp.y"
     {
         // First check if the name is already taken
         symbol* sym = get_symbol(sym_tab_stack, (yyvsp[-3].id), false, false);
@@ -1732,11 +1731,11 @@ yyreduce:
 
         
     }
-#line 1736 "comp.tab.c"
+#line 1735 "comp.tab.c"
     break;
 
   case 14:
-#line 287 "comp.y"
+#line 294 "comp.y"
     {
         // First check if the symbol exists
         symbol* sym = get_symbol(sym_tab_stack, (yyvsp[-3].id), false, true);
@@ -1754,71 +1753,71 @@ yyreduce:
             printf("PUSH_MEM %d\n", sym->symbol_id);
         }
     }
-#line 1758 "comp.tab.c"
+#line 1757 "comp.tab.c"
     break;
 
   case 15:
-#line 307 "comp.y"
+#line 314 "comp.y"
                 { (yyval.integer)=0;}
-#line 1764 "comp.tab.c"
+#line 1763 "comp.tab.c"
     break;
 
   case 16:
-#line 308 "comp.y"
+#line 315 "comp.y"
                 { (yyval.integer)=1; }
-#line 1770 "comp.tab.c"
+#line 1769 "comp.tab.c"
     break;
 
   case 17:
-#line 312 "comp.y"
+#line 319 "comp.y"
                                              {(yyval.symbolval) = (yyvsp[-1].symbolval);}
-#line 1776 "comp.tab.c"
+#line 1775 "comp.tab.c"
     break;
 
   case 18:
-#line 313 "comp.y"
+#line 320 "comp.y"
                                              {(yyval.symbolval) = NULL;}
-#line 1782 "comp.tab.c"
+#line 1781 "comp.tab.c"
     break;
 
   case 19:
-#line 317 "comp.y"
+#line 324 "comp.y"
                         { (yyval.symbolval) = (yyvsp[0].symbolval); }
-#line 1788 "comp.tab.c"
+#line 1787 "comp.tab.c"
     break;
 
   case 20:
-#line 318 "comp.y"
+#line 325 "comp.y"
                         {  }
-#line 1794 "comp.tab.c"
+#line 1793 "comp.tab.c"
     break;
 
   case 21:
-#line 319 "comp.y"
+#line 326 "comp.y"
                         {  }
-#line 1800 "comp.tab.c"
+#line 1799 "comp.tab.c"
     break;
 
   case 22:
-#line 320 "comp.y"
+#line 327 "comp.y"
                         {  }
-#line 1806 "comp.tab.c"
+#line 1805 "comp.tab.c"
     break;
 
   case 23:
-#line 321 "comp.y"
+#line 328 "comp.y"
                         {  }
-#line 1812 "comp.tab.c"
+#line 1811 "comp.tab.c"
     break;
 
   case 24:
-#line 322 "comp.y"
+#line 329 "comp.y"
                                            { (yyval.symbolval) = (yyvsp[-1].symbolval); }
-#line 1818 "comp.tab.c"
+#line 1817 "comp.tab.c"
     break;
 
   case 25:
-#line 326 "comp.y"
+#line 333 "comp.y"
                     { 
                     identifier_flag = 1; (yyval.symbolval) = (yyvsp[0].id); 
                     // First check if the symbol exists
@@ -1833,11 +1832,11 @@ yyreduce:
                         printf("POP_MEM %d\n", sym->symbol_id);
                     }
                     }
-#line 1837 "comp.tab.c"
+#line 1836 "comp.tab.c"
     break;
 
   case 26:
-#line 340 "comp.y"
+#line 347 "comp.y"
                     { 
                     printf("PUSH %d\n", (yyvsp[0].integer));
                     //Create a new void pointer to store the value of the integer
@@ -1847,11 +1846,11 @@ yyreduce:
                     //Return the void pointer
                     (yyval.symbolval) = val;
                     }
-#line 1851 "comp.tab.c"
+#line 1850 "comp.tab.c"
     break;
 
   case 27:
-#line 349 "comp.y"
+#line 356 "comp.y"
                     { 
                     printf("PUSH %f\n", (yyvsp[0].real));
                     //Create a new void pointer to store the value of the real
@@ -1861,11 +1860,11 @@ yyreduce:
                     //Return the void pointer
                     (yyval.symbolval) = val;
                     }
-#line 1865 "comp.tab.c"
+#line 1864 "comp.tab.c"
     break;
 
   case 28:
-#line 358 "comp.y"
+#line 365 "comp.y"
                     { 
                     printf("PUSH %d\n", (yyvsp[0].boolean)); 
                     //Create a new void pointer to store the value of the boolean
@@ -1875,11 +1874,11 @@ yyreduce:
                     //Return the void pointer
                     (yyval.symbolval) = val;
                     }
-#line 1879 "comp.tab.c"
+#line 1878 "comp.tab.c"
     break;
 
   case 29:
-#line 367 "comp.y"
+#line 374 "comp.y"
                     { 
                     printf("PUSH %s\n", (yyvsp[0].string));
                     //Create a new void pointer to store the value of the string
@@ -1889,137 +1888,137 @@ yyreduce:
                     //Return the void pointer
                     (yyval.symbolval) = val;
                     }
-#line 1893 "comp.tab.c"
+#line 1892 "comp.tab.c"
     break;
 
   case 30:
-#line 379 "comp.y"
+#line 386 "comp.y"
                               { printf("ADD\n"); }
-#line 1899 "comp.tab.c"
+#line 1898 "comp.tab.c"
     break;
 
   case 31:
-#line 380 "comp.y"
+#line 387 "comp.y"
                               { printf("SUB\n"); }
-#line 1905 "comp.tab.c"
+#line 1904 "comp.tab.c"
     break;
 
   case 32:
-#line 381 "comp.y"
+#line 388 "comp.y"
                               { printf("MUL\n"); }
-#line 1911 "comp.tab.c"
+#line 1910 "comp.tab.c"
     break;
 
   case 33:
-#line 382 "comp.y"
+#line 389 "comp.y"
                               { printf("DIV\n"); }
-#line 1917 "comp.tab.c"
+#line 1916 "comp.tab.c"
     break;
 
   case 34:
-#line 383 "comp.y"
+#line 390 "comp.y"
                               { printf("MOD\n"); }
-#line 1923 "comp.tab.c"
+#line 1922 "comp.tab.c"
     break;
 
   case 35:
-#line 384 "comp.y"
+#line 391 "comp.y"
                               { printf("EXP\n"); }
-#line 1929 "comp.tab.c"
+#line 1928 "comp.tab.c"
     break;
 
   case 36:
-#line 388 "comp.y"
+#line 395 "comp.y"
                                 { printf("NOT\n"); }
-#line 1935 "comp.tab.c"
+#line 1934 "comp.tab.c"
     break;
 
   case 37:
-#line 389 "comp.y"
+#line 396 "comp.y"
                                 { printf("AND\n"); }
-#line 1941 "comp.tab.c"
+#line 1940 "comp.tab.c"
     break;
 
   case 38:
-#line 390 "comp.y"
+#line 397 "comp.y"
                                 { printf("OR\n"); }
-#line 1947 "comp.tab.c"
+#line 1946 "comp.tab.c"
     break;
 
   case 39:
-#line 391 "comp.y"
+#line 398 "comp.y"
                                 { printf("LT\n"); }
-#line 1953 "comp.tab.c"
+#line 1952 "comp.tab.c"
     break;
 
   case 40:
-#line 392 "comp.y"
+#line 399 "comp.y"
                                 { printf("GT\n"); }
-#line 1959 "comp.tab.c"
+#line 1958 "comp.tab.c"
     break;
 
   case 41:
-#line 393 "comp.y"
+#line 400 "comp.y"
                                 { printf("LEQ\n"); }
-#line 1965 "comp.tab.c"
+#line 1964 "comp.tab.c"
     break;
 
   case 42:
-#line 394 "comp.y"
+#line 401 "comp.y"
                                 { printf("GEQ\n"); }
-#line 1971 "comp.tab.c"
+#line 1970 "comp.tab.c"
     break;
 
   case 43:
-#line 395 "comp.y"
+#line 402 "comp.y"
                                 { printf("EQ\n"); }
-#line 1977 "comp.tab.c"
+#line 1976 "comp.tab.c"
     break;
 
   case 44:
-#line 396 "comp.y"
+#line 403 "comp.y"
                                 { printf("NEQ\n"); }
-#line 1983 "comp.tab.c"
+#line 1982 "comp.tab.c"
     break;
 
   case 45:
-#line 400 "comp.y"
+#line 407 "comp.y"
                                 { }
-#line 1989 "comp.tab.c"
+#line 1988 "comp.tab.c"
     break;
 
   case 46:
-#line 401 "comp.y"
+#line 408 "comp.y"
                                 {  }
-#line 1995 "comp.tab.c"
+#line 1994 "comp.tab.c"
     break;
 
   case 47:
-#line 402 "comp.y"
+#line 409 "comp.y"
                                 {  }
-#line 2001 "comp.tab.c"
+#line 2000 "comp.tab.c"
     break;
 
   case 48:
-#line 403 "comp.y"
+#line 410 "comp.y"
                                 {  }
-#line 2007 "comp.tab.c"
+#line 2006 "comp.tab.c"
     break;
 
   case 49:
-#line 404 "comp.y"
+#line 411 "comp.y"
                                 {  }
-#line 2013 "comp.tab.c"
+#line 2012 "comp.tab.c"
     break;
 
   case 50:
-#line 405 "comp.y"
+#line 412 "comp.y"
                                 {  }
-#line 2019 "comp.tab.c"
+#line 2018 "comp.tab.c"
     break;
 
   case 51:
-#line 410 "comp.y"
+#line 417 "comp.y"
     {
         // How to hanle labels of the if statement:
         // increment the if_label_counter which is global
@@ -2033,11 +2032,11 @@ yyreduce:
         add_symbol(sym_tab_stack, "IF", TYPE_JUMP , NULL , line_num ,if_label_counter, false, false, false);
 
     }
-#line 2037 "comp.tab.c"
+#line 2036 "comp.tab.c"
     break;
 
   case 52:
-#line 424 "comp.y"
+#line 431 "comp.y"
     {
         // Search for the last symbol with name IF in the symbol table
         // Search from the top of the stack
@@ -2054,11 +2053,11 @@ yyreduce:
         }
 
     }
-#line 2058 "comp.tab.c"
+#line 2057 "comp.tab.c"
     break;
 
   case 53:
-#line 440 "comp.y"
+#line 447 "comp.y"
                {
         // Search for the last symbol with name IF in the symbol table
         // Search from the top of the stack
@@ -2075,11 +2074,11 @@ yyreduce:
         }
 
     }
-#line 2079 "comp.tab.c"
+#line 2078 "comp.tab.c"
     break;
 
   case 54:
-#line 456 "comp.y"
+#line 463 "comp.y"
           { 
         // Search for the last symbol with name IF in the symbol table
         // Search from the top of the stack
@@ -2096,35 +2095,158 @@ yyreduce:
         }
 
     }
-#line 2100 "comp.tab.c"
+#line 2099 "comp.tab.c"
     break;
 
   case 55:
-#line 476 "comp.y"
-    {  }
-#line 2106 "comp.tab.c"
+#line 483 "comp.y"
+    {
+        /// $2 is the identifier of the counter variable
+        // Create a new symbol for the counter variable and push it to the symbol table
+        // First check if the symbol is already defined in the symbol table
+        if(get_symbol(sym_tab_stack, (yyvsp[-3].id), false, false) != NULL){
+            printf("ERROR: Symbol %s already defined on line %d\n", (yyvsp[-3].id), line_num);
+            exit(1);
+        }
+        else{
+            // Create the symbol and push it to the symbol table
+            symbol_id++;
+            add_symbol(sym_tab_stack, (yyvsp[-3].id), TYPE_INT , NULL , line_num ,symbol_id, false, false, false);
+            // Write the assymbly code
+            printf("PUSH_MEM %d\n", symbol_id);
+
+            // Increment the for_label_counter which is global
+            for_label_counter++;
+
+            // Create a new symbol for the for statement and push it to the symbol table
+            add_symbol(sym_tab_stack, "FOR", TYPE_JUMP , NULL , line_num ,for_label_counter, false, false, false);
+
+            // Write the assembly code
+            printf("BEGIN_FOR_%d:\n", for_label_counter);
+        }
+
+    }
+#line 2130 "comp.tab.c"
     break;
 
   case 56:
-#line 481 "comp.y"
-    {  }
-#line 2112 "comp.tab.c"
+#line 510 "comp.y"
+    {
+        // Get the symbol for the counter variable
+        symbol* sym = get_symbol(sym_tab_stack, (yyvsp[-7].id), false, false);
+        if( sym == NULL){
+            printf("ERROR: Symbol %s not defined on line %d\n", (yyvsp[-7].id), line_num);
+            exit(1);
+        }
+        else{
+            // Write the assembly code
+            printf("POP_MEM %d\n", sym->symbol_id);
+        }
+
+        printf("LESS_THAN_OR_EQUAL\n");
+        printf("JMP_FALSE END_FOR_%d\n", for_label_counter);
+
+    }
+#line 2151 "comp.tab.c"
     break;
 
   case 57:
-#line 485 "comp.y"
-                    { }
-#line 2118 "comp.tab.c"
+#line 528 "comp.y"
+    {
+        // Will create a symbol with the name step_size_for_($for_label_counter) and type Int to store the terminal value
+        // No need to check if the symbol is already defined in the symbol table
+        char * var_name = malloc(100);
+        sprintf(var_name, "step_size_for_%d", for_label_counter);
+
+        // Create the symbol and push it to the symbol table
+        symbol_id++;
+        add_symbol(sym_tab_stack, var_name, TYPE_INT , NULL , line_num ,symbol_id, false, false, false);
+
+        // Write the assembly code
+        printf("PUSH_MEM %d\n", symbol_id);
+
+    }
+#line 2170 "comp.tab.c"
     break;
 
   case 58:
-#line 486 "comp.y"
-                        {  }
-#line 2124 "comp.tab.c"
+#line 543 "comp.y"
+    {
+ 
+        // Search for the last symbol with name FOR in the symbol table
+        // Search from the top of the stack
+        symbol* for_symbol = get_symbol(sym_tab_stack, "FOR", true, false);
+
+        // If the symbol is not found, error out
+        if(for_symbol == NULL){
+            printf("ERROR: Symbol %s not defined on line %d\n", "FOR", line_num);
+            exit(1);
+        }
+
+        // Get the old for label counter and create a new variable to search for the step size
+        int old_for_label_counter = for_symbol->symbol_id;
+        char * var_name = malloc(100);
+        sprintf(var_name, "step_size_for_%d", old_for_label_counter);
+
+        // Get the symbol for the step size
+        symbol* step_size_sym = get_symbol(sym_tab_stack, var_name, false, false);
+        if( step_size_sym == NULL){
+            printf("ERROR: Symbol %s not defined on line %d\n", var_name, line_num);
+            exit(1);
+        }
+
+        // Want to get the symbol for the counter variable
+        // Get the symbol for the counter variable
+        symbol* counter_sym = get_symbol(sym_tab_stack, (yyvsp[-12].id), false, false);
+        if( counter_sym == NULL){
+            printf("ERROR: Symbol %s not defined on line %d\n", (yyvsp[-12].id), line_num);
+            exit(1);
+        }
+
+        // Write the assembly code
+        printf("POP_MEM %d\n", step_size_sym->symbol_id);
+        printf("POP_MEM %d\n", counter_sym->symbol_id);
+        printf("ADD\n");
+        printf("PUSH_MEM %d\n", counter_sym->symbol_id);
+
+        // Write the assembly code
+        printf("JMP BEGIN_FOR_%d\n", for_symbol->symbol_id);
+
+
+        // If the symbol is found, print the label for the end of the for block
+        printf("END_FOR_%d:\n", for_symbol->symbol_id);
+    }
+#line 2220 "comp.tab.c"
     break;
 
   case 59:
-#line 490 "comp.y"
+#line 591 "comp.y"
+               {
+        // Check if the symbol is defined in the symbol table, if not error out
+        symbol* sym = get_symbol(sym_tab_stack, (yyvsp[0].id), false, false);
+        if( sym == NULL){
+            printf("ERROR: Symbol %s not defined on line %d\n", (yyvsp[0].id), line_num);
+            exit(1);
+        }
+        else{
+            // Write the assembly code
+            printf("POP_MEM %d\n", sym->symbol_id);
+        }
+    }
+#line 2237 "comp.tab.c"
+    break;
+
+  case 60:
+#line 603 "comp.y"
+            { 
+        // Write the assembly code
+        printf("PUSH %d\n", (yyvsp[0].integer));
+    }
+#line 2246 "comp.tab.c"
+    break;
+
+  case 61:
+#line 610 "comp.y"
                {
         // How to hanle labels of the while statement:
         // increment the while_label_counter which is global
@@ -2137,11 +2259,11 @@ yyreduce:
         // Create a new symbol for the while statement and push it to the symbol table
         add_symbol(sym_tab_stack, "WHILE", TYPE_JUMP , NULL , line_num ,while_label_counter, false, false, false);
     }
-#line 2141 "comp.tab.c"
+#line 2263 "comp.tab.c"
     break;
 
-  case 60:
-#line 502 "comp.y"
+  case 62:
+#line 622 "comp.y"
         {
         // Search for the last symbol with name WHILE in the symbol table
         // Search from the top of the stack
@@ -2157,11 +2279,11 @@ yyreduce:
             printf("JMP_FALSE END_WHILE_%d\n", sym->symbol_id);
         }
     }
-#line 2161 "comp.tab.c"
+#line 2283 "comp.tab.c"
     break;
 
-  case 61:
-#line 517 "comp.y"
+  case 63:
+#line 637 "comp.y"
          {
         // Search for the last symbol with name WHILE in the symbol table
         // Search from the top of the stack
@@ -2178,183 +2300,363 @@ yyreduce:
             printf("END_WHILE_%d:\n", sym->symbol_id);
         }
     }
-#line 2182 "comp.tab.c"
-    break;
-
-  case 62:
-#line 537 "comp.y"
-    {  }
-#line 2188 "comp.tab.c"
-    break;
-
-  case 63:
-#line 542 "comp.y"
-    {  }
-#line 2194 "comp.tab.c"
+#line 2304 "comp.tab.c"
     break;
 
   case 64:
-#line 547 "comp.y"
-    {  }
-#line 2200 "comp.tab.c"
+#line 656 "comp.y"
+               {
+        // How to hanle labels of the while statement:
+        // increment the while_label_counter which is global
+        // Store it in the symbol_id of the symbol entry in the symbol table
+        // End_while will get the latest entry in the symbol table with type WHILE 
+        // If the expression is flase, Jump to the end_while label
+        while_label_counter++;
+        printf("BEGIN_WHILE_%d:\n", while_label_counter);
+
+        // Create a new symbol for the while statement and push it to the symbol table
+        add_symbol(sym_tab_stack, "WHILE", TYPE_JUMP , NULL , line_num ,while_label_counter, false, false, false);
+    }
+#line 2321 "comp.tab.c"
     break;
 
   case 65:
-#line 551 "comp.y"
-                                    {  }
-#line 2206 "comp.tab.c"
+#line 668 "comp.y"
+        {
+        // Search for the last symbol with name WHILE in the symbol table
+        // Search from the top of the stack
+        symbol* sym = get_symbol(sym_tab_stack, "WHILE", true, false);
+
+        // If the symbol is not found, error out
+        if(sym == NULL){
+            printf("ERROR: Symbol %s not defined on line %d\n", "WHILE", line_num);
+            exit(1);
+        }
+        else{
+            // If the symbol is found, print the label for the jump block
+            printf("JMP_TRUE END_WHILE_%d\n", sym->symbol_id);
+        }
+    }
+#line 2341 "comp.tab.c"
     break;
 
   case 66:
-#line 553 "comp.y"
-    {  }
-#line 2212 "comp.tab.c"
+#line 683 "comp.y"
+         {
+        // Search for the last symbol with name WHILE in the symbol table
+        // Search from the top of the stack
+        symbol* sym = get_symbol(sym_tab_stack, "WHILE", true, false);
+
+        // If the symbol is not found, error out
+        if(sym == NULL){
+            printf("ERROR: Symbol %s not defined on line %d\n", "WHILE", line_num);
+            exit(1);
+        }
+        else{
+            // If the symbol is found, print the label for the jump block
+            printf("JUMP BEGIN_WHILE_%d\n", sym->symbol_id);
+            printf("END_WHILE_%d:\n", sym->symbol_id);
+        }
+    }
+#line 2362 "comp.tab.c"
     break;
 
   case 67:
-#line 558 "comp.y"
+#line 703 "comp.y"
     {  }
-#line 2218 "comp.tab.c"
+#line 2368 "comp.tab.c"
     break;
 
   case 68:
-#line 560 "comp.y"
-    {  }
-#line 2224 "comp.tab.c"
+#line 707 "comp.y"
+                {
+        switch_label_counter++;
+        
+        printf("SWITCH_%d:\n", switch_label_counter);
+
+        // Create a new symbol for the switch statement and push it to the symbol table
+        add_symbol(sym_tab_stack, "SWITCH", TYPE_JUMP , NULL , line_num ,switch_label_counter, false, false, false);
+
+    }
+#line 2382 "comp.tab.c"
     break;
 
   case 69:
-#line 564 "comp.y"
+#line 716 "comp.y"
+         {
+        // Printf DUP
+        printf("DUP\n");
+
+    }
+#line 2392 "comp.tab.c"
+    break;
+
+  case 70:
+#line 722 "comp.y"
+    {
+        // Search for the last symbol with name SWITCH in the symbol table
+        // Search from the top of the stack
+        symbol* sym = get_symbol(sym_tab_stack, "SWITCH", true, false);
+
+        // If the symbol is not found, error out
+        if(sym == NULL){
+            printf("ERROR: Symbol %s not defined on line %d\n", "SWITCH", line_num);
+            exit(1);
+        }
+        else{
+            // If the symbol is found, print the label for the jump block
+            printf("END_SWITCH_%d:\n", sym->symbol_id);
+        }
+    }
+#line 2412 "comp.tab.c"
+    break;
+
+  case 71:
+#line 740 "comp.y"
+                                    {  }
+#line 2418 "comp.tab.c"
+    break;
+
+  case 72:
+#line 742 "comp.y"
+    {  }
+#line 2424 "comp.tab.c"
+    break;
+
+  case 73:
+#line 747 "comp.y"
+    {
+        // Search for the last symbol with name SWITCH in the symbol table
+        // Search from the top of the stack
+        symbol* sym = get_symbol(sym_tab_stack, "SWITCH", true, false);
+
+        // If the symbol is not found, error out
+        if(sym == NULL){
+            printf("ERROR: Symbol %s not defined on line %d\n", "SWITCH", line_num);
+            exit(1);
+        }
+        else{
+            // If the symbol is found, print the label for the jump block
+            printf("ELSE_SWITCH_%d:\n", sym->symbol_id);
+        }
+
+    }
+#line 2445 "comp.tab.c"
+    break;
+
+  case 74:
+#line 764 "comp.y"
+    { 
+        // Search for the last symbol with name SWITCH in the symbol table
+        // Search from the top of the stack
+        symbol* sym = get_symbol(sym_tab_stack, "SWITCH", true, false);
+
+        // If the symbol is not found, error out
+        if(sym == NULL){
+            printf("ERROR: Symbol %s not defined on line %d\n", "SWITCH", line_num);
+            exit(1);
+        }
+        else{
+            // If the symbol is found, print the label for the jump block
+            printf("JMP END_SWITCH_%d\n", sym->symbol_id);
+        }
+    }
+#line 2465 "comp.tab.c"
+    break;
+
+  case 75:
+#line 780 "comp.y"
+    {
+        // Print the assembly code for the comparison
+        printf("EQ\n");
+
+        // Search for the last symbol with name SWITCH in the symbol table
+        // Search from the top of the stack
+        symbol* sym = get_symbol(sym_tab_stack, "SWITCH", true, false);
+
+        // We need a unique label for each case
+        case_label_counter++;
+
+        // store the label for the case statement in a variable
+        char* case_label = (char*)malloc(sizeof(char)*20);
+        sprintf(case_label, "CASE_%d_%d", sym->symbol_id, case_label_counter);
+
+        // Create a new symbol for the case statement and push it to the symbol table
+        add_symbol(sym_tab_stack, "CASE", TYPE_JUMP , NULL , line_num ,case_label_counter, false, false, false);
+
+
+        // If the symbol is not found, error out
+        if(sym == NULL){
+            printf("ERROR: Symbol %s not defined on line %d\n", "SWITCH", line_num);
+            exit(1);
+        }
+        else{
+            // If the symbol is found, print the label for the jump block
+            printf("JMP_FALSE END_CASE_%d_%d\n", sym->symbol_id, case_label_counter);
+        }
+    }
+#line 2499 "comp.tab.c"
+    break;
+
+  case 76:
+#line 810 "comp.y"
+    {
+        // After evaluating the block, jump to the end of the switch statement
+        // Search for the last symbol with name SWITCH in the symbol table
+        // Search from the top of the stack
+        symbol* sym = get_symbol(sym_tab_stack, "SWITCH", true, false);
+
+        // Search for the last symbol with name CASE in the symbol table to get the case label
+        // Search from the top of the stack
+        symbol* case_sym = get_symbol(sym_tab_stack, "CASE", true, false);
+
+        // If the symbol is not found, error out
+        if(sym == NULL){
+            printf("ERROR: Symbol %s not defined on line %d\n", "SWITCH", line_num);
+            exit(1);
+        }
+        else{
+            // If the symbol is found, print the label for the jump block
+            printf("JMP END_SWITCH_%d\n", sym->symbol_id);
+            printf("END_CASE_%d_%d:\n", sym->symbol_id, case_sym->symbol_id);
+            printf("DUP\n");
+        }
+    }
+#line 2526 "comp.tab.c"
+    break;
+
+  case 77:
+#line 835 "comp.y"
                  {
         // Create a new symbol table for the if block and push it to the stack
         symTable* block_sym_tab = create_sym_table();
         push_sym_tab(sym_tab_stack, block_sym_tab);
 
     }
-#line 2235 "comp.tab.c"
+#line 2537 "comp.tab.c"
     break;
 
-  case 70:
-#line 571 "comp.y"
+  case 78:
+#line 842 "comp.y"
                   { 
         // After evaluating the block, pop the symbol table on top of the stack
         // First pop the symbol table on top of the stack
         pop_sym_tab(sym_tab_stack);
 
      }
-#line 2246 "comp.tab.c"
-    break;
-
-  case 71:
-#line 580 "comp.y"
-                                                {  }
-#line 2252 "comp.tab.c"
-    break;
-
-  case 72:
-#line 581 "comp.y"
-                                                { }
-#line 2258 "comp.tab.c"
-    break;
-
-  case 73:
-#line 585 "comp.y"
-                                            {  }
-#line 2264 "comp.tab.c"
-    break;
-
-  case 74:
-#line 586 "comp.y"
-                                            {  }
-#line 2270 "comp.tab.c"
-    break;
-
-  case 75:
-#line 587 "comp.y"
-                                            {  }
-#line 2276 "comp.tab.c"
-    break;
-
-  case 76:
-#line 591 "comp.y"
-                                                                                 { }
-#line 2282 "comp.tab.c"
-    break;
-
-  case 77:
-#line 595 "comp.y"
-                                        {}
-#line 2288 "comp.tab.c"
-    break;
-
-  case 78:
-#line 596 "comp.y"
-                                        {}
-#line 2294 "comp.tab.c"
+#line 2548 "comp.tab.c"
     break;
 
   case 79:
-#line 597 "comp.y"
-                                        {}
-#line 2300 "comp.tab.c"
+#line 851 "comp.y"
+                                                {  }
+#line 2554 "comp.tab.c"
     break;
 
   case 80:
-#line 601 "comp.y"
-                                                    {  }
-#line 2306 "comp.tab.c"
+#line 852 "comp.y"
+                                                { }
+#line 2560 "comp.tab.c"
     break;
 
   case 81:
-#line 605 "comp.y"
-                                                    {  }
-#line 2312 "comp.tab.c"
+#line 856 "comp.y"
+                                            {  }
+#line 2566 "comp.tab.c"
     break;
 
   case 82:
-#line 609 "comp.y"
-                        {}
-#line 2318 "comp.tab.c"
+#line 857 "comp.y"
+                                            {  }
+#line 2572 "comp.tab.c"
     break;
 
   case 83:
-#line 610 "comp.y"
-                        {}
-#line 2324 "comp.tab.c"
+#line 858 "comp.y"
+                                            {  }
+#line 2578 "comp.tab.c"
     break;
 
   case 84:
-#line 611 "comp.y"
-                                {}
-#line 2330 "comp.tab.c"
+#line 862 "comp.y"
+                                                                                 { }
+#line 2584 "comp.tab.c"
     break;
 
   case 85:
-#line 615 "comp.y"
-                                                                         {  }
-#line 2336 "comp.tab.c"
+#line 866 "comp.y"
+                                        {}
+#line 2590 "comp.tab.c"
     break;
 
   case 86:
-#line 619 "comp.y"
-                                                        {  }
-#line 2342 "comp.tab.c"
+#line 867 "comp.y"
+                                        {}
+#line 2596 "comp.tab.c"
     break;
 
   case 87:
-#line 620 "comp.y"
-                                                        {  }
-#line 2348 "comp.tab.c"
+#line 868 "comp.y"
+                                        {}
+#line 2602 "comp.tab.c"
     break;
 
   case 88:
-#line 624 "comp.y"
+#line 872 "comp.y"
+                                                    {  }
+#line 2608 "comp.tab.c"
+    break;
+
+  case 89:
+#line 876 "comp.y"
+                                                    {  }
+#line 2614 "comp.tab.c"
+    break;
+
+  case 90:
+#line 880 "comp.y"
+                        {}
+#line 2620 "comp.tab.c"
+    break;
+
+  case 91:
+#line 881 "comp.y"
+                        {}
+#line 2626 "comp.tab.c"
+    break;
+
+  case 92:
+#line 882 "comp.y"
+                                {}
+#line 2632 "comp.tab.c"
+    break;
+
+  case 93:
+#line 886 "comp.y"
+                                                                         {  }
+#line 2638 "comp.tab.c"
+    break;
+
+  case 94:
+#line 890 "comp.y"
+                                                        {  }
+#line 2644 "comp.tab.c"
+    break;
+
+  case 95:
+#line 891 "comp.y"
+                                                        {  }
+#line 2650 "comp.tab.c"
+    break;
+
+  case 96:
+#line 895 "comp.y"
                                                         { }
-#line 2354 "comp.tab.c"
+#line 2656 "comp.tab.c"
     break;
 
 
-#line 2358 "comp.tab.c"
+#line 2660 "comp.tab.c"
 
       default: break;
     }
@@ -2586,7 +2888,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 628 "comp.y"
+#line 899 "comp.y"
 
 
 
@@ -2664,9 +2966,9 @@ symTable* pop_sym_tab(symTableStack *sym_tab_stack){
         // Get the top symbol table from the stack
         symTable* sym_tab = stack->sym_tabs[stack->num_sym_tabs - 1];
 
-        // Check if the symbol is already in the symbol table
+        // Check if the symbol is already in the symbol table and it is not a jump (we store names of jumps (which is the keywords) in the symbol table)
         for(int i = 0; i < sym_tab->num_symbols; i++){
-            if(strcmp(sym_tab->symbols[i].name, name) == 0){
+            if(strcmp(sym_tab->symbols[i].name, name) == 0 && type != TYPE_JUMP ){
                 // If it is, Error out
                 printf("Error: Symbol %s already exists in symbol table\n", name);
                 return;

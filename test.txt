@@ -1,27 +1,24 @@
 module Main
+import numpy
+import iostream
 
-val x : int = 10;
+type BOOL = TRUE;
+val x: Int = 10;
 
-fun fib() int {
-
-    while (1) {
-
-
-
-    if 1 {
-
-
-    val x : int = 10;
-
-    } else {
-
-
-    x = 9;
-
-
-
+fun fib(val n:int, var p:int, val k:string) int {
+    switch 1 {
+        1:{}
+        2:{
+                switch 1 {
+    1:{
+        x = 10;
+    }
+    2:{}
+    else:{}
     };
 
-
+        }
+        else:{}
     };
+
 }

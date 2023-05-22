@@ -1,18 +1,22 @@
-Kak_BEGINE
-PUSH 10
-PUSH_MEM 1
-BEGIN_WHILE_1:
+//switch cond
 PUSH 1
-JMP_FALSE END_WHILE_1
-PUSH 1
-JMP_FALSE ELSE_IF_1
-PUSH 10
-PUSH_MEM 2
-JUMP END_IF_1
-ELSE_IF_1:
-PUSH 9
-PUSH_MEM 1
-END_IF_1:
-JUMP BEGIN_WHILE_1
-END_WHILE_1:
-Kak_END
+//comparison between 2 and switch cond
+DUP
+PUSH 2
+//are they equal
+EQ
+    //if not, skip this case
+    JUMP-FALSE ENDCASE_1
+    //otherwise, execute it and end switch
+    <code for block 1>
+    JUMP ENDSWITCH
+    //end of case 1, test if case 2
+ENDCASE_1:
+DUP
+PUSH 3
+EQ
+    JUMP-FALSE ENDCASE_2:
+    <code for block2>
+    JUMP ENDSWITCH
+ENDCASE_2:
+ENDSWITCH:

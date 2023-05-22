@@ -118,6 +118,12 @@
 
     int while_label_counter = 0; // Counter for the WHILE labels
 
+    int for_label_counter = 0; // Counter for the FOR labels
+
+    int switch_label_counter = 0; // Counter for the SWITCH labels
+
+    int case_label_counter = 0; // Counter for the CASE labels
+
     int identifier_flag = 0; // Flag to check if the current token is an identifier
 
 %}
@@ -212,6 +218,7 @@
 %type <symbolval> expr
 %type <symbolval> optional_assignment
 %type <symbolval> atomic_value
+%type <symbolval> for_var
 
 /* module Main */
 %left TOKEN_PLUS TOKEN_MINUS TOKEN_MULT TOKEN_DIV TOKEN_MOD
@@ -472,18 +479,131 @@ if_then_else_expr:
     ;
 
 for_loop_expr:
-    TOKEN_FOR IDENTIFIER TOKEN_COLON range block   
-    {  }
+    TOKEN_FOR IDENTIFIER TOKEN_COLON TOKEN_LPAREN for_var 
+    {
+        /// $2 is the identifier of the counter variable
+        // Create a new symbol for the counter variable and push it to the symbol table
+        // First check if the symbol is already defined in the symbol table
+        if(get_symbol(sym_tab_stack, $2, false, false) != NULL){
+            printf("ERROR: Symbol %s already defined on line %d\n", $2, line_num);
+            exit(1);
+        }
+        else{
+            // Create the symbol and push it to the symbol table
+            symbol_id++;
+            add_symbol(sym_tab_stack, $2, TYPE_INT , NULL , line_num ,symbol_id, false, false, false);
+            // Write the assymbly code
+            printf("PUSH_MEM %d\n", symbol_id);
+
+            // Increment the for_label_counter which is global
+            for_label_counter++;
+
+            // Create a new symbol for the for statement and push it to the symbol table
+            add_symbol(sym_tab_stack, "FOR", TYPE_JUMP , NULL , line_num ,for_label_counter, false, false, false);
+
+            // Write the assembly code
+            printf("BEGIN_FOR_%d:\n", for_label_counter);
+        }
+
+    }
+    TOKEN_COMMA for_var TOKEN_COMMA
+    {
+        // Get the symbol for the counter variable
+        symbol* sym = get_symbol(sym_tab_stack, $2, false, false);
+        if( sym == NULL){
+            printf("ERROR: Symbol %s not defined on line %d\n", $2, line_num);
+            exit(1);
+        }
+        else{
+            // Write the assembly code
+            printf("POP_MEM %d\n", sym->symbol_id);
+        }
+
+        printf("LESS_THAN_OR_EQUAL\n");
+        printf("JMP_FALSE END_FOR_%d\n", for_label_counter);
+
+    }
+     
+    for_var TOKEN_RPAREN 
+    {
+        // Will create a symbol with the name step_size_for_($for_label_counter) and type Int to store the terminal value
+        // No need to check if the symbol is already defined in the symbol table
+        char * var_name = malloc(100);
+        sprintf(var_name, "step_size_for_%d", for_label_counter);
+
+        // Create the symbol and push it to the symbol table
+        symbol_id++;
+        add_symbol(sym_tab_stack, var_name, TYPE_INT , NULL , line_num ,symbol_id, false, false, false);
+
+        // Write the assembly code
+        printf("PUSH_MEM %d\n", symbol_id);
+
+    }
+    block   
+    {
+ 
+        // Search for the last symbol with name FOR in the symbol table
+        // Search from the top of the stack
+        symbol* for_symbol = get_symbol(sym_tab_stack, "FOR", true, false);
+
+        // If the symbol is not found, error out
+        if(for_symbol == NULL){
+            printf("ERROR: Symbol %s not defined on line %d\n", "FOR", line_num);
+            exit(1);
+        }
+
+        // Get the old for label counter and create a new variable to search for the step size
+        int old_for_label_counter = for_symbol->symbol_id;
+        char * var_name = malloc(100);
+        sprintf(var_name, "step_size_for_%d", old_for_label_counter);
+
+        // Get the symbol for the step size
+        symbol* step_size_sym = get_symbol(sym_tab_stack, var_name, false, false);
+        if( step_size_sym == NULL){
+            printf("ERROR: Symbol %s not defined on line %d\n", var_name, line_num);
+            exit(1);
+        }
+
+        // Want to get the symbol for the counter variable
+        // Get the symbol for the counter variable
+        symbol* counter_sym = get_symbol(sym_tab_stack, $2, false, false);
+        if( counter_sym == NULL){
+            printf("ERROR: Symbol %s not defined on line %d\n", $2, line_num);
+            exit(1);
+        }
+
+        // Write the assembly code
+        printf("POP_MEM %d\n", step_size_sym->symbol_id);
+        printf("POP_MEM %d\n", counter_sym->symbol_id);
+        printf("ADD\n");
+        printf("PUSH_MEM %d\n", counter_sym->symbol_id);
+
+        // Write the assembly code
+        printf("JMP BEGIN_FOR_%d\n", for_symbol->symbol_id);
+
+
+        // If the symbol is found, print the label for the end of the for block
+        printf("END_FOR_%d:\n", for_symbol->symbol_id);
+    }
     ;
 
-range:
-    TOKEN_LPAREN expr TOKEN_COMMA expr optional_step TOKEN_RPAREN  
-    {  }
-    ;
-
-optional_step:
-    %empty          { }
-|   TOKEN_COMMA expr    {  }
+for_var:
+    IDENTIFIER {
+        // Check if the symbol is defined in the symbol table, if not error out
+        symbol* sym = get_symbol(sym_tab_stack, $1, false, false);
+        if( sym == NULL){
+            printf("ERROR: Symbol %s not defined on line %d\n", $1, line_num);
+            exit(1);
+        }
+        else{
+            // Write the assembly code
+            printf("POP_MEM %d\n", sym->symbol_id);
+        }
+    }
+|   INTEGER { 
+        // Write the assembly code
+        printf("PUSH %d\n", $1);
+    }
     ;
 
 while_loop_expr:
@@ -533,8 +653,49 @@ while_loop_expr:
     ;
 
 until_loop_expr:
-    TOKEN_UNTIL expr block    
-    {  }
+    TOKEN_UNTIL{
+        // How to hanle labels of the while statement:
+        // increment the while_label_counter which is global
+        // Store it in the symbol_id of the symbol entry in the symbol table
+        // End_while will get the latest entry in the symbol table with type WHILE 
+        // If the expression is flase, Jump to the end_while label
+        while_label_counter++;
+        printf("BEGIN_WHILE_%d:\n", while_label_counter);
+
+        // Create a new symbol for the while statement and push it to the symbol table
+        add_symbol(sym_tab_stack, "WHILE", TYPE_JUMP , NULL , line_num ,while_label_counter, false, false, false);
+    } 
+    expr{
+        // Search for the last symbol with name WHILE in the symbol table
+        // Search from the top of the stack
+        symbol* sym = get_symbol(sym_tab_stack, "WHILE", true, false);
+
+        // If the symbol is not found, error out
+        if(sym == NULL){
+            printf("ERROR: Symbol %s not defined on line %d\n", "WHILE", line_num);
+            exit(1);
+        }
+        else{
+            // If the symbol is found, print the label for the jump block
+            printf("JMP_TRUE END_WHILE_%d\n", sym->symbol_id);
+        }
+    } 
+    block{
+        // Search for the last symbol with name WHILE in the symbol table
+        // Search from the top of the stack
+        symbol* sym = get_symbol(sym_tab_stack, "WHILE", true, false);
+
+        // If the symbol is not found, error out
+        if(sym == NULL){
+            printf("ERROR: Symbol %s not defined on line %d\n", "WHILE", line_num);
+            exit(1);
+        }
+        else{
+            // If the symbol is found, print the label for the jump block
+            printf("JUMP BEGIN_WHILE_%d\n", sym->symbol_id);
+            printf("END_WHILE_%d:\n", sym->symbol_id);
+        }
+    }
     ;
 
 do_block_expr:
@@ -543,8 +704,36 @@ do_block_expr:
     ;
 
 switch_expr:
-    TOKEN_SWITCH expr TOKEN_LBRACE case_expr_list TOKEN_RBRACE  
-    {  }
+    TOKEN_SWITCH{
+        switch_label_counter++;
+        
+        printf("SWITCH_%d:\n", switch_label_counter);
+
+        // Create a new symbol for the switch statement and push it to the symbol table
+        add_symbol(sym_tab_stack, "SWITCH", TYPE_JUMP , NULL , line_num ,switch_label_counter, false, false, false);
+
+    } 
+    expr {
+        // Printf DUP
+        printf("DUP\n");
+
+    }
+    TOKEN_LBRACE case_expr_list TOKEN_RBRACE  
+    {
+        // Search for the last symbol with name SWITCH in the symbol table
+        // Search from the top of the stack
+        symbol* sym = get_symbol(sym_tab_stack, "SWITCH", true, false);
+
+        // If the symbol is not found, error out
+        if(sym == NULL){
+            printf("ERROR: Symbol %s not defined on line %d\n", "SWITCH", line_num);
+            exit(1);
+        }
+        else{
+            // If the symbol is found, print the label for the jump block
+            printf("END_SWITCH_%d:\n", sym->symbol_id);
+        }
+    }
     ;
 
 case_expr_list:
@@ -554,10 +743,92 @@ case_expr_list:
     ;
 
 case_expr:
-    TOKEN_ELSE TOKEN_COLON block    
-    {  }
-|   expr TOKEN_COLON block          
-    {  }
+    TOKEN_ELSE TOKEN_COLON
+    {
+        // Search for the last symbol with name SWITCH in the symbol table
+        // Search from the top of the stack
+        symbol* sym = get_symbol(sym_tab_stack, "SWITCH", true, false);
+
+        // If the symbol is not found, error out
+        if(sym == NULL){
+            printf("ERROR: Symbol %s not defined on line %d\n", "SWITCH", line_num);
+            exit(1);
+        }
+        else{
+            // If the symbol is found, print the label for the jump block
+            printf("ELSE_SWITCH_%d:\n", sym->symbol_id);
+        }
+
+    }
+    block    
+    { 
+        // Search for the last symbol with name SWITCH in the symbol table
+        // Search from the top of the stack
+        symbol* sym = get_symbol(sym_tab_stack, "SWITCH", true, false);
+
+        // If the symbol is not found, error out
+        if(sym == NULL){
+            printf("ERROR: Symbol %s not defined on line %d\n", "SWITCH", line_num);
+            exit(1);
+        }
+        else{
+            // If the symbol is found, print the label for the jump block
+            printf("JMP END_SWITCH_%d\n", sym->symbol_id);
+        }
+    }
+|   expr TOKEN_COLON 
+    {
+        // Print the assembly code for the comparison
+        printf("EQ\n");
+
+        // Search for the last symbol with name SWITCH in the symbol table
+        // Search from the top of the stack
+        symbol* sym = get_symbol(sym_tab_stack, "SWITCH", true, false);
+
+        // We need a unique label for each case
+        case_label_counter++;
+
+        // store the label for the case statement in a variable
+        char* case_label = (char*)malloc(sizeof(char)*20);
+        sprintf(case_label, "CASE_%d_%d", sym->symbol_id, case_label_counter);
+
+        // Create a new symbol for the case statement and push it to the symbol table
+        add_symbol(sym_tab_stack, "CASE", TYPE_JUMP , NULL , line_num ,case_label_counter, false, false, false);
+
+
+        // If the symbol is not found, error out
+        if(sym == NULL){
+            printf("ERROR: Symbol %s not defined on line %d\n", "SWITCH", line_num);
+            exit(1);
+        }
+        else{
+            // If the symbol is found, print the label for the jump block
+            printf("JMP_FALSE END_CASE_%d_%d\n", sym->symbol_id, case_label_counter);
+        }
+    }
+    block
+    {
+        // After evaluating the block, jump to the end of the switch statement
+        // Search for the last symbol with name SWITCH in the symbol table
+        // Search from the top of the stack
+        symbol* sym = get_symbol(sym_tab_stack, "SWITCH", true, false);
+
+        // Search for the last symbol with name CASE in the symbol table to get the case label
+        // Search from the top of the stack
+        symbol* case_sym = get_symbol(sym_tab_stack, "CASE", true, false);
+
+        // If the symbol is not found, error out
+        if(sym == NULL){
+            printf("ERROR: Symbol %s not defined on line %d\n", "SWITCH", line_num);
+            exit(1);
+        }
+        else{
+            // If the symbol is found, print the label for the jump block
+            printf("JMP END_SWITCH_%d\n", sym->symbol_id);
+            printf("END_CASE_%d_%d:\n", sym->symbol_id, case_sym->symbol_id);
+            printf("DUP\n");
+        }
+    }
     ;
 
 block:  
@@ -702,9 +973,9 @@ symTable* pop_sym_tab(symTableStack *sym_tab_stack){
         // Get the top symbol table from the stack
         symTable* sym_tab = stack->sym_tabs[stack->num_sym_tabs - 1];
 
-        // Check if the symbol is already in the symbol table
+        // Check if the symbol is already in the symbol table and it is not a jump (we store names of jumps (which is the keywords) in the symbol table)
         for(int i = 0; i < sym_tab->num_symbols; i++){
-            if(strcmp(sym_tab->symbols[i].name, name) == 0){
+            if(strcmp(sym_tab->symbols[i].name, name) == 0 && type != TYPE_JUMP ){
                 // If it is, Error out
                 printf("Error: Symbol %s already exists in symbol table\n", name);
                 return;
