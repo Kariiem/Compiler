@@ -51,10 +51,10 @@ int main(int argc, char *argv[]) {
   yyparse(scanner, &source_module);
 
   // print_ast_source_t(source_module, 0);
-  instructions = fopen("instructions.txt", "w");
-  functions = fopen("functions.txt", "w");
-  call_stack = fopen("call_stack.txt", "w");
-  types = fopen("types.txt", "w");
+  instructions = fopen("codegen/instructions.txt", "w");
+  functions = fopen("codegen/functions.txt", "w");
+  call_stack = fopen("codegen/call_stack.txt", "w");
+  types = fopen("codegen/types.txt", "w");
 
   walk_ast_source_t(source_module, global_symbol_table, 0);
 
