@@ -1,4 +1,5 @@
 #include "expr.h"
+#include "../../symbol.h"
 #include "../utils.h"
 #include "bin_expr.h"
 #include "do.h"
@@ -6,8 +7,9 @@
 #include "if.h"
 #include "switch.h"
 #include "while.h"
-#include "../../symbol.h"
 // #include <gmp.h>
+
+static char *map_int_to_operators(int i);
 
 ast_expr_t *create_ast_expr_t(int const type, void *value) {
   ast_expr_t *expr = calloc(1, sizeof(ast_expr_t));
@@ -77,6 +79,7 @@ ast_expr_t *create_ast_expr_t(int const type, void *value) {
   }
   return expr;
 }
+
 void free_ast_expr_t(ast_expr_t **expr_ptr) {
   DEBUG_EPRINTF("free ast_expr_t\n");
   ast_expr_t *expr = *expr_ptr;
@@ -148,7 +151,7 @@ void free_ast_expr_t(ast_expr_t **expr_ptr) {
 void print_ast_expr_t(ast_expr_t const *expr, int indent) {
   INDENT(indent);
   printf("ast_expr_t\n");
-  INDENT(indent+1);
+  INDENT(indent + 1);
   switch (expr->type) {
   default:
     DEBUG_ASSERT(false, "Unkown type %d", expr->type);
@@ -189,7 +192,7 @@ void print_ast_expr_t(ast_expr_t const *expr, int indent) {
   case EXPR_GEQ:
   case EXPR_EQ:
   case EXPR_NEQ:
-    print_ast_bin_expr_t(expr->value.binary_expr, indent+1);
+    print_ast_bin_expr_t(expr->value.binary_expr, indent + 1);
     break;
   case EXPR_NOT:
     print_ast_expr_t(expr->value.not_, indent);
@@ -220,20 +223,29 @@ void print_ast_expr_t(ast_expr_t const *expr, int indent) {
   }
 }
 
-void walk_ast_expr_t(ast_expr_t const *expr, symbol_table_t *sym_tab, int id){
+void walk_ast_expr_t(ast_expr_t const *expr, symbol_table_t *sym_tab, int* id) {
   DEBUG_EPRINTF("walk ast_expr_t\n");
   switch (expr->type) {
   default:
     DEBUG_ASSERT(false, "Unkown type %d", expr->type);
-  case EXPR_IDENTIFIER:
+  case EXPR_IDENTIFIER: {
+    symbol_t *sym = get_symbol(sym_tab, expr->value.identifier);
+    if (sym == NULL || sym->type != SYM_TY_TERM) {
+      REPORT_ERROR("Symbol %s not found\n", expr->value.identifier);
+      exit(1);
+    }
+    GEN_INSTRUCTIONS("POP_MEM $%d\n", sym->id);
     break;
+  }
   case EXPR_INTEGER:
   case EXPR_INT:
   case EXPR_REAL:
   case EXPR_DOUBLE:
   case EXPR_BOOL:
-  case EXPR_STRING:
+  case EXPR_STRING: {
+    GEN_INSTRUCTIONS("PUSH %s\n", expr->value.string);
     break;
+  }
   // binary expressions
   case EXPR_ADD:
   case EXPR_SUB:
@@ -249,33 +261,73 @@ void walk_ast_expr_t(ast_expr_t const *expr, symbol_table_t *sym_tab, int id){
   case EXPR_GEQ:
   case EXPR_EQ:
   case EXPR_NEQ:
-    walk_ast_bin_expr_t(expr->value.binary_expr, sym_tab, id);
+    walk_ast_expr_t(expr->value.binary_expr->left, sym_tab, id);
+    walk_ast_expr_t(expr->value.binary_expr->right, sym_tab, id);
+    GEN_INSTRUCTIONS("%s\n", map_int_to_operators(expr->type));
+    // walk_ast_bin_expr_t(expr->value.binary_expr, sym_tab, id);
     break;
   case EXPR_NOT:
-    walk_ast_expr_t(expr->value.not_, sym_tab,id);
+    walk_ast_expr_t(expr->value.not_, sym_tab, id);
+    GEN_INSTRUCTIONS("%s\n", map_int_to_operators(expr->type));
     break;
   // function call
   case EXPR_FUNCALL:
-    walk_ast_funcall_t(expr->value.funcall, sym_tab,id);
+    walk_ast_funcall_t(expr->value.funcall, sym_tab, id);
     break;
   // compound expressions
   case EXPR_IF:
-    walk_ast_if_t(expr->value.if_, sym_tab,id);
+    walk_ast_if_t(expr->value.if_, sym_tab, id);
     break;
   case EXPR_FOR:
-    walk_ast_for_t(expr->value.for_, sym_tab,id);
+    walk_ast_for_t(expr->value.for_, sym_tab, id);
     break;
   case EXPR_WHILE:
-    walk_ast_while_t(expr->value.while_, sym_tab,id);
+    walk_ast_while_t(expr->value.while_, sym_tab, id);
     break;
   case EXPR_UNTIL:
-    walk_ast_while_t(expr->value.while_, sym_tab,id);
+    walk_ast_while_t(expr->value.while_, sym_tab, id);
     break;
   case EXPR_DO:
-    walk_ast_do_t(expr->value.do_, sym_tab,id);
+    walk_ast_do_t(expr->value.do_, sym_tab, id);
     break;
   case EXPR_SWITCH:
-    walk_ast_switch_t(expr->value.switch_, sym_tab,id);
+    walk_ast_switch_t(expr->value.switch_, sym_tab, id);
     break;
   }
+}
+
+static char *map_int_to_operators(int i) {
+  switch (i) {
+  case EXPR_ADD:
+    return "ADD";
+  case EXPR_SUB:
+    return "SUB";
+  case EXPR_MUL:
+    return "MUL";
+  case EXPR_DIV:
+    return "DIV";
+  case EXPR_MOD:
+    return "MOD";
+  case EXPR_EXP:
+    return "EXP";
+  case EXPR_AND:
+    return "AND";
+  case EXPR_OR:
+    return "OR";
+  case EXPR_LT:
+    return "LT";
+  case EXPR_GT:
+    return "GT";
+  case EXPR_LEQ:
+    return "LEQ";
+  case EXPR_GEQ:
+    return "GEQ";
+  case EXPR_EQ:
+    return "EQ";
+  case EXPR_NEQ:
+    return "NEQ";
+  case EXPR_NOT:
+    return "NOT";
+  }
+  return NULL;
 }

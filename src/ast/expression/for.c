@@ -42,7 +42,7 @@ void print_ast_for_t(ast_for_t const *for_loop, int indent){
   }
 }
 
-void walk_ast_for_t(ast_for_t const *for_loop, symbol_table_t *sym_tab, int id){
+void walk_ast_for_t(ast_for_t const *for_loop, symbol_table_t *sym_tab, int* id){
   DEBUG_EPRINTF("walk ast_for_t\n");
   walk_ast_range_t(for_loop->range, sym_tab,id);
   walk_ast_block_t(for_loop->body, sym_tab, id);

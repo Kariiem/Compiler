@@ -29,7 +29,7 @@ void print_ast_funcall_t(ast_funcall_t const *funcall, int indent) {
   cvector_for_each_in(it, funcall->args) { print_ast_expr_t(*it, indent + 2); }
 }
 
-void walk_ast_funcall_t(ast_funcall_t const *funcall, symbol_table_t *sym_tab, int id) {
+void walk_ast_funcall_t(ast_funcall_t const *funcall, symbol_table_t *sym_tab, int* id) {
   DEBUG_EPRINTF("walk ast_funcall_t\n");
   
 }

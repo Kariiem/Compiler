@@ -16,5 +16,5 @@ ast_assignment_t *create_ast_assignment_t(char const *identifier,
 void free_ast_assignment_t(ast_assignment_t **assignment_ptr);
 void print_ast_assignment_t(ast_assignment_t const *assignment, int indent);
 void walk_ast_assignment_t(ast_assignment_t const *assignment,
-                           symbol_table_t *sym_tab,int id);
+                           symbol_table_t *sym_tab,int* id);
 #endif // __AST_NODE_ASSIGNMENT__

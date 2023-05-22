@@ -34,7 +34,7 @@ void print_ast_source_t(ast_source_t const *source, int indent) {
 }
 
 void walk_ast_source_t(ast_source_t const *source, symbol_table_t *sym_tab,
-                       int id) {
+                       int* id) {
   DEBUG_EPRINTF("walk ast_source_t\n");
   DEBUG_ASSERT(sym_tab, "sym_tab is NULL\n");
   walk_ast_module_decl_t(source->module, sym_tab, id);

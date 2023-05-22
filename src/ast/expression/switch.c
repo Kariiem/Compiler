@@ -31,7 +31,7 @@ void print_ast_switch_t(ast_switch_t const *switch_, int indent){
   }
 }
 
-void walk_ast_switch_t(ast_switch_t const *switch_, symbol_table_t *sym_tab, int id){
+void walk_ast_switch_t(ast_switch_t const *switch_, symbol_table_t *sym_tab, int* id){
   DEBUG_EPRINTF("walk ast_switch_t\n");
   walk_ast_expr_t(switch_->enum_expr, sym_tab,id);
   ast_case_t **it;

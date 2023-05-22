@@ -1,7 +1,7 @@
 #include "term_decl.h"
+#include "../../symbol.h"
 #include "../utils.h"
 #include <stdlib.h>
-#include "../../symbol.h"
 ast_term_decl_t *create_ast_term_decl_t(int type, char const *decl_name,
                                         char const *decl_type,
                                         ast_expr_t *value) {
@@ -35,17 +35,28 @@ void print_ast_term_decl_t(ast_term_decl_t const *term_decl, int indent) {
   printf("decl_type: %s\n", term_decl->decl_type);
   if (term_decl->value) {
     print_ast_expr_t(term_decl->value, indent + 1);
-  }
-  else {
+  } else {
     INDENT(indent);
     printf("value: NULL\n");
   }
 }
 
 void walk_ast_term_decl_t(ast_term_decl_t const *term_decl,
-                          symbol_table_t *sym_tab,int id) {
+                          symbol_table_t *sym_tab, int *id) {
   DEBUG_EPRINTF("walk ast_term_decl_t\n");
+  DEBUG_ASSERT(sym_tab, "sym_tab is NULL");
+  if (get_symbol(sym_tab, term_decl->decl_name)) {
+    REPORT_ERROR("Error: %s has been declared\n", term_decl->decl_name);
+  }
+
+  if (get_symbol(sym_tab, term_decl->decl_type) == NULL) {
+    REPORT_ERROR("Error: %s does not name a type\n", term_decl->decl_type);
+  }
+  symbol_t *term_sym =
+      create_symbol_t(term_decl->decl_name, SYM_TY_TERM, term_decl, *id);
+  insert_symbol(sym_tab, term_sym);
   if (term_decl->value) {
-    walk_ast_expr_t(term_decl->value, sym_tab,id);
+    walk_ast_expr_t(term_decl->value, sym_tab, id);
+    GEN_INSTRUCTIONS("PUSH_MEM $%d\n", *id);
   }
 }

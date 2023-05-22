@@ -31,7 +31,7 @@ void print_ast_if_t(ast_if_t const *if_, int indent){
   print_ast_block_t(if_->else_branch, indent+1);
 }
 
-void walk_ast_if_t(ast_if_t const *if_, symbol_table_t *sym_tab, int id){
+void walk_ast_if_t(ast_if_t const *if_, symbol_table_t *sym_tab, int* id){
   DEBUG_EPRINTF("walk ast_if_t\n");
   walk_ast_expr_t(if_->cond, sym_tab,id);
   walk_ast_block_t(if_->then_branch, sym_tab,id);

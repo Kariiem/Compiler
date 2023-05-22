@@ -2,7 +2,7 @@
 CC = gcc
 LEX = flex
 YACC = bison
-CFLAGS = -Wall -Wextra -Wconversion -Wshadow -ggdb -fsanitize=address,undefined -fno-omit-frame-pointer -std=c99 -Isrc -Isrc/ast -Isrc/ast/datastructures -Isrc/ast/declaration -Isrc/ast/expression
+CFLAGS = -Wall -Wpedantic -Wextra -Wconversion -Wconversion-extra -Wshadow -ggdb -fsanitize=address,undefined -fno-omit-frame-pointer -std=c99 -Isrc -Isrc/ast -Isrc/ast/datastructures -Isrc/ast/declaration -Isrc/ast/expression
 LDFLAGS =
 
 # Directories

@@ -19,5 +19,5 @@ void free_ast_source_t(ast_source_t **source);
 void print_ast_source_t(ast_source_t const *source, int indent);
 
 void walk_ast_source_t(ast_source_t const *source, symbol_table_t *sym_tab,
-                       int id);
+                       int* id);
 #endif // __AST_NODE_SOURCE__

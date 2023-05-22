@@ -6,8 +6,8 @@
 
 extern FILE *instructions;
 extern FILE *functions; 
-extern FILE *call_stack;
 extern FILE *types;
+
 #include "bytecode.h"
 
 

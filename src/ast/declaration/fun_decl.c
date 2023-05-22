@@ -40,7 +40,7 @@ void print_ast_fundecl_t(ast_fundecl_t const *fundecl, int indent){
   print_ast_block_t(fundecl->body, indent + 2);
 }
 
-void walk_ast_fundecl_t(ast_fundecl_t const *fundecl, symbol_table_t *sym_tab,int id){
+void walk_ast_fundecl_t(ast_fundecl_t const *fundecl, symbol_table_t *sym_tab,int *id){
   DEBUG_EPRINTF("walk ast_fundecl_t\n");
 
 }

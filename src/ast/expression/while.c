@@ -28,7 +28,7 @@ void print_ast_while_t(ast_while_t const *while_, int indent) {
   print_ast_block_t(while_->body, indent + 1);
 }
 
-void walk_ast_while_t(ast_while_t const *while_, symbol_table_t *sym_tab, int id) {
+void walk_ast_while_t(ast_while_t const *while_, symbol_table_t *sym_tab, int* id) {
   DEBUG_EPRINTF("walk ast_while_t\n");
   walk_ast_expr_t(while_->cond, sym_tab,id);
   walk_ast_block_t(while_->body, sym_tab,id);

@@ -33,7 +33,7 @@ void print_ast_range_t(ast_range_t const *range, int indent){
     print_ast_expr_t(range->step, indent+1);
 }
 
-void walk_ast_range_t(ast_range_t const *range, symbol_table_t *sym_tab, int id){
+void walk_ast_range_t(ast_range_t const *range, symbol_table_t *sym_tab, int *id){
   DEBUG_EPRINTF("walk ast_range_t\n");
   walk_ast_expr_t(range->start, sym_tab,id);
   walk_ast_expr_t(range->end, sym_tab,id);

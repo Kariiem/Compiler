@@ -18,5 +18,5 @@ ast_type_decl_t *create_ast_type_decl_t(char const *type_name,
 void free_ast_type_decl_t(ast_type_decl_t **type_decl_ptr);
 void print_ast_type_decl_t(ast_type_decl_t const *type_decl, int indent);
 void walk_ast_type_decl_t(ast_type_decl_t const *type_decl,
-                          symbol_table_t *sym_tab, int id);
+                          symbol_table_t *sym_tab, int* id);
 #endif // __AST_NODE_TYPE_DECL__

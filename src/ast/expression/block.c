@@ -26,7 +26,7 @@ void print_ast_block_t(ast_block_t const *block, int indent){
     print_ast_block_expr_t(*it, indent + 1);
   }
 }
-void walk_ast_block_t(ast_block_t const *block, symbol_table_t *sym_tab,int id){
+void walk_ast_block_t(ast_block_t const *block, symbol_table_t *sym_tab,int* id){
   DEBUG_EPRINTF("walk ast_block_t\n");
   ast_block_expr_t **it;
   cvector_for_each_in(it, block->block_expr_list) {
