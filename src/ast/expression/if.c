@@ -48,12 +48,16 @@ void walk_ast_if_t(ast_if_t const *if_,  int *id) {
   //IF prolouge
   GEN_INSTRUCTIONS("\tJMPF _if_%d_\n", label_id);
   // Then branch
+  push_scope(&global_symbol_table);
   walk_ast_block_t(if_->then_branch,  id);
-
   GEN_INSTRUCTIONS("\tJMP _if_end_%d_\n", label_id);
   GEN_INSTRUCTIONS("_if_%d_:\n", label_id);
+  child_scope = global_symbol_table;
+  pop_scope(&global_symbol_table);
   // Else branch
+  push_scope(&global_symbol_table);
   walk_ast_block_t(if_->else_branch,  id);
+  pop_scope(&global_symbol_table);
   //IF epilouge
   GEN_INSTRUCTIONS("_if_end_%d_:\n", label_id);
 }

@@ -39,6 +39,7 @@ void walk_ast_while_t(ast_while_t const *while_, int *id) {
   }
   int label_id = *id;
   // WHILE prolouge
+  push_scope(&global_symbol_table);
   GEN_INSTRUCTIONS("_while_%d_:\n", label_id);
   walk_ast_expr_t(while_->cond,  id);
   GEN_INSTRUCTIONS("\tJMPF _while_end_%d_\n", label_id);
@@ -50,5 +51,7 @@ void walk_ast_while_t(ast_while_t const *while_, int *id) {
   GEN_INSTRUCTIONS("\tJMP _while_%d_\n", label_id);
 
   // WHILE epilouge
+  child_scope = global_symbol_table;
+  pop_scope(&global_symbol_table);
   GEN_INSTRUCTIONS("_while_end_%d_:\n", label_id);
 }

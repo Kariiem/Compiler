@@ -75,6 +75,7 @@ void walk_ast_block_expr_t(ast_block_expr_t const *block_expr,
   default:
     DEBUG_ASSERT(false, "Unkown type %d", block_expr->type);
   case EXPR: {
+    ++(*id);
     walk_ast_expr_t(block_expr->value.expr,  id);
     break;
   }

@@ -11,6 +11,7 @@ extern FILE *instructions;
 extern FILE *functions;
 extern FILE *types;
 extern symbol_table_t *global_symbol_table;
+extern symbol_table_t *child_scope;
 
 #include "bytecode.h"
 

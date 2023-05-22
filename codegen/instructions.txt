@@ -5,3 +5,15 @@ _start:
 	PUSH_MEM $2
 	PUSH 0
 	PUSH_MEM $3
+	PUSH true
+	JMPF _if_5_
+	PUSH true
+	PUSH_MEM $6
+	POP_MEM $6
+	JMP _if_end_5_
+_if_5_:
+	PUSH false
+	PUSH_MEM $8
+	POP_MEM $8
+_if_end_5_:
+	PUSH_MEM $4

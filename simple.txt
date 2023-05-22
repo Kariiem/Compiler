@@ -4,7 +4,10 @@ var y:int = 0;
 var b:bool = true;
 var t:int = 0;
 
-var z :bool= do {
+var z :bool= if true {
         var t:bool = true;
+        t;
+    }else {
+        var t:bool = false;
         t;
     };

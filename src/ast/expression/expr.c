@@ -359,7 +359,7 @@ char const *get_ast_expr_type(ast_expr_t *expr, symbol_table_t *sym_tab) {
   case EXPR_IDENTIFIER: {
     symbol_t *sym = get_symbol(sym_tab, expr->value.identifier);
     if (sym == NULL || sym->type != SYM_TY_TERM) {
-      REPORT_ERROR("Symbol %s not found\n", expr->value.identifier);
+      REPORT_ERROR("Error: Symbol %s not found\n", expr->value.identifier);
       exit(1);
     }
     printf("%s has type %s\n",expr->value.identifier,sym->value.term_val->decl_type);

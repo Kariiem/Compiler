@@ -46,6 +46,7 @@ void print_ast_for_t(ast_for_t const *for_loop, int indent) {
 
 void walk_ast_for_t(ast_for_t const *for_loop, int *id) {
   DEBUG_EPRINTF("walk ast_for_t\n");
-  walk_ast_range_t(for_loop->range, id);
+  // walk_ast_range_t(for_loop->range, id);
+  
   walk_ast_block_t(for_loop->body, id);
 }

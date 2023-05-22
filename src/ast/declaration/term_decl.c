@@ -44,8 +44,7 @@ void print_ast_term_decl_t(ast_term_decl_t const *term_decl, int indent) {
   }
 }
 
-void walk_ast_term_decl_t(ast_term_decl_t const *term_decl,
-                           int *id) {
+void walk_ast_term_decl_t(ast_term_decl_t const *term_decl, int *id) {
   DEBUG_EPRINTF("walk ast_term_decl_t\n");
   // DEBUG_ASSERT(sym_tab, "sym_tab is NULL");
 
@@ -60,12 +59,19 @@ void walk_ast_term_decl_t(ast_term_decl_t const *term_decl,
   symbol_t *term_sym =
       create_symbol_t(term_decl->decl_name, SYM_TY_TERM, term_decl, *id);
   if (term_decl->value) {
-
+    int old_id = *id;
+    // if (term_decl->value->type == EXPR_FOR ||
+    //     term_decl->value->type == EXPR_SWITCH ||
+    //     term_decl->value->type == EXPR_WHILE ||
+    //     term_decl->value->type == EXPR_UNTIL ||
+    //     term_decl->value->type == EXPR_DO) {
+    //   push_scope(&global_symbol_table);
+    // }
+    walk_ast_expr_t(term_decl->value, id);
     printf(BLU "symbol name: %s, symbol type: %s\n" RESET, term_decl->decl_name,
            term_decl->decl_type);
-    walk_ast_expr_t(term_decl->value, id);
     char const *term_sym_value_type =
-        get_ast_expr_type(term_sym->value.term_val->value, global_symbol_table);
+        get_ast_expr_type(term_sym->value.term_val->value, child_scope);
 
     printf("term_sym_value_type: %s\n", term_sym_value_type);
     if (strcmp(term_sym_value_type, term_decl->decl_type)) {
@@ -74,7 +80,7 @@ void walk_ast_term_decl_t(ast_term_decl_t const *term_decl,
       exit(1);
     }
 
-    GEN_INSTRUCTIONS("\tPUSH_MEM $%d\n", *id);
+    GEN_INSTRUCTIONS("\tPUSH_MEM $%d\n", old_id);
   }
   insert_symbol(global_symbol_table, term_sym);
 }

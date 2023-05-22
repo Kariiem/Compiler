@@ -17,6 +17,7 @@ FILE *instructions;
 FILE *functions;
 FILE *types;
 symbol_table_t *global_symbol_table;
+symbol_table_t *child_scope;
 
 void insert_builtin_types(symbol_table_t *global_symbol_table) {
   char *builtin_types[] = {"unit", "int", "double", "bool", "string"};
