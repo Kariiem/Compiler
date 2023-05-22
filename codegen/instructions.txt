@@ -1,35 +1,23 @@
 _start:
 	PUSH 0
 	STORE $1
-	PUSH true
-	STORE $2
+_switch_start_3_:
 	LOAD $1
-	STORE $3
 	PUSH 1
-	STORE $5
-_for_start_5_:
-	LOAD $5
+	EQ
+	JMPT _switch_case_4_
+	LOAD $1
 	PUSH 2
-	LEQ
-	JMPF _for_end_5_:
-	PUSH false
-	STORE $6
+	EQ
+	JMPT _switch_case_5_
+_switch_case_4_:
 	PUSH true
+	JMP _switch_end_3_
+_switch_case_5_:
 	PUSH true
-	JMPF _if_9_
-	PUSH 0
-	STORE $10
-	PUSH false
-	JMP _if_end_9_
-_if_9_:
-	PUSH false
-	STORE $12
-	PUSH false
-_if_end_9_:
-	LOAD $5
-	PUSH 3
-	ADD
-	STORE $5
-	JMP _for_start_5_
-_for_end_5_:
-	STORE $4
+	JMP _switch_end_3_
+_switch_case_6_:
+	PUSH true
+	JMP _switch_end_3_
+_switch_end_3_:
+	STORE $2

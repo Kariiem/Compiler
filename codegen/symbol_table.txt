@@ -1,10 +1,4 @@
-        symbol name: t, type: SYM_TY_TERM, id: 10
-        symbol name: t, type: SYM_TY_TERM, id: 12
-    symbol name: t, type: SYM_TY_TERM, id: 6
-    symbol name: i, type: SYM_TY_TERM, id: 5
-symbol name: z, type: SYM_TY_TERM, id: 4
-symbol name: t, type: SYM_TY_TERM, id: 3
-symbol name: b, type: SYM_TY_TERM, id: 2
+symbol name: z, type: SYM_TY_TERM, id: 2
 symbol name: y, type: SYM_TY_TERM, id: 1
 symbol name: string, type: SYM_TY_TYPE, id: 4
 symbol name: bool, type: SYM_TY_TYPE, id: 3

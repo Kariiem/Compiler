@@ -58,8 +58,7 @@ void walk_ast_bin_expr_t(ast_bin_expr_t const *bin_expr, int *id) {
       exit(1);
     }
   }
-  if (bin_expr->op == EXPR_AND || bin_expr->op == EXPR_OR ||
-      bin_expr->op == EXPR_EQ || bin_expr->op == EXPR_NEQ) {
+  if (bin_expr->op == EXPR_AND || bin_expr->op == EXPR_OR ) {
     if (strcmp(left_type, "bool")) {
       REPORT_ERROR(RED "Type mismatch:" GRN
                        "operator %s cannot operate on %s and %s, \n" RESET,

@@ -1,0 +1,18 @@
+module Main
+
+var y:int = 0;
+var b:bool = true;
+var t:int = y;
+
+var z :bool= for i:(1,2,3) {
+    val t:bool=false;
+    true;
+    if true {
+        val t:int =0;
+        false;
+    } else {
+        val t:bool = false;
+        false;
+    };
+   
+};

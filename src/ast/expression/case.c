@@ -33,6 +33,7 @@ void print_ast_case_t(ast_case_t const *case_, int indent) {
 
 void walk_ast_case_t(ast_case_t const *case_, int *id) {
   DEBUG_EPRINTF("walk ast_case_t\n");
+  // CASE prologue
   if (case_->case_expr)
     walk_ast_expr_t(case_->case_expr, id);
   walk_ast_block_t(case_->body, id);
