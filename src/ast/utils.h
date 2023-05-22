@@ -31,11 +31,12 @@
     free((void *)ptr);                                                         \
     (ptr) = NULL;                                                              \
   } while (0)
-
+#undef FREE_ATOM
+#define FREE_ATOM(ptr)
 #define INDENT(indent)                                                         \
   do {                                                                         \
     for (int i = 0; i < indent; i++) {                                         \
-      printf("  ");                                                             \
+      printf("  ");                                                            \
     }                                                                          \
   } while (0)
 #endif //__UTILS__
