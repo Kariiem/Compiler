@@ -1,19 +1,35 @@
 _start:
 	PUSH 0
-	PUSH_MEM $1
+	STORE $1
 	PUSH true
-	PUSH_MEM $2
-	PUSH 0
-	PUSH_MEM $3
-	PUSH true
-	JMPF _if_5_
-	PUSH true
-	PUSH_MEM $6
-	POP_MEM $6
-	JMP _if_end_5_
-_if_5_:
+	STORE $2
+	LOAD $1
+	STORE $3
+	PUSH 1
+	STORE $5
+_for_start_5_:
+	LOAD $5
+	PUSH 2
+	LEQ
+	JMPF _for_end_5_:
 	PUSH false
-	PUSH_MEM $8
-	POP_MEM $8
-_if_end_5_:
-	PUSH_MEM $4
+	STORE $6
+	PUSH true
+	PUSH true
+	JMPF _if_9_
+	PUSH 0
+	STORE $10
+	PUSH false
+	JMP _if_end_9_
+_if_9_:
+	PUSH false
+	STORE $12
+	PUSH false
+_if_end_9_:
+	LOAD $5
+	PUSH 3
+	ADD
+	STORE $5
+	JMP _for_start_5_
+_for_end_5_:
+	STORE $4

@@ -50,4 +50,9 @@ typedef struct {
     fprintf(types, __VA_ARGS__);                                               \
   } while (0)
 
+#define GEN_SYMBOL_TABLE(...)                                                  \
+  do {                                                                         \
+    fprintf(symbol_table, __VA_ARGS__);                                        \
+  } while (0)
+
 #endif // __BYTECODE_GEN_H__

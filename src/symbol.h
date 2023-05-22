@@ -10,6 +10,7 @@ typedef struct symbol_table_t symbol_table_t;
 extern FILE *instructions;
 extern FILE *functions;
 extern FILE *types;
+extern FILE *symbol_table;
 extern symbol_table_t *global_symbol_table;
 extern symbol_table_t *child_scope;
 
@@ -58,5 +59,5 @@ int is_symbol_in_scope(symbol_table_t *head, char const *name);
 // create new local scope
 void push_scope(symbol_table_t **head);
 void pop_scope(symbol_table_t **head);
-
+void print_symbol_t(symbol_t *symbol, int indent);
 #endif // __SYMBOL_H__

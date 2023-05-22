@@ -14,7 +14,7 @@ struct ast_term_decl_t {
 };
 
 ast_term_decl_t *create_ast_term_decl_t(int type, char const *decl_name,
-                                        char const *dev_type,
+                                        char const *decl_type,
                                         ast_expr_t *value);
 void free_ast_term_decl_t(ast_term_decl_t **term_decl_ptr);
 void print_ast_term_decl_t(ast_term_decl_t const *term_decl, int indent);

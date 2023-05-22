@@ -1,6 +1,9 @@
 #include "for.h"
 #include "../../symbol.h"
 #include "../utils.h"
+#include "bin_expr.h"
+#include "block_expr.h"
+#include "expr.h"
 #include "range.h"
 
 ast_for_t *create_ast_for_t(char const *loop_var, ast_range_t *range,
@@ -47,6 +50,31 @@ void print_ast_for_t(ast_for_t const *for_loop, int indent) {
 void walk_ast_for_t(ast_for_t const *for_loop, int *id) {
   DEBUG_EPRINTF("walk ast_for_t\n");
   // walk_ast_range_t(for_loop->range, id);
-  
+  int label_id = *id;
+  push_scope(&global_symbol_table);
+  ast_term_decl_t *loop_var_term = create_ast_term_decl_t(
+      TERM_VAR, for_loop->loop_var, "int", for_loop->range->start);
+
+  ast_expr_t *loop_var_reference =
+      create_ast_expr_t(EXPR_IDENTIFIER, loop_var_term->decl_name);
+  ast_bin_expr_t *cmp_expr =
+      create_ast_bin_expr_t(loop_var_reference, for_loop->range->end, EXPR_LEQ);
+
+  ast_bin_expr_t *step_expr = create_ast_bin_expr_t(
+      loop_var_reference, for_loop->range->step, EXPR_ADD);
+
+  ast_assignment_t *update_expr = create_ast_assignment_t(
+      loop_var_term->decl_name, create_ast_expr_t(EXPR_ADD, step_expr));
+
+  walk_ast_term_decl_t(loop_var_term, id);
+  GEN_INSTRUCTIONS("_for_start_%d_:\n", label_id);
+  walk_ast_bin_expr_t(cmp_expr, id);
+  GEN_INSTRUCTIONS("\tJMPF _for_end_%d_:\n", label_id);
   walk_ast_block_t(for_loop->body, id);
+  walk_ast_assignment_t(update_expr, id);
+  GEN_INSTRUCTIONS("\tJMP _for_start_%d_\n", label_id);
+  // FOR epilogue
+  child_scope = global_symbol_table;
+  pop_scope(&global_symbol_table);
+  GEN_INSTRUCTIONS("_for_end_%d_:\n", label_id);
 }

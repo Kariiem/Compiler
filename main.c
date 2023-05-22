@@ -16,6 +16,7 @@ static int yydebug;
 FILE *instructions;
 FILE *functions;
 FILE *types;
+FILE *symbol_table;
 symbol_table_t *global_symbol_table;
 symbol_table_t *child_scope;
 
@@ -41,6 +42,7 @@ int main(int argc, char *argv[]) {
   yylex_init(&scanner);
   ast_source_t *source_module;
   global_symbol_table = create_symbol_table_t();
+  child_scope = global_symbol_table;
   insert_builtin_types(global_symbol_table);
   /*insert the builtin types into the symbol table*/
   FILE *fptr;
@@ -79,10 +81,11 @@ int main(int argc, char *argv[]) {
   instructions = fopen("codegen/instructions.txt", "w");
   functions = fopen("codegen/functions.txt", "w");
   types = fopen("codegen/types.txt", "w");
+  symbol_table = fopen("codegen/symbol_table.txt", "w");
   int intial_memory_address = 0;
 
   walk_ast_source_t(source_module, &intial_memory_address);
-
+  pop_scope(&global_symbol_table);
   // free_symbol_table_t(&global_symbol_table);
   yylex_destroy(scanner);
   return 0;

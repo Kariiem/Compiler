@@ -240,7 +240,7 @@ void walk_ast_expr_t(ast_expr_t const *expr,  int *id) {
       exit(1);
     }
 
-    GEN_INSTRUCTIONS("\tPOP_MEM $%d\n", sym->id);
+    GEN_INSTRUCTIONS("\tLOAD $%d\n", sym->id);
     break;
   }
   case EXPR_INTEGER:
@@ -358,8 +358,12 @@ char const *get_ast_expr_type(ast_expr_t *expr, symbol_table_t *sym_tab) {
     DEBUG_ASSERT(false, "Unkown type %d", expr->type);
   case EXPR_IDENTIFIER: {
     symbol_t *sym = get_symbol(sym_tab, expr->value.identifier);
-    if (sym == NULL || sym->type != SYM_TY_TERM) {
+    if (sym == NULL ) {
       REPORT_ERROR("Error: Symbol %s not found\n", expr->value.identifier);
+      exit(1);
+    }
+    if (sym->type != SYM_TY_TERM){
+      REPORT_ERROR("Error: Cannot Assign a non-term %s not found\n", expr->value.identifier);
       exit(1);
     }
     printf("%s has type %s\n",expr->value.identifier,sym->value.term_val->decl_type);

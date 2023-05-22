@@ -1,5 +1,8 @@
 #include "symbol.h"
+#include "ast/datastructures/cvector_utils.h"
+#include "ast/declaration/term_decl.h"
 #include "ast/utils.h"
+#include "bytecode.h"
 #include <stdio.h>
 
 // Symbol
@@ -90,7 +93,15 @@ int is_symbol_in_scope(symbol_table_t *head, char const *name) {
   }
   return 0;
 }
-
+static int distance_top_parent(symbol_table_t **head) {
+  int distance = 0;
+  symbol_table_t *iterator = *head;
+  while (iterator != NULL) {
+    ++distance;
+    iterator = iterator->parent;
+  }
+  return distance;
+}
 void push_scope(symbol_table_t **head) {
   symbol_table_t *new_scope = create_symbol_table_t();
   new_scope->parent = *head;
@@ -100,5 +111,30 @@ void push_scope(symbol_table_t **head) {
 void pop_scope(symbol_table_t **head) {
   symbol_table_t *temp = *head;
   *head = (*head)->parent;
+  int distance = distance_top_parent(head);
+  for (int i = ((int)cvector_size(temp->entries)) - 1; i >= 0; --i) {
+    print_symbol_t(temp->entries[i], distance);
+  }
   // free_symbol_table_t(&temp);
+}
+
+void print_symbol_t(symbol_t *symbol, int indent) {
+  GEN_SYMBOL_TABLE("%*s",4*indent,"");
+  switch (symbol->type) {
+  case SYM_TY_TERM:
+    // print_ast_term_decl_t(symbol->value.term_val, 0);
+    GEN_SYMBOL_TABLE("symbol name: %s, type: SYM_TY_TERM, id: %d\n",
+                     symbol->name, symbol->id);
+    break;
+  case SYM_TY_FUNC:
+    // print_ast_fundecl_t(symbol->value.func_val, 0);
+    GEN_SYMBOL_TABLE("symbol name: %s, type: SYM_TY_FUNC, id: %d\n",
+                     symbol->name, symbol->id);
+    break;
+  case SYM_TY_TYPE:
+    // print_ast_type_decl_t(symbol->value.type_val, 0);
+    GEN_SYMBOL_TABLE("symbol name: %s, type: SYM_TY_TYPE, id: %d\n",
+                     symbol->name, symbol->id);
+    break;
+  }
 }

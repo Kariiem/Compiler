@@ -66,5 +66,5 @@ void walk_ast_assignment_t(ast_assignment_t const *assignment,
     sym->value.term_val->value = assignment->value;
   }
   walk_ast_expr_t(assignment->value,  id);
-  GEN_INSTRUCTIONS("\tPUSH_MEM $%d\n", sym->id);
+  GEN_INSTRUCTIONS("\tSTORE $%d\n", sym->id);
 }
