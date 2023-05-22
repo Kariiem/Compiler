@@ -4,15 +4,15 @@
 #include "ast/ast.h"
 #include "ast/utils.h"
 
-extern FILE *instructions;
-extern FILE *functions; 
-extern FILE *types;
-
-#include "bytecode.h"
-
-
 typedef struct symbol_t symbol_t;
 typedef struct symbol_table_t symbol_table_t;
+
+extern FILE *instructions;
+extern FILE *functions;
+extern FILE *types;
+extern symbol_table_t *global_symbol_table;
+
+#include "bytecode.h"
 
 // Struct of a single entry in the symbol table
 struct symbol_t {
@@ -30,8 +30,8 @@ struct symbol_t {
     ast_fun_param_t *func_param_val;
     ast_constructors_t *enum_cons_val;
   } value;
-  char *name;   // Name of the symbol
-  int id; // id of the symbol for code generation
+  char *name; // Name of the symbol
+  int id;     // id of the symbol for code generation
 };
 
 // Struct of the symbol table itself
@@ -51,7 +51,8 @@ void free_symbol_table_t(symbol_table_t **sym_tab_ptr);
 
 // insert symbol into the current symbol table (scope)
 void insert_symbol(symbol_table_t *head, symbol_t *symbol);
-symbol_t *get_symbol(symbol_table_t *head, char const  *name);
+symbol_t *get_symbol(symbol_table_t *head, char const *name);
+int is_symbol_in_scope(symbol_table_t *head, char const *name);
 
 // create new local scope
 void push_scope(symbol_table_t **head);

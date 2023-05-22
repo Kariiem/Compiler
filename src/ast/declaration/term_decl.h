@@ -19,5 +19,5 @@ ast_term_decl_t *create_ast_term_decl_t(int type, char const *decl_name,
 void free_ast_term_decl_t(ast_term_decl_t **term_decl_ptr);
 void print_ast_term_decl_t(ast_term_decl_t const *term_decl, int indent);
 void walk_ast_term_decl_t(ast_term_decl_t const *term_decl,
-                          symbol_table_t *sym_tab,int *id);
+                          int *id);
 #endif // __AST_NODE_TERM_DECL__

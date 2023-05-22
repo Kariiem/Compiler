@@ -2,17 +2,6 @@ _start:
 	PUSH 0
 	PUSH_MEM $1
 	PUSH true
-	JMPF _if_3_
-	PUSH 10
-	PUSH_MEM $1
-	PUSH 10
-	PUSH_MEM $6
-	PUSH 1
-	JMP _if_end_3_
-_if_3_:
-	PUSH 2
-	PUSH 2
-_if_end_3_:
-	PUSH_MEM $7
-	PUSH true
-	PUSH_MEM $8
+	PUSH_MEM $2
+	PUSH 0
+	PUSH_MEM $3

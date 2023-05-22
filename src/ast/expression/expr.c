@@ -224,14 +224,17 @@ void print_ast_expr_t(ast_expr_t const *expr, int indent) {
   }
 }
 
-void walk_ast_expr_t(ast_expr_t const *expr, symbol_table_t *sym_tab, int *id) {
+void walk_ast_expr_t(ast_expr_t const *expr,  int *id) {
   DEBUG_EPRINTF("walk ast_expr_t\n");
   switch (expr->type) {
   default:
     DEBUG_ASSERT(false, "Unkown type %d", expr->type);
 
   case EXPR_IDENTIFIER: {
-    symbol_t *sym = get_symbol(sym_tab, expr->value.identifier);
+    if(is_symbol_in_scope(global_symbol_table, expr->value.identifier)){
+      printf(BLU"symbol %s found in the top symbol table\n"RESET, expr->value.identifier);
+    }
+    symbol_t *sym = get_symbol(global_symbol_table, expr->value.identifier);
     if (sym == NULL || sym->type != SYM_TY_TERM) {
       REPORT_ERROR("Symbol %s not found\n", expr->value.identifier);
       exit(1);
@@ -264,45 +267,45 @@ void walk_ast_expr_t(ast_expr_t const *expr, symbol_table_t *sym_tab, int *id) {
   case EXPR_GEQ:
   case EXPR_EQ:
   case EXPR_NEQ: {
-    walk_ast_bin_expr_t(expr->value.binary_expr, sym_tab, id);
+    walk_ast_bin_expr_t(expr->value.binary_expr,  id);
     break;
   }
   case EXPR_NOT: {
-    char const *expr_type = get_ast_expr_type(expr->value.not_, sym_tab);
+    char const *expr_type = get_ast_expr_type(expr->value.not_, global_symbol_table);
     if (strcmp(expr_type, "bool")) {
       REPORT_ERROR("Expected bool, got %s\n", expr_type);
       exit(1);
     }
-    walk_ast_expr_t(expr->value.not_, sym_tab, id);
+    walk_ast_expr_t(expr->value.not_,  id);
     GEN_INSTRUCTIONS("%s\n", map_int_to_operators(expr->type));
     break;
   }
   // function call
   case EXPR_FUNCALL:
-    walk_ast_funcall_t(expr->value.funcall, sym_tab, id);
+    walk_ast_funcall_t(expr->value.funcall,  id);
     break;
   // compound expressions
   case EXPR_IF: {
     ++(*id);
-    walk_ast_if_t(expr->value.if_, sym_tab, id);
+    walk_ast_if_t(expr->value.if_,  id);
     break;
   }
   case EXPR_FOR:
     ++(*id);
-    walk_ast_for_t(expr->value.for_, sym_tab, id);
+    walk_ast_for_t(expr->value.for_,  id);
     break;
   case EXPR_WHILE:
   case EXPR_UNTIL:
     ++(*id);
-    walk_ast_while_t(expr->value.while_, sym_tab, id);
+    walk_ast_while_t(expr->value.while_,  id);
     break;
   case EXPR_DO:
     ++(*id);
-    walk_ast_do_t(expr->value.do_, sym_tab, id);
+    walk_ast_do_t(expr->value.do_,  id);
     break;
   case EXPR_SWITCH:
     ++(*id);
-    walk_ast_switch_t(expr->value.switch_, sym_tab, id);
+    walk_ast_switch_t(expr->value.switch_,  id);
     break;
   }
 }
@@ -359,6 +362,7 @@ char const *get_ast_expr_type(ast_expr_t *expr, symbol_table_t *sym_tab) {
       REPORT_ERROR("Symbol %s not found\n", expr->value.identifier);
       exit(1);
     }
+    printf("%s has type %s\n",expr->value.identifier,sym->value.term_val->decl_type);
     return sym->value.term_val->decl_type;
   }
   case EXPR_INTEGER:
@@ -407,10 +411,7 @@ char const *get_ast_expr_type(ast_expr_t *expr, symbol_table_t *sym_tab) {
   // compound expressions
   case EXPR_IF: {
     ast_expr_t *last_expr = get_last_block_expr(expr->value.if_->then_branch);
-
-    char const *e = get_ast_expr_type(last_expr, sym_tab);
-
-    return e;
+    return get_ast_expr_type(last_expr, sym_tab);
   }
   case EXPR_FOR: {
     ast_expr_t *last_expr = get_last_block_expr(expr->value.for_->body);

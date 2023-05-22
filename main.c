@@ -16,6 +16,7 @@ static int yydebug;
 FILE *instructions;
 FILE *functions;
 FILE *types;
+symbol_table_t *global_symbol_table;
 
 void insert_builtin_types(symbol_table_t *global_symbol_table) {
   char *builtin_types[] = {"unit", "int", "double", "bool", "string"};
@@ -38,7 +39,7 @@ int main(int argc, char *argv[]) {
   yyscan_t scanner;
   yylex_init(&scanner);
   ast_source_t *source_module;
-  symbol_table_t *global_symbol_table = create_symbol_table_t();
+  global_symbol_table = create_symbol_table_t();
   insert_builtin_types(global_symbol_table);
   /*insert the builtin types into the symbol table*/
   FILE *fptr;
@@ -79,7 +80,7 @@ int main(int argc, char *argv[]) {
   types = fopen("codegen/types.txt", "w");
   int intial_memory_address = 0;
 
-  walk_ast_source_t(source_module, global_symbol_table, &intial_memory_address);
+  walk_ast_source_t(source_module, &intial_memory_address);
 
   // free_symbol_table_t(&global_symbol_table);
   yylex_destroy(scanner);

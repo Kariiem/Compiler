@@ -1,18 +1,10 @@
 module Main
 
 var y:int = 0;
+var b:bool = true;
+var t:int = 0;
 
-var x:int = 
-    if true { 
-        var z:int;
-        y= 10;
-        val g:int;
-        g = 10;
-        1;
-    } else { 
-        2;
-        2;
+var z :bool= do {
+        var t:bool = true;
+        t;
     };
-
-var z:bool;
-z = true;

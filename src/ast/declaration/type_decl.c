@@ -35,11 +35,10 @@ void print_ast_type_decl_t(ast_type_decl_t const *type_decl, int indent) {
   //                  indent + 2);
 }
 void walk_ast_type_decl_t(ast_type_decl_t const *type_decl,
-                          symbol_table_t *sym_tab, int* id) {
+                           int* id) {
   DEBUG_EPRINTF("walk ast_type_decl_t\n");
-  DEBUG_ASSERT(sym_tab, "sym_tab is NULL");
   symbol_t *type_sym =
       create_symbol_t(type_decl->type_name, SYM_TY_TYPE, type_decl, 0);
-  insert_symbol(sym_tab, type_sym);
+  insert_symbol(global_symbol_table, type_sym);
   GEN_TYPES("%s\n", type_decl->type_name);
 }

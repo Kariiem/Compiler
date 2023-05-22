@@ -24,7 +24,14 @@ void print_ast_do_t(ast_do_t const *do_, int indent){
   print_ast_block_t(do_->body, indent+1);
 }
 
-void walk_ast_do_t(ast_do_t const *do_, symbol_table_t *sym_tab, int* id){
+void walk_ast_do_t(ast_do_t const *do_, int* id){
   DEBUG_EPRINTF("walk ast_do_t\n");
-  walk_ast_block_t(do_->body, sym_tab,id);
+  int label_id = *id;
+  // DO prolouge
+  // body
+  symbol_table_t *sym_tab_nested_scope = create_symbol_table_t();
+  sym_tab_nested_scope->parent = global_symbol_table;
+  walk_ast_block_t(do_->body,  id);
+  // free_symbol_table_t(&sym_tab_nested_scope);
+  // DO epilouge
 }

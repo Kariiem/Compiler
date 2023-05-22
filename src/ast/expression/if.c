@@ -35,31 +35,25 @@ void print_ast_if_t(ast_if_t const *if_, int indent) {
   print_ast_block_t(if_->else_branch, indent + 1);
 }
 
-void walk_ast_if_t(ast_if_t const *if_, symbol_table_t *sym_tab, int *id) {
+void walk_ast_if_t(ast_if_t const *if_,  int *id) {
   DEBUG_EPRINTF("walk ast_if_t\n");
   // the nested scope symbol table
-  char const *cond_type = get_ast_expr_type(if_->cond, sym_tab);
+  char const *cond_type = get_ast_expr_type(if_->cond, global_symbol_table);
   if (strcmp(cond_type, "bool")) {
     REPORT_ERROR(RED "if condition must be of type bool\n" RESET);
     exit(1);
   }
-  walk_ast_expr_t(if_->cond, sym_tab, id);
+  walk_ast_expr_t(if_->cond,  id);
   int label_id = *id;
   //IF prolouge
   GEN_INSTRUCTIONS("\tJMPF _if_%d_\n", label_id);
   // Then branch
-  symbol_table_t *sym_tab_nested_scope = create_symbol_table_t();
-  sym_tab_nested_scope->parent = sym_tab;
-  walk_ast_block_t(if_->then_branch, sym_tab_nested_scope, id);
-  free_symbol_table_t(&sym_tab_nested_scope);
+  walk_ast_block_t(if_->then_branch,  id);
 
   GEN_INSTRUCTIONS("\tJMP _if_end_%d_\n", label_id);
   GEN_INSTRUCTIONS("_if_%d_:\n", label_id);
   // Else branch
-  sym_tab_nested_scope = create_symbol_table_t();
-  sym_tab_nested_scope->parent = sym_tab;
-  walk_ast_block_t(if_->else_branch, sym_tab_nested_scope, id);
-  free_symbol_table_t(&sym_tab_nested_scope);
+  walk_ast_block_t(if_->else_branch,  id);
   //IF epilouge
   GEN_INSTRUCTIONS("_if_end_%d_:\n", label_id);
 }

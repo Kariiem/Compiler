@@ -17,7 +17,8 @@ void free_ast_term_decl_t(ast_term_decl_t **term_decl_ptr) {
   DEBUG_EPRINTF("free ast_term_decl_t\n");
   ast_term_decl_t *term = *term_decl_ptr;
   // DEBUG_ASSERT(term, "term is NULL");
-  if(term==NULL) return;
+  if (term == NULL)
+    return;
   FREE_ATOM(term->decl_name);
   FREE_ATOM(term->decl_type);
   if (term->value)
@@ -44,32 +45,36 @@ void print_ast_term_decl_t(ast_term_decl_t const *term_decl, int indent) {
 }
 
 void walk_ast_term_decl_t(ast_term_decl_t const *term_decl,
-                          symbol_table_t *sym_tab, int *id) {
+                           int *id) {
   DEBUG_EPRINTF("walk ast_term_decl_t\n");
-  DEBUG_ASSERT(sym_tab, "sym_tab is NULL");
+  // DEBUG_ASSERT(sym_tab, "sym_tab is NULL");
 
-  if (get_symbol(sym_tab, term_decl->decl_name)) {
+  if (is_symbol_in_scope(global_symbol_table, term_decl->decl_name)) {
     REPORT_ERROR("Error: %s has been declared\n", term_decl->decl_name);
   }
 
-  if (get_symbol(sym_tab, term_decl->decl_type) == NULL) {
+  if (get_symbol(global_symbol_table, term_decl->decl_type) == NULL) {
     REPORT_ERROR("Error: %s does not name a type\n", term_decl->decl_type);
   }
 
   symbol_t *term_sym =
       create_symbol_t(term_decl->decl_name, SYM_TY_TERM, term_decl, *id);
   if (term_decl->value) {
-    char const *term_sym_value_type =
-        get_ast_expr_type(term_sym->value.term_val->value, sym_tab);
 
+    printf(BLU "symbol name: %s, symbol type: %s\n" RESET, term_decl->decl_name,
+           term_decl->decl_type);
+    walk_ast_expr_t(term_decl->value, id);
+    char const *term_sym_value_type =
+        get_ast_expr_type(term_sym->value.term_val->value, global_symbol_table);
+
+    printf("term_sym_value_type: %s\n", term_sym_value_type);
     if (strcmp(term_sym_value_type, term_decl->decl_type)) {
       REPORT_ERROR(RED "type mismatch:" GRN "can not assign %s to %s\n" RESET,
                    term_sym_value_type, term_decl->decl_type);
       exit(1);
     }
 
-    walk_ast_expr_t(term_decl->value, sym_tab, id);
     GEN_INSTRUCTIONS("\tPUSH_MEM $%d\n", *id);
   }
-  insert_symbol(sym_tab, term_sym);
+  insert_symbol(global_symbol_table, term_sym);
 }

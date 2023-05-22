@@ -36,9 +36,9 @@ void print_ast_assignment_t(ast_assignment_t const *assignment, int indent) {
   }
 }
 void walk_ast_assignment_t(ast_assignment_t const *assignment,
-                           symbol_table_t *sym_tab, int *id) {
+                            int *id) {
   DEBUG_EPRINTF("walk ast_assignment_t\n");
-  symbol_t *sym = get_symbol(sym_tab, assignment->identifier);
+  symbol_t *sym = get_symbol(global_symbol_table, assignment->identifier);
   if (sym == NULL) {
     REPORT_ERROR(RED "Error: Assignment to undeclared identifier\n" RESET);
     exit(1);
@@ -48,8 +48,9 @@ void walk_ast_assignment_t(ast_assignment_t const *assignment,
     exit(1);
   }
   char const *term_type = sym->value.term_val->decl_type;
-  char const *expr_type = get_ast_expr_type(assignment->value, sym_tab);
-  if (strcmp(term_type, expr_type) != 0) {
+  printf("term_type: %s\n", term_type);
+  char const *expr_type = get_ast_expr_type(assignment->value, global_symbol_table);
+  if (strcmp(term_type, expr_type)) {
     REPORT_ERROR(RED "Error: Assignment to identifier with wrong type\n" RESET);
     exit(1);
   }
@@ -64,6 +65,6 @@ void walk_ast_assignment_t(ast_assignment_t const *assignment,
   } else {
     sym->value.term_val->value = assignment->value;
   }
-  walk_ast_expr_t(assignment->value, sym_tab, id);
+  walk_ast_expr_t(assignment->value,  id);
   GEN_INSTRUCTIONS("\tPUSH_MEM $%d\n", sym->id);
 }

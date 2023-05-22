@@ -27,7 +27,7 @@ void print_ast_module_decl_t(ast_module_decl_t const *module, int indent) {
 }
 
 void walk_ast_module_decl_t(ast_module_decl_t const *module,
-                            symbol_table_t *sym_tab,int* id) {
+                            int* id) {
   DEBUG_EPRINTF("walk ast_module_decl_t\n");
   GEN_INSTRUCTIONS("_start:\n");
 }

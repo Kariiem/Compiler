@@ -9,9 +9,10 @@ struct ast_module_decl_t {
 
 ast_module_decl_t *create_ast_module_decl_t(char const *module_name);
 
-void free_ast_module_decl_t(ast_module_decl_t**module_ptr);
+void free_ast_module_decl_t(ast_module_decl_t **module_ptr);
 
-void print_ast_module_decl_t(ast_module_decl_t const*module,int indent);
+void print_ast_module_decl_t(ast_module_decl_t const *module, int indent);
 
-void walk_ast_module_decl_t(ast_module_decl_t const*module,symbol_table_t*sym_tab,int* id);
+void walk_ast_module_decl_t(ast_module_decl_t const *module,
+                             int *id);
 #endif // __AST_NODE_MODULE__

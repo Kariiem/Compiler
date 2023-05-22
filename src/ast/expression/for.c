@@ -1,7 +1,7 @@
 #include "for.h"
+#include "../../symbol.h"
 #include "../utils.h"
 #include "range.h"
-#include "../../symbol.h"
 
 ast_for_t *create_ast_for_t(char const *loop_var, ast_range_t *range,
                             ast_block_t *body) {
@@ -15,7 +15,8 @@ ast_for_t *create_ast_for_t(char const *loop_var, ast_range_t *range,
 void free_ast_for_t(ast_for_t **for_ptr) {
   DEBUG_EPRINTF("free ast_for_t\n");
   ast_for_t *for_ = *for_ptr;
-  if(for_==NULL) return;
+  if (for_ == NULL)
+    return;
   // DEBUG_ASSERT(for_, "for is NULL");
   FREE_ATOM(for_->loop_var);
   free_ast_range_t(&for_->range);
@@ -24,7 +25,7 @@ void free_ast_for_t(ast_for_t **for_ptr) {
   *for_ptr = NULL;
 }
 
-void print_ast_for_t(ast_for_t const *for_loop, int indent){
+void print_ast_for_t(ast_for_t const *for_loop, int indent) {
   INDENT(indent);
   printf("ast_for_t\n");
   INDENT(indent + 1);
@@ -43,8 +44,8 @@ void print_ast_for_t(ast_for_t const *for_loop, int indent){
   }
 }
 
-void walk_ast_for_t(ast_for_t const *for_loop, symbol_table_t *sym_tab, int* id){
+void walk_ast_for_t(ast_for_t const *for_loop, int *id) {
   DEBUG_EPRINTF("walk ast_for_t\n");
-  walk_ast_range_t(for_loop->range, sym_tab,id);
-  walk_ast_block_t(for_loop->body, sym_tab, id);
+  walk_ast_range_t(for_loop->range, id);
+  walk_ast_block_t(for_loop->body, id);
 }

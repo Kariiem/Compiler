@@ -13,5 +13,5 @@ struct ast_do_t {
 ast_do_t *create_ast_do_t(ast_block_t *body);
 void free_ast_do_t(ast_do_t **do_ptr);
 void print_ast_do_t(ast_do_t const *do_, int indent);
-void walk_ast_do_t(ast_do_t const *do_, symbol_table_t *sym_tab, int *id);
+void walk_ast_do_t(ast_do_t const *do_, int *id);
 #endif // __AST_NODE_DO__

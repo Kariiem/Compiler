@@ -77,7 +77,7 @@ struct ast_expr_t {
 ast_expr_t *create_ast_expr_t(int const type, void *value);
 void free_ast_expr_t(ast_expr_t **expr_ptr);
 void print_ast_expr_t(ast_expr_t const *expr, int indent);
-void walk_ast_expr_t(ast_expr_t const *expr, symbol_table_t *sym_tab, int *id);
+void walk_ast_expr_t(ast_expr_t const *expr, int *id);
 char const *get_ast_expr_type(ast_expr_t *expr, symbol_table_t *sym_tab);
 char const *map_int_to_operators(int i);
 

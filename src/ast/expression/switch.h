@@ -17,5 +17,5 @@ ast_switch_t *create_ast_switch_t(ast_expr_t *expr,
                                   vtype(ast_case_t *) cases);
 void free_ast_switch_t(ast_switch_t **switch_ptr);
 void print_ast_switch_t(ast_switch_t const *switch_, int indent);
-void walk_ast_switch_t(ast_switch_t const *switch_, symbol_table_t *sym_tab, int* id);
+void walk_ast_switch_t(ast_switch_t const *switch_,  int* id);
 #endif // __AST_NODE_SWITCH__

@@ -2,7 +2,6 @@
 #include "ast/utils.h"
 #include <stdio.h>
 
-
 // Symbol
 symbol_t *create_symbol_t(char const *name, int type, void *value, int id) {
   symbol_t *symbol = (symbol_t *)calloc(1, sizeof(symbol_t));
@@ -83,6 +82,14 @@ symbol_t *get_symbol(symbol_table_t *head, char const *name) {
   }
   return NULL;
 }
+int is_symbol_in_scope(symbol_table_t *head, char const *name) {
+  for (int i = 0; i < cvector_size(head->entries); i++) {
+    if (strcmp(head->entries[i]->name, name) == 0) {
+      return 1;
+    }
+  }
+  return 0;
+}
 
 void push_scope(symbol_table_t **head) {
   symbol_table_t *new_scope = create_symbol_table_t();
@@ -93,5 +100,5 @@ void push_scope(symbol_table_t **head) {
 void pop_scope(symbol_table_t **head) {
   symbol_table_t *temp = *head;
   *head = (*head)->parent;
-  free_symbol_table_t(&temp);
+  // free_symbol_table_t(&temp);
 }

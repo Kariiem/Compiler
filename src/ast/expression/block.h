@@ -15,6 +15,6 @@ ast_block_t *create_ast_block_t(vtype(ast_block_expr_t *)
                                     block_expr_list);
 void free_ast_block_t(ast_block_t **block_ptr);
 void print_ast_block_t(ast_block_t const *block, int indent);
-void walk_ast_block_t(ast_block_t const *block, symbol_table_t *sym_tab,int* id);
+void walk_ast_block_t(ast_block_t const *block,int* id);
 ast_expr_t *get_last_block_expr(ast_block_t *block_expr) ;
 #endif // __AST_NODE_BLOCK__

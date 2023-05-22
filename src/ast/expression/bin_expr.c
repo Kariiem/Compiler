@@ -13,7 +13,8 @@ ast_bin_expr_t *create_ast_bin_expr_t(ast_expr_t *left, ast_expr_t *right,
 void free_ast_bin_expr_t(ast_bin_expr_t **bin_expr_ptr) {
   DEBUG_EPRINTF("free ast_bin_expr_t\n");
   ast_bin_expr_t *bin_expr = *bin_expr_ptr;
-  if(bin_expr==NULL) return;
+  if (bin_expr == NULL)
+    return;
   // DEBUG_ASSERT(bin_expr, "bin_expr is NULL");
   free_ast_expr_t(&bin_expr->left);
   free_ast_expr_t(&bin_expr->right);
@@ -30,15 +31,14 @@ void print_ast_bin_expr_t(ast_bin_expr_t const *bin_expr, int indent) {
   print_ast_expr_t(bin_expr->right, indent + 1);
 }
 
-void walk_ast_bin_expr_t(ast_bin_expr_t const *bin_expr,
-                         symbol_table_t *sym_tab, int *id) {
+void walk_ast_bin_expr_t(ast_bin_expr_t const *bin_expr, int *id) {
   DEBUG_EPRINTF("walk ast_bin_expr_t\n");
   ast_expr_t *left = bin_expr->left;
   ast_expr_t *right = bin_expr->right;
-  walk_ast_expr_t(left, sym_tab, id);
-  walk_ast_expr_t(right, sym_tab, id);
-  char const *left_type = get_ast_expr_type(left, sym_tab);
-  char const *right_type = get_ast_expr_type(right, sym_tab);
+  walk_ast_expr_t(left, id);
+  walk_ast_expr_t(right, id);
+  char const *left_type = get_ast_expr_type(left, global_symbol_table);
+  char const *right_type = get_ast_expr_type(right, global_symbol_table);
   if (strcmp(left_type, right_type)) {
     REPORT_ERROR(RED "Type mismatch:" GRN
                      "operator %s cannot operate on %s and %s, \n" RESET,
@@ -68,5 +68,5 @@ void walk_ast_bin_expr_t(ast_bin_expr_t const *bin_expr,
     }
   }
 
-  GEN_INSTRUCTIONS("%s\n", map_int_to_operators(bin_expr->op));
+  GEN_INSTRUCTIONS("\t%s\n", map_int_to_operators(bin_expr->op));
 }

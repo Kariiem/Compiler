@@ -14,5 +14,5 @@ struct ast_while_t {
 ast_while_t *create_ast_while_t(ast_expr_t *cond, ast_block_t *body);
 void free_ast_while_t(ast_while_t **while_ptr);
 void print_ast_while_t(ast_while_t const *while_, int indent);
-void walk_ast_while_t(ast_while_t const *while_, symbol_table_t *sym_tab, int* id);
+void walk_ast_while_t(ast_while_t const *while_, int *id);
 #endif // __AST_NODE_WHILE__

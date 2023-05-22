@@ -16,7 +16,8 @@ ast_source_t *create_ast_source_t(ast_module_decl_t *module,
 void free_ast_source_t(ast_source_t **source) {
   DEBUG_EPRINTF("free ast_source_t\n");
   ast_source_t *source_ptr = *source;
-  if(source_ptr==NULL) return;
+  if (source_ptr == NULL)
+    return;
   // DEBUG_ASSERT(source_ptr, "source is NULL");
   free_ast_module_decl_t(&source_ptr->module);
   CVECTOR_FREE(source_ptr->decl_list, free_ast_top_level_decl_t);
@@ -34,13 +35,11 @@ void print_ast_source_t(ast_source_t const *source, int indent) {
   }
 }
 
-void walk_ast_source_t(ast_source_t const *source, symbol_table_t *sym_tab,
-                       int* id) {
+void walk_ast_source_t(ast_source_t const *source, int *id) {
   DEBUG_EPRINTF("walk ast_source_t\n");
-  DEBUG_ASSERT(sym_tab, "sym_tab is NULL\n");
-  walk_ast_module_decl_t(source->module, sym_tab, id);
+  walk_ast_module_decl_t(source->module,  id);
   ast_top_level_decl_t **it;
   cvector_for_each_in(it, source->decl_list) {
-    walk_ast_top_level_decl_t(*it, sym_tab, id);
+    walk_ast_top_level_decl_t(*it,  id);
   }
 }
