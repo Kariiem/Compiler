@@ -1,9 +1,9 @@
 #include "symbol.h"
-#include <stdio.h>
 #include "ast/utils.h"
+#include <stdio.h>
 // Symbol
 
-symbol_t *create_symbol_t(char *name, int type, void *value, int line_num) {
+symbol_t *create_symbol_t(char *name, int type, void *value, int id) {
   symbol_t *symbol = (symbol_t *)calloc(1, sizeof(symbol_t));
   symbol->name = name;
   symbol->type = type;
@@ -18,7 +18,7 @@ symbol_t *create_symbol_t(char *name, int type, void *value, int line_num) {
     symbol->value.type_val = value;
     break;
   }
-  symbol->line_num = line_num;
+  symbol->id = id;
   return symbol;
 }
 
@@ -32,6 +32,12 @@ void free_symbol_t(symbol_t *symbol) {
     break;
   case SYM_TY_TYPE:
     free_ast_type_decl_t(&symbol->value.type_val);
+    break;
+  case SYM_TY_FUNC_PARAM:
+    free_ast_fun_param_t(&symbol->value.func_param_val);
+    break;
+  case SYM_TY_ENUM_CONS:
+    free_ast_constructors_t(&symbol->value.enum_cons_val);
     break;
   }
   free(symbol);
@@ -63,7 +69,7 @@ void insert_symbol(sym_tab_t *head, int type, void *val, char *name,
   cvector_push_back(head->entries, symbol);
 }
 
-symbol_t *get_symbol(sym_tab_t *head, char *name) {
+symbol_t *get_symbol(sym_tab_t *head, char const *name) {
   sym_tab_t *iterator = head;
   while (iterator != NULL) {
     for (int i = 0; i < cvector_size(iterator->entries); i++) {
