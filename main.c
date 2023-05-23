@@ -20,9 +20,11 @@ FILE *symbol_table;
 symbol_table_t *global_symbol_table;
 symbol_table_t *child_scope;
 
+#define NUM_BUILTIN_TYPES 5
+
 void insert_builtin_types(symbol_table_t *global_symbol_table) {
   char *builtin_types[] = {"unit", "int", "double", "bool", "string"};
-  for (int i = 0; i < 5; i++) {
+  for (int i = 0; i < NUM_BUILTIN_TYPES; i++) {
     symbol_t *type_sym =
         create_symbol_t(builtin_types[i], SYM_TY_TYPE, NULL, i);
     insert_symbol(global_symbol_table, type_sym);
@@ -31,7 +33,7 @@ void insert_builtin_types(symbol_table_t *global_symbol_table) {
 
 void free_builtin_types(symbol_table_t *global_symbol_table) {
   char *builtin_types[] = {"int", "float", "bool", "string", "unit"};
-  for (int i = 0; i < 5; i++) {
+  for (int i = 0; i < NUM_BUILTIN_TYPES; i++) {
     symbol_t *type_sym = get_symbol(global_symbol_table, builtin_types[i]);
     free_symbol_t(&type_sym);
   }
@@ -82,9 +84,9 @@ int main(int argc, char *argv[]) {
   functions = fopen("codegen/functions.txt", "w");
   types = fopen("codegen/types.txt", "w");
   symbol_table = fopen("codegen/symbol_table.txt", "w");
-  int intial_memory_address = 0;
+  int intial_symbol_id = NUM_BUILTIN_TYPES+1;
 
-  walk_ast_source_t(source_module, &intial_memory_address);
+  walk_ast_source_t(source_module, &intial_symbol_id);
   pop_scope(&global_symbol_table);
   // free_symbol_table_t(&global_symbol_table);
   yylex_destroy(scanner);

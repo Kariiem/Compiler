@@ -5,8 +5,8 @@
 #include "block.h"
 #include "case.h"
 #include "expr.h"
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 ast_switch_t *create_ast_switch_t(ast_expr_t *expr, vtype(ast_case_t *) cases) {
   ast_switch_t *switch_ = calloc(1, sizeof(ast_switch_t));
@@ -41,8 +41,10 @@ void walk_ast_switch_t(ast_switch_t const *switch_, int *id) {
   // (switch_->enum_expr->type == EXPR_IDENTIFIER &&
   //  !strcmp(get_ast_expr_type(switch_->enum_expr, global_symbol_table),
   //  "int")))
-  char const*switch_expr_type = get_ast_expr_type(switch_->enum_expr, global_symbol_table);
-  if (strcmp(switch_expr_type, "int")==0){
+  char const *switch_expr_type =
+      get_ast_expr_type(switch_->enum_expr, global_symbol_table);
+  if (strcmp(switch_expr_type, "int") == 0 ||
+      get_symbol(global_symbol_table, switch_expr_type)->type == SYM_TY_TYPE) {
 
     int label_id = *id;
     // SWITCH prologue
@@ -81,9 +83,10 @@ void walk_ast_switch_t(ast_switch_t const *switch_, int *id) {
       GEN_INSTRUCTIONS("\tJMP _switch_end_%d_\n", label_id);
     }
     GEN_INSTRUCTIONS("_switch_end_%d_:\n", label_id);
-  }
-  else {
-    REPORT_ERROR("Error: Switch expression must be int/enum,found %s\n",switch_expr_type);
+  } else {
+    REPORT_ERROR(
+        "Error: Switch expression must be int or user-defined enum, found %s\n",
+        switch_expr_type);
     exit(1);
   }
 }

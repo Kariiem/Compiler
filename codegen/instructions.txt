@@ -1,8 +1,23 @@
 _start:
-_switch_start_3_:
-_switch_start_4_:
-	PUSH 1
-	PUSH 1
+	PUSH 4
+	STORE $10
+_switch_start_12_:
+	LOAD $7
+	LOAD $7
 	EQ
-	JMPT _switch_case_5_
-_switch_case_5_:
+	JMPT _switch_case_13_
+	LOAD $7
+	LOAD $8
+	EQ
+	JMPT _switch_case_14_
+_switch_case_13_:
+	PUSH true
+	JMP _switch_end_12_
+_switch_case_14_:
+	PUSH true
+	JMP _switch_end_12_
+_switch_case_15_:
+	PUSH true
+	JMP _switch_end_12_
+_switch_end_12_:
+	STORE $11

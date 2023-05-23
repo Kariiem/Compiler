@@ -40,28 +40,49 @@ void walk_ast_bin_expr_t(ast_bin_expr_t const *bin_expr, int *id) {
   char const *left_type = get_ast_expr_type(left, global_symbol_table);
   char const *right_type = get_ast_expr_type(right, global_symbol_table);
   if (strcmp(left_type, right_type)) {
-    REPORT_ERROR( "Error: Type mismatch, operator %s cannot operate on %s and %s, \n",
-                 map_int_to_operators(bin_expr->op), left_type, right_type);
+    REPORT_ERROR(
+        "Error: Type mismatch, operator %s cannot operate on %s and %s, \n",
+        map_int_to_operators(bin_expr->op), left_type, right_type);
     exit(1);
   }
-  if (bin_expr->op == EXPR_ADD || bin_expr->op == EXPR_SUB ||
-      bin_expr->op == EXPR_MUL || bin_expr->op == EXPR_DIV ||
-      bin_expr->op == EXPR_MOD || bin_expr->op == EXPR_EXP ||
-      bin_expr->op == EXPR_EQ || bin_expr->op == EXPR_NEQ ||
-      bin_expr->op == EXPR_LT || bin_expr->op == EXPR_LEQ ||
-      bin_expr->op == EXPR_GT || bin_expr->op == EXPR_GEQ) {
-    if (strcmp(left_type, "int") && strcmp(left_type, "double")) {
-      REPORT_ERROR("Error: Type mismatch, operator %s cannot operate on %s and %s, \n",
-                   map_int_to_operators(bin_expr->op), left_type, right_type);
-      exit(1);
-    }
+
+  switch (bin_expr->op) {
+  default: {
+    REPORT_ERROR("Error: Unknown operator %ld\n", bin_expr->op);
+    exit(1);
   }
-  else if (bin_expr->op == EXPR_AND || bin_expr->op == EXPR_OR ) {
-    if (strcmp(left_type, "bool")) {
-      REPORT_ERROR( "Error: Type mismatch, operator %s cannot operate on %s and %s, \n" ,
-                   map_int_to_operators(bin_expr->op), left_type, right_type);
+  case EXPR_ADD:
+  case EXPR_SUB:
+  case EXPR_MUL:
+  case EXPR_DIV:
+  case EXPR_MOD:
+  case EXPR_EXP:
+  case EXPR_LT:
+  case EXPR_GT:
+  case EXPR_LEQ:
+  case EXPR_GEQ: {
+    if (strcmp(left_type, "int") && strcmp(left_type, "double")) {
+      REPORT_ERROR(
+          "Error: Type mismatch, operator %s cannot operate on %s and %s, \n",
+          map_int_to_operators(bin_expr->op), left_type, right_type);
       exit(1);
     }
+    break;
+  }
+  case EXPR_AND:
+  case EXPR_OR: {
+    if (strcmp(left_type, "bool")) {
+      REPORT_ERROR(
+          "Error: Type mismatch, operator %s cannot operate on %s and %s, \n",
+          map_int_to_operators(bin_expr->op), left_type, right_type);
+      exit(1);
+    }
+    break;
+  }
+  case EXPR_NEQ:
+  case EXPR_EQ: {
+    break;
+  }
   }
 
   GEN_INSTRUCTIONS("\t%s\n", map_int_to_operators(bin_expr->op));

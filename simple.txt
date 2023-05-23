@@ -1,12 +1,16 @@
 module Main
 
-var y:int ;
+type Bool = True 
+          | False;
 
-var z :bool= switch switch 1 { 1:{y;}} {
-        1: {
+var y:int=4;
+
+var z :bool= 
+    switch True {
+        True: {
             true;
         }
-        2: {
+        False: {
             true;
         }
         else:{
