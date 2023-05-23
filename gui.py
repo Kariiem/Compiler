@@ -32,7 +32,7 @@ class CompilerWindow(QMainWindow):
 
     def compile_button_clicked(self):
 
-        code_text = self.text_input.text()
+        code_text = self.text_input.toPlainText()
 
         # Store the code in a file named "code_text"
         with open("code_text", "w") as file:
@@ -53,7 +53,10 @@ class CompilerWindow(QMainWindow):
         self.instructions_textbox.clear()
         self.symbols_textbox.clear()
 
-        # Create a file named "functions.txt" and store the functions in it
+        # Create a file named "functions.txt" first
+        
+        
+        
         # Create a file named "instructions.txt" and store the instructions in it
         # Create a file named "symbols.txt" and store the symbols in it
 
