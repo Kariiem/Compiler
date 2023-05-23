@@ -1,22 +1,3 @@
 module Main
 
-fun fib(val n:int,val a:int, val b:int) int {
-    if n < 2 {
-        n;
-    } else {
-        fib(n-1,b,a+b);
-    };
-}
-
-val x:int = fib(10,0,1);
-
-val g : bool = true;
-val y:bool = false;
-val z:int = 
-    if not y and g {
-        1;
-        val y:int =0;
-        y;
-    } else  {
-        2;
-    };
+val x:double = int_to_double(1);

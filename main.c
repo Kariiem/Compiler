@@ -1,5 +1,8 @@
 #include "comp.h"
 #include "src/ast/ast.h"
+#include "src/ast/datastructures/cvector.h"
+#include "src/ast/declaration/fun_decl.h"
+#include "src/ast/declaration/fun_param.h"
 #include "src/ast/declaration/type_decl.h"
 #include "src/ast/expression/block_expr.h"
 #include "src/ast/source.h"
@@ -21,6 +24,7 @@ symbol_table_t *global_symbol_table;
 symbol_table_t *child_scope;
 
 #define NUM_BUILTIN_TYPES 5
+#define NUM_BUILTIN_FUNCS 2
 
 void insert_builtin_types(symbol_table_t *global_symbol_table) {
   char *builtin_types[] = {"unit", "int", "double", "bool", "string"};
@@ -39,14 +43,49 @@ void free_builtin_types(symbol_table_t *global_symbol_table) {
   }
 }
 
+void insert_builtin_functions(symbol_table_t *global_symbol_table) {
+  char *builtin_fun_names[] = {"int_to_double", "double_to_int"};
+  vtype(ast_fun_param_t *) param_lists_i2d = NULL;
+  vtype(ast_fun_param_t *) param_lists_d2i = NULL;
+  cvector_push_back(param_lists_i2d,
+                    create_ast_fun_param_t(PARAM_VAL, "x", "int"));
+  cvector_push_back(param_lists_d2i,
+                    create_ast_fun_param_t(PARAM_VAL, "x", "double"));
+
+  ast_fundecl_t *builtin_funs[2] = {
+      create_ast_fundecl_t(builtin_fun_names[0], param_lists_i2d, "double", NULL),
+      create_ast_fundecl_t(builtin_fun_names[1], param_lists_d2i, "int",    NULL)
+  };
+
+
+  symbol_t *fun_sym =
+      create_symbol_t(builtin_fun_names[0], SYM_TY_FUNC, builtin_funs[0], 0);
+  insert_symbol(global_symbol_table, fun_sym);
+  fun_sym =
+      create_symbol_t(builtin_fun_names[1], SYM_TY_FUNC, builtin_funs[1], 1);
+  insert_symbol(global_symbol_table, fun_sym);
+}
+
+void free_builtin_functions(symbol_table_t *global_symbol_table) {
+  char *builtin_funs[] = {"int_to_float", "float_to_int"};
+
+  for (int i = 0; i < NUM_BUILTIN_FUNCS; i++) {
+    symbol_t *fun_sym = get_symbol(global_symbol_table, builtin_funs[i]);
+    free_symbol_t(&fun_sym);
+  }
+}
+
 int main(int argc, char *argv[]) {
   yyscan_t scanner;
   yylex_init(&scanner);
   ast_source_t *source_module;
   global_symbol_table = create_symbol_table_t();
   child_scope = global_symbol_table;
-  insert_builtin_types(global_symbol_table);
   /*insert the builtin types into the symbol table*/
+  insert_builtin_types(global_symbol_table);
+  /*insert the builtin functions into the symbol table*/
+  insert_builtin_functions(global_symbol_table);
+
   FILE *fptr;
 
   --argc, ++argv;
@@ -84,7 +123,7 @@ int main(int argc, char *argv[]) {
   functions = fopen("codegen/functions.txt", "w");
   types = fopen("codegen/types.txt", "w");
   symbol_table = fopen("codegen/symbol_table.txt", "w");
-  int intial_symbol_id = NUM_BUILTIN_TYPES+1;
+  int intial_symbol_id = NUM_BUILTIN_TYPES + 1;
 
   walk_ast_source_t(source_module, &intial_symbol_id);
   pop_scope(&global_symbol_table);
