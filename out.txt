@@ -1,22 +1,13 @@
-//switch cond
+func_print:
+    PUSH_MEM 0
+    PUSH_MEM 1
+    PUSH_MEM 2
+    /*BLOCK*/
+RET
+
+
+
+PUSH 0
 PUSH 1
-//comparison between 2 and switch cond
-DUP
 PUSH 2
-//are they equal
-EQ
-    //if not, skip this case
-    JUMP-FALSE ENDCASE_1
-    //otherwise, execute it and end switch
-    <code for block 1>
-    JUMP ENDSWITCH
-    //end of case 1, test if case 2
-ENDCASE_1:
-DUP
-PUSH 3
-EQ
-    JUMP-FALSE ENDCASE_2:
-    <code for block2>
-    JUMP ENDSWITCH
-ENDCASE_2:
-ENDSWITCH:
+CALL func_print

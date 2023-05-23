@@ -43,6 +43,14 @@
 #if YYDEBUG
 extern int yydebug;
 #endif
+/* "%code requires" blocks.  */
+#line 1 "comp.y"
+
+    #include "cvector.h"
+    #include "cvector_utils.h"
+    #include "utils.h"
+
+#line 54 "comp.tab.h"
 
 /* Token type.  */
 #ifndef YYTOKENTYPE
@@ -104,7 +112,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 132 "comp.y"
+#line 150 "comp.y"
 
     char* id;
     int integer;
@@ -113,8 +121,9 @@ union YYSTYPE
     int boolean;
     void* voidVal;
     void* symbolval;
+    vtype(char*) type_list;
 
-#line 118 "comp.tab.h"
+#line 127 "comp.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

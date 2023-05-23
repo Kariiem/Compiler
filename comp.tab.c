@@ -66,12 +66,15 @@
 
 
 /* First part of user prologue.  */
-#line 4 "comp.y"
+#line 7 "comp.y"
 
 
     #include <stdio.h>
     #include <string.h>
     #include <stdlib.h>
+    #include "cvector.h"
+    #include "cvector_utils.h"
+    #include "utils.h"
     #define SYM_TAB_MAX 1000
     #define SYM_MAX 1000
     #define SYM_TAB_STACK_MAX 1000
@@ -85,6 +88,12 @@
         char* value;  // Value of the symbol
         int line_num;   // Line number of the symbol for debugging
         int symbol_id;     // ID of the symbol
+        int * enum_values;  // Values of the enum
+        int num_enum_values;    // Number of values in the enum
+        int max_enum_values;    // Maximum number of values in the enum
+        int return_type;    // Return type of the function
+        int num_parameters; // Number of parameters of the function
+        int * parameter_list_types; // Types of the parameters of the function
         bool is_const;  // Whether the symbol is a constant
         bool is_enum;   // Whether the symbol is an enum
         bool is_func;   // Whether the symbol is a function
@@ -131,6 +140,9 @@
 
     // Define a function to add a symbol to the symbol table
     void add_symbol(symTableStack* stack, char* name, int type, char* value, int line_num, int symbol_id, bool is_const, bool is_enum, bool is_func);
+
+    // Define a function to add a symbol to the symbol table but with a list of parameters
+    void add_symbol_with_args(symTableStack* stack, char* name, int type, char* value, int line_num, int symbol_id, bool is_const, bool is_enum, bool is_func, char * return_identifier, vtype(char*) parameter_list_types);
 
     // Define a function to get a symbol from the symbol table
     // reverse_search is used to search the symbol table stack from top to bottom with default value false
@@ -190,10 +202,13 @@
 
     int case_label_counter = 0; // Counter for the CASE labels
 
+
+    char * current_identifier; // Current identifier
+
     int identifier_flag = 0; // Flag to check if the current token is an identifier
 
 
-#line 197 "comp.tab.c"
+#line 212 "comp.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -235,6 +250,14 @@
 #if YYDEBUG
 extern int yydebug;
 #endif
+/* "%code requires" blocks.  */
+#line 1 "comp.y"
+
+    #include "cvector.h"
+    #include "cvector_utils.h"
+    #include "utils.h"
+
+#line 261 "comp.tab.c"
 
 /* Token type.  */
 #ifndef YYTOKENTYPE
@@ -296,7 +319,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 132 "comp.y"
+#line 150 "comp.y"
 
     char* id;
     int integer;
@@ -305,8 +328,9 @@ union YYSTYPE
     int boolean;
     void* voidVal;
     void* symbolval;
+    vtype(char*) type_list;
 
-#line 310 "comp.tab.c"
+#line 334 "comp.tab.c"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -625,16 +649,16 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  5
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   286
+#define YYLAST   299
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  51
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  51
+#define YYNNTS  55
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  96
+#define YYNRULES  101
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  173
+#define YYNSTATES  179
 
 #define YYUNDEFTOK  2
 #define YYMAXUTOK   305
@@ -686,16 +710,17 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,   231,   231,   231,   235,   240,   241,   246,   248,   250,
-     252,   254,   259,   264,   293,   314,   315,   319,   320,   324,
-     325,   326,   327,   328,   329,   333,   347,   356,   365,   374,
-     386,   387,   388,   389,   390,   391,   395,   396,   397,   398,
-     399,   400,   401,   402,   403,   407,   408,   409,   410,   411,
-     412,   417,   431,   447,   416,   483,   510,   528,   482,   591,
-     603,   610,   622,   610,   656,   668,   656,   702,   707,   716,
-     707,   740,   741,   747,   746,   780,   779,   835,   835,   851,
-     852,   856,   857,   858,   862,   866,   867,   868,   872,   876,
-     880,   881,   882,   886,   890,   891,   895
+       0,   254,   254,   254,   258,   263,   264,   269,   271,   273,
+     275,   277,   282,   287,   316,   337,   338,   342,   343,   347,
+     348,   349,   350,   351,   352,   356,   370,   379,   388,   397,
+     409,   410,   411,   412,   413,   414,   418,   419,   420,   421,
+     422,   423,   424,   425,   426,   430,   431,   432,   433,   434,
+     435,   440,   454,   470,   439,   506,   533,   551,   505,   614,
+     626,   633,   645,   633,   679,   691,   679,   725,   730,   739,
+     730,   763,   764,   770,   769,   803,   802,   858,   858,   874,
+     875,   879,   880,   881,   886,   891,   885,   927,   928,   929,
+     930,   935,   962,   962,  1010,  1049,  1050,  1051,  1055,  1059,
+    1060,  1064
 };
 #endif
 
@@ -722,9 +747,9 @@ static const char *const yytname[] =
   "$@7", "for_var", "while_loop_expr", "$@8", "$@9", "until_loop_expr",
   "$@10", "$@11", "do_block_expr", "switch_expr", "$@12", "$@13",
   "case_expr_list", "case_expr", "$@14", "$@15", "block", "$@16",
-  "block_expression_list", "block_expression", "fun_decl", "param_list",
-  "param", "funcall", "arg_list", "type_decl", "constructor_list",
-  "constructor_field", YY_NULLPTR
+  "block_expression_list", "block_expression", "fun_decl", "$@17", "$@18",
+  "param_list", "param", "fun_block", "$@19", "funcall", "arg_list",
+  "type_decl", "constructor_list", "constructor_field", YY_NULLPTR
 };
 #endif
 
@@ -742,7 +767,7 @@ static const yytype_int16 yytoknum[] =
 };
 # endif
 
-#define YYPACT_NINF (-148)
+#define YYPACT_NINF (-151)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -756,24 +781,24 @@ static const yytype_int16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int16 yypact[] =
 {
-       8,   -19,    32,  -148,    19,  -148,  -148,  -148,     9,    24,
-      29,  -148,  -148,    38,    55,  -148,  -148,  -148,  -148,    41,
-    -148,  -148,    46,    51,    59,   126,    61,  -148,    23,    45,
-      54,   126,    49,  -148,  -148,  -148,   126,   126,    58,  -148,
-    -148,  -148,  -148,   183,  -148,  -148,  -148,  -148,  -148,  -148,
-    -148,  -148,  -148,  -148,  -148,    53,    56,   -30,  -148,  -148,
-       3,  -148,  -148,  -148,   256,    65,   126,   126,   126,    77,
-     160,   126,   126,   126,   126,   126,   126,   126,   126,   126,
-     126,   126,   126,   126,   126,   126,  -148,   -23,    69,    23,
-      57,  -148,    45,  -148,    54,    66,   256,   256,   256,  -148,
-     256,    -8,    -5,    -5,    39,    39,    39,    39,    77,    39,
-      77,    77,    77,    77,    77,    77,   126,  -148,  -148,    60,
-    -148,    54,  -148,    67,  -148,    12,    54,    54,    70,   126,
-    -148,   202,  -148,  -148,  -148,   -28,  -148,  -148,   221,  -148,
-      96,  -148,  -148,  -148,  -148,  -148,  -148,   256,  -148,  -148,
-    -148,    75,   113,    54,    12,    79,  -148,   240,  -148,  -148,
-      78,  -148,  -148,  -148,    54,    54,    12,  -148,  -148,    80,
-    -148,    54,  -148
+      21,   -41,    16,  -151,   -11,  -151,  -151,  -151,    13,    14,
+      15,  -151,  -151,    17,     4,  -151,  -151,  -151,  -151,    22,
+    -151,  -151,    20,    33,    46,   162,    48,  -151,  -151,    35,
+      44,   162,    39,  -151,  -151,  -151,   162,   162,    49,  -151,
+    -151,  -151,  -151,   196,  -151,  -151,  -151,  -151,  -151,  -151,
+    -151,  -151,  -151,  -151,  -151,    50,     8,  -151,     2,  -151,
+    -151,  -151,   269,    67,   162,   162,   162,    74,   163,   162,
+     162,   162,   162,   162,   162,   162,   162,   162,   162,   162,
+     162,   162,   162,   162,  -151,     1,    54,   -30,  -151,  -151,
+      35,  -151,    44,    66,   269,   269,   269,  -151,   269,   -26,
+       0,     0,    65,    65,    65,    65,    74,    65,    74,    74,
+      74,    74,    74,    74,   162,  -151,  -151,    71,     8,    59,
+    -151,    60,  -151,    -4,    44,    44,    73,   162,  -151,   215,
+      70,  -151,  -151,  -151,   -28,  -151,  -151,   234,  -151,   111,
+    -151,  -151,  -151,  -151,  -151,  -151,   269,  -151,  -151,    83,
+    -151,  -151,    90,   120,  -151,  -151,    44,    -4,    93,  -151,
+     253,  -151,  -151,  -151,    92,  -151,  -151,   105,  -151,    44,
+      44,  -151,    -4,  -151,  -151,    88,  -151,    44,  -151
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -783,44 +808,44 @@ static const yytype_int8 yydefact[] =
 {
        0,     0,     0,     2,     0,     1,     5,     4,     3,     0,
        0,    15,    16,     0,     0,     6,     7,     9,    11,     0,
-      10,     8,     0,     0,     0,     0,     0,    12,    85,     0,
+      10,     8,     0,     0,     0,     0,     0,    12,    84,     0,
        0,     0,     0,    61,    64,    68,     0,     0,    25,    26,
       27,    29,    28,     0,    19,    20,    21,    23,    45,    46,
-      47,    48,    49,    50,    22,     0,     0,     0,    86,    96,
-       0,    94,    77,    67,    51,     0,     0,     0,     0,    36,
-       0,    90,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,    14,     0,     0,     0,
-       0,    93,     0,    79,     0,     0,    62,    65,    69,    24,
-      91,     0,    37,    38,    30,    31,    32,    33,    35,    34,
-      39,    40,    41,    42,    43,    44,     0,    18,    13,     0,
-      87,     0,    95,     0,    52,     0,     0,     0,     0,     0,
-      89,     0,    88,    84,    78,    25,    82,    83,     0,    80,
-       0,    59,    60,    55,    63,    66,    71,    92,    17,    81,
-      53,     0,     0,     0,     0,     0,    70,     0,    72,    54,
-       0,    73,    75,    56,     0,     0,     0,    74,    76,     0,
-      57,     0,    58
+      47,    48,    49,    50,    22,     0,    87,   101,     0,    99,
+      77,    67,    51,     0,     0,     0,     0,    36,     0,    95,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,    14,     0,     0,     0,    90,    98,
+       0,    79,     0,     0,    62,    65,    69,    24,    96,     0,
+      37,    38,    30,    31,    32,    33,    35,    34,    39,    40,
+      41,    42,    43,    44,     0,    18,    13,     0,    89,     0,
+     100,     0,    52,     0,     0,     0,     0,     0,    94,     0,
+       0,    88,    85,    78,    25,    82,    83,     0,    80,     0,
+      59,    60,    55,    63,    66,    71,    97,    17,    91,     0,
+      81,    53,     0,     0,    92,    86,     0,     0,     0,    70,
+       0,    72,    79,    54,     0,    73,    75,     0,    56,     0,
+       0,    93,     0,    74,    76,     0,    57,     0,    58
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int16 yypgoto[] =
 {
-    -148,  -148,  -148,  -148,  -148,  -148,  -148,    -3,     7,   -26,
-    -148,   -31,  -148,  -148,  -148,  -148,  -148,  -148,  -148,  -148,
-    -148,  -148,  -148,  -148,  -147,  -148,  -148,  -148,  -148,  -148,
-    -148,  -148,  -148,  -148,  -148,  -148,  -148,  -148,  -148,   -93,
-    -148,  -148,  -148,  -148,  -148,    42,  -148,  -148,  -148,  -148,
-      26
+    -151,  -151,  -151,  -151,  -151,  -151,  -151,   129,   130,   -54,
+    -151,   -25,  -151,  -151,  -151,  -151,  -151,  -151,  -151,  -151,
+    -151,  -151,  -151,  -151,  -150,  -151,  -151,  -151,  -151,  -151,
+    -151,  -151,  -151,  -151,  -151,  -151,  -151,  -151,  -151,   -91,
+    -151,   -23,  -151,  -151,  -151,  -151,  -151,    23,  -151,  -151,
+    -151,  -151,  -151,  -151,    52
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int16 yydefgoto[] =
 {
-      -1,     2,     6,     3,     8,    15,    16,    17,    18,    19,
-     118,    43,    44,    45,    46,    47,    48,    94,   140,   153,
-      49,   151,   166,   171,   143,    50,    66,   126,    51,    67,
-     127,    52,    53,    68,   128,   152,   158,   164,   165,    63,
-      93,   123,   139,    20,    57,    58,    54,   101,    21,    60,
-      61
+      -1,     2,     6,     3,     8,    15,    16,   135,   136,    19,
+     116,   137,    44,    45,    46,    47,    48,    92,   139,   156,
+      49,   152,   172,   177,   142,    50,    64,   124,    51,    65,
+     125,    52,    53,    66,   126,   153,   161,   169,   170,    61,
+      91,   121,   138,    20,    56,   149,    87,    88,   155,   162,
+      54,    99,    21,    58,    59
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -828,68 +853,70 @@ static const yytype_int16 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_uint8 yytable[] =
 {
-      64,   124,    56,    25,    89,    69,    70,   160,   116,    90,
-      71,     1,   117,     9,    10,    11,    12,    13,    78,   169,
-      80,    81,    82,    83,    84,    85,   129,     4,   133,    11,
-      12,   130,     5,   144,   145,    96,    97,    98,    91,    92,
-     100,   102,   103,   104,   105,   106,   107,   108,   109,   110,
-     111,   112,   113,   114,   115,    14,    72,    73,   141,   142,
-     159,     7,    78,    56,    80,    81,    82,    83,    84,    85,
-      22,   167,   168,    11,    12,    23,    30,    31,   172,    32,
-      33,    34,    35,    36,    24,   131,    25,    26,    27,    28,
-      29,    59,   138,    55,    62,    65,    71,    95,   147,    87,
-      78,   119,    88,   121,   125,    37,   132,   150,   134,   154,
-     146,   161,   163,   135,    39,    40,    41,    42,   122,   170,
-     136,   157,    30,    31,   155,    32,    33,    34,    35,    36,
-     137,   120,     0,     0,     0,    30,    31,     0,    32,    33,
-      34,    35,    36,     0,     0,     0,     0,     0,     0,     0,
-       0,    37,     0,     0,   156,     0,     0,     0,     0,    38,
-      39,    40,    41,    42,    37,     0,     0,     0,     0,     0,
-       0,     0,    38,    39,    40,    41,    42,    72,    73,    74,
-      75,    76,    77,    78,    79,    80,    81,    82,    83,    84,
-      85,     0,     0,     0,     0,     0,     0,     0,     0,    99,
-      72,    73,    74,    75,    76,    77,    78,    79,    80,    81,
-      82,    83,    84,    85,     0,     0,     0,     0,    86,    72,
-      73,    74,    75,    76,    77,    78,    79,    80,    81,    82,
-      83,    84,    85,     0,     0,     0,     0,   148,    72,    73,
-      74,    75,    76,    77,    78,    79,    80,    81,    82,    83,
-      84,    85,     0,     0,     0,     0,   149,    72,    73,    74,
-      75,    76,    77,    78,    79,    80,    81,    82,    83,    84,
-      85,     0,   162,    72,    73,    74,    75,    76,    77,    78,
-      79,    80,    81,    82,    83,    84,    85
+      43,   122,    86,    25,   118,     4,    62,   164,   127,   119,
+      69,    67,    68,   128,    11,    12,     5,     9,    10,    11,
+      12,    13,   175,    76,     1,    78,    79,    80,    81,    82,
+      83,     7,   114,   143,   144,    25,   115,    89,    90,    94,
+      95,    96,   140,   141,    98,   100,   101,   102,   103,   104,
+     105,   106,   107,   108,   109,   110,   111,   112,   113,    14,
+      22,    23,    27,    24,    86,   163,    11,    12,    26,    30,
+      31,    28,    32,    33,    34,    35,    36,    29,   173,   174,
+      55,    57,    70,    71,    60,    63,   178,    69,    76,   129,
+      78,    79,    80,    81,    82,    83,    85,    76,    37,    93,
+     117,   133,   146,   130,   123,   132,   134,    39,    40,    41,
+      42,    11,    12,   145,    30,    31,   148,    32,    33,    34,
+      35,    36,   151,   154,   157,   165,   168,   176,   160,    30,
+      31,   158,    32,    33,    34,    35,    36,    17,    18,   167,
+       0,   131,   120,    37,     0,     0,   171,     0,     0,     0,
+       0,   134,    39,    40,    41,    42,     0,     0,    37,     0,
+       0,   159,     0,     0,     0,     0,    38,    39,    40,    41,
+      42,    30,    31,     0,    32,    33,    34,    35,    36,     0,
+      70,    71,    72,    73,    74,    75,    76,    77,    78,    79,
+      80,    81,    82,    83,     0,     0,     0,     0,     0,     0,
+      37,     0,    97,     0,     0,     0,     0,     0,    38,    39,
+      40,    41,    42,    70,    71,    72,    73,    74,    75,    76,
+      77,    78,    79,    80,    81,    82,    83,     0,     0,     0,
+       0,    84,    70,    71,    72,    73,    74,    75,    76,    77,
+      78,    79,    80,    81,    82,    83,     0,     0,     0,     0,
+     147,    70,    71,    72,    73,    74,    75,    76,    77,    78,
+      79,    80,    81,    82,    83,     0,     0,     0,     0,   150,
+      70,    71,    72,    73,    74,    75,    76,    77,    78,    79,
+      80,    81,    82,    83,     0,   166,    70,    71,    72,    73,
+      74,    75,    76,    77,    78,    79,    80,    81,    82,    83
 };
 
 static const yytype_int16 yycheck[] =
 {
-      31,    94,    28,    31,    34,    36,    37,   154,    31,    39,
-      38,     3,    35,     4,     5,     6,     7,     8,    23,   166,
-      25,    26,    27,    28,    29,    30,    34,    46,   121,     6,
-       7,    39,     0,   126,   127,    66,    67,    68,    35,    36,
-      71,    72,    73,    74,    75,    76,    77,    78,    79,    80,
-      81,    82,    83,    84,    85,    46,    17,    18,    46,    47,
-     153,    42,    23,    89,    25,    26,    27,    28,    29,    30,
-      46,   164,   165,     6,     7,    46,     9,    10,   171,    12,
-      13,    14,    15,    16,    46,   116,    31,    46,    42,    38,
-      31,    46,   123,    32,    40,    46,    38,    32,   129,    46,
-      23,    32,    46,    46,    38,    38,    46,    11,    41,    34,
-      40,    32,    34,    46,    47,    48,    49,    50,    92,    39,
-     123,   152,     9,    10,    11,    12,    13,    14,    15,    16,
-     123,    89,    -1,    -1,    -1,     9,    10,    -1,    12,    13,
-      14,    15,    16,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    38,    -1,    -1,    41,    -1,    -1,    -1,    -1,    46,
-      47,    48,    49,    50,    38,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    46,    47,    48,    49,    50,    17,    18,    19,
-      20,    21,    22,    23,    24,    25,    26,    27,    28,    29,
-      30,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    39,
+      25,    92,    56,    31,    34,    46,    31,   157,    34,    39,
+      38,    36,    37,    39,     6,     7,     0,     4,     5,     6,
+       7,     8,   172,    23,     3,    25,    26,    27,    28,    29,
+      30,    42,    31,   124,   125,    31,    35,    35,    36,    64,
+      65,    66,    46,    47,    69,    70,    71,    72,    73,    74,
+      75,    76,    77,    78,    79,    80,    81,    82,    83,    46,
+      46,    46,    42,    46,   118,   156,     6,     7,    46,     9,
+      10,    38,    12,    13,    14,    15,    16,    31,   169,   170,
+      32,    46,    17,    18,    40,    46,   177,    38,    23,   114,
+      25,    26,    27,    28,    29,    30,    46,    23,    38,    32,
+      46,    41,   127,    32,    38,    46,    46,    47,    48,    49,
+      50,     6,     7,    40,     9,    10,    46,    12,    13,    14,
+      15,    16,    11,    40,    34,    32,    34,    39,   153,     9,
+      10,    11,    12,    13,    14,    15,    16,     8,     8,   162,
+      -1,   118,    90,    38,    -1,    -1,    41,    -1,    -1,    -1,
+      -1,    46,    47,    48,    49,    50,    -1,    -1,    38,    -1,
+      -1,    41,    -1,    -1,    -1,    -1,    46,    47,    48,    49,
+      50,     9,    10,    -1,    12,    13,    14,    15,    16,    -1,
       17,    18,    19,    20,    21,    22,    23,    24,    25,    26,
-      27,    28,    29,    30,    -1,    -1,    -1,    -1,    35,    17,
-      18,    19,    20,    21,    22,    23,    24,    25,    26,    27,
-      28,    29,    30,    -1,    -1,    -1,    -1,    35,    17,    18,
-      19,    20,    21,    22,    23,    24,    25,    26,    27,    28,
-      29,    30,    -1,    -1,    -1,    -1,    35,    17,    18,    19,
-      20,    21,    22,    23,    24,    25,    26,    27,    28,    29,
-      30,    -1,    32,    17,    18,    19,    20,    21,    22,    23,
-      24,    25,    26,    27,    28,    29,    30
+      27,    28,    29,    30,    -1,    -1,    -1,    -1,    -1,    -1,
+      38,    -1,    39,    -1,    -1,    -1,    -1,    -1,    46,    47,
+      48,    49,    50,    17,    18,    19,    20,    21,    22,    23,
+      24,    25,    26,    27,    28,    29,    30,    -1,    -1,    -1,
+      -1,    35,    17,    18,    19,    20,    21,    22,    23,    24,
+      25,    26,    27,    28,    29,    30,    -1,    -1,    -1,    -1,
+      35,    17,    18,    19,    20,    21,    22,    23,    24,    25,
+      26,    27,    28,    29,    30,    -1,    -1,    -1,    -1,    35,
+      17,    18,    19,    20,    21,    22,    23,    24,    25,    26,
+      27,    28,    29,    30,    -1,    32,    17,    18,    19,    20,
+      21,    22,    23,    24,    25,    26,    27,    28,    29,    30
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
@@ -898,22 +925,22 @@ static const yytype_int8 yystos[] =
 {
        0,     3,    52,    54,    46,     0,    53,    42,    55,     4,
        5,     6,     7,     8,    46,    56,    57,    58,    59,    60,
-      94,    99,    46,    46,    46,    31,    46,    42,    38,    31,
+      94,   103,    46,    46,    46,    31,    46,    42,    38,    31,
        9,    10,    12,    13,    14,    15,    16,    38,    46,    47,
       48,    49,    50,    62,    63,    64,    65,    66,    67,    71,
-      76,    79,    82,    83,    97,    32,    60,    95,    96,    46,
-     100,   101,    40,    90,    62,    46,    77,    80,    84,    62,
-      62,    38,    17,    18,    19,    20,    21,    22,    23,    24,
-      25,    26,    27,    28,    29,    30,    35,    46,    46,    34,
-      39,    35,    36,    91,    68,    32,    62,    62,    62,    39,
-      62,    98,    62,    62,    62,    62,    62,    62,    62,    62,
-      62,    62,    62,    62,    62,    62,    31,    35,    61,    32,
-      96,    46,   101,    92,    90,    38,    78,    81,    85,    34,
-      39,    62,    46,    90,    41,    46,    58,    59,    62,    93,
-      69,    46,    47,    75,    90,    90,    40,    62,    35,    35,
-      11,    72,    86,    70,    34,    11,    41,    62,    87,    90,
-      75,    32,    32,    34,    88,    89,    73,    90,    90,    75,
-      39,    74,    90
+      76,    79,    82,    83,   101,    32,    95,    46,   104,   105,
+      40,    90,    62,    46,    77,    80,    84,    62,    62,    38,
+      17,    18,    19,    20,    21,    22,    23,    24,    25,    26,
+      27,    28,    29,    30,    35,    46,    60,    97,    98,    35,
+      36,    91,    68,    32,    62,    62,    62,    39,    62,   102,
+      62,    62,    62,    62,    62,    62,    62,    62,    62,    62,
+      62,    62,    62,    62,    31,    35,    61,    46,    34,    39,
+     105,    92,    90,    38,    78,    81,    85,    34,    39,    62,
+      32,    98,    46,    41,    46,    58,    59,    62,    93,    69,
+      46,    47,    75,    90,    90,    40,    62,    35,    46,    96,
+      35,    11,    72,    86,    40,    99,    70,    34,    11,    41,
+      62,    87,   100,    90,    75,    32,    32,    92,    34,    88,
+      89,    41,    73,    90,    90,    75,    39,    74,    90
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
@@ -927,8 +954,9 @@ static const yytype_int8 yyr1[] =
       66,    68,    69,    70,    67,    72,    73,    74,    71,    75,
       75,    77,    78,    76,    80,    81,    79,    82,    84,    85,
       83,    86,    86,    88,    87,    89,    87,    91,    90,    92,
-      92,    93,    93,    93,    94,    95,    95,    95,    96,    97,
-      98,    98,    98,    99,   100,   100,   101
+      92,    93,    93,    93,    95,    96,    94,    97,    97,    97,
+      97,    98,   100,    99,   101,   102,   102,   102,   103,   104,
+     104,   105
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
@@ -942,8 +970,9 @@ static const yytype_int8 yyr2[] =
        1,     0,     0,     0,     8,     0,     0,     0,    14,     1,
        1,     0,     0,     5,     0,     0,     5,     2,     0,     0,
        7,     0,     2,     0,     4,     0,     4,     0,     4,     0,
-       2,     2,     1,     1,     7,     0,     1,     3,     4,     4,
-       0,     1,     3,     5,     1,     3,     1
+       2,     2,     1,     1,     0,     0,     9,     0,     3,     2,
+       1,     4,     0,     4,     4,     0,     1,     3,     5,     1,
+       3,     1
 };
 
 
@@ -1639,73 +1668,73 @@ yyreduce:
   switch (yyn)
     {
   case 2:
-#line 231 "comp.y"
+#line 254 "comp.y"
                 {printf("Kak_BEGINE\n");}
-#line 1645 "comp.tab.c"
+#line 1674 "comp.tab.c"
     break;
 
   case 3:
-#line 231 "comp.y"
+#line 254 "comp.y"
                                                                    {printf("Kak_END\n");}
-#line 1651 "comp.tab.c"
+#line 1680 "comp.tab.c"
     break;
 
   case 4:
-#line 236 "comp.y"
+#line 259 "comp.y"
     {}
-#line 1657 "comp.tab.c"
+#line 1686 "comp.tab.c"
     break;
 
   case 5:
-#line 240 "comp.y"
+#line 263 "comp.y"
                                             {}
-#line 1663 "comp.tab.c"
+#line 1692 "comp.tab.c"
     break;
 
   case 6:
-#line 242 "comp.y"
+#line 265 "comp.y"
     {}
-#line 1669 "comp.tab.c"
+#line 1698 "comp.tab.c"
     break;
 
   case 7:
-#line 247 "comp.y"
+#line 270 "comp.y"
     {}
-#line 1675 "comp.tab.c"
+#line 1704 "comp.tab.c"
     break;
 
   case 8:
-#line 249 "comp.y"
+#line 272 "comp.y"
     {}
-#line 1681 "comp.tab.c"
+#line 1710 "comp.tab.c"
     break;
 
   case 9:
-#line 251 "comp.y"
+#line 274 "comp.y"
     {}
-#line 1687 "comp.tab.c"
+#line 1716 "comp.tab.c"
     break;
 
   case 10:
-#line 253 "comp.y"
+#line 276 "comp.y"
     {}
-#line 1693 "comp.tab.c"
+#line 1722 "comp.tab.c"
     break;
 
   case 11:
-#line 255 "comp.y"
+#line 278 "comp.y"
     {}
-#line 1699 "comp.tab.c"
+#line 1728 "comp.tab.c"
     break;
 
   case 12:
-#line 260 "comp.y"
+#line 283 "comp.y"
     {}
-#line 1705 "comp.tab.c"
+#line 1734 "comp.tab.c"
     break;
 
   case 13:
-#line 265 "comp.y"
+#line 288 "comp.y"
     {
         // First check if the name is already taken
         symbol* sym = get_symbol(sym_tab_stack, (yyvsp[-3].id), false, false);
@@ -1731,11 +1760,11 @@ yyreduce:
 
         
     }
-#line 1735 "comp.tab.c"
+#line 1764 "comp.tab.c"
     break;
 
   case 14:
-#line 294 "comp.y"
+#line 317 "comp.y"
     {
         // First check if the symbol exists
         symbol* sym = get_symbol(sym_tab_stack, (yyvsp[-3].id), false, true);
@@ -1753,272 +1782,272 @@ yyreduce:
             printf("PUSH_MEM %d\n", sym->symbol_id);
         }
     }
-#line 1757 "comp.tab.c"
+#line 1786 "comp.tab.c"
     break;
 
   case 15:
-#line 314 "comp.y"
-                { (yyval.integer)=0;}
-#line 1763 "comp.tab.c"
+#line 337 "comp.y"
+                    { (yyval.integer)=0;}
+#line 1792 "comp.tab.c"
     break;
 
   case 16:
-#line 315 "comp.y"
-                { (yyval.integer)=1; }
-#line 1769 "comp.tab.c"
+#line 338 "comp.y"
+                    { (yyval.integer)=1; }
+#line 1798 "comp.tab.c"
     break;
 
   case 17:
-#line 319 "comp.y"
-                                             {(yyval.symbolval) = (yyvsp[-1].symbolval);}
-#line 1775 "comp.tab.c"
+#line 342 "comp.y"
+                                                 {(yyval.symbolval) = (yyvsp[-1].symbolval);}
+#line 1804 "comp.tab.c"
     break;
 
   case 18:
-#line 320 "comp.y"
-                                             {(yyval.symbolval) = NULL;}
-#line 1781 "comp.tab.c"
+#line 343 "comp.y"
+                                                 {(yyval.symbolval) = NULL;}
+#line 1810 "comp.tab.c"
     break;
 
   case 19:
-#line 324 "comp.y"
-                        { (yyval.symbolval) = (yyvsp[0].symbolval); }
-#line 1787 "comp.tab.c"
+#line 347 "comp.y"
+                            { (yyval.symbolval) = (yyvsp[0].symbolval); }
+#line 1816 "comp.tab.c"
     break;
 
   case 20:
-#line 325 "comp.y"
-                        {  }
-#line 1793 "comp.tab.c"
+#line 348 "comp.y"
+                            {  }
+#line 1822 "comp.tab.c"
     break;
 
   case 21:
-#line 326 "comp.y"
-                        {  }
-#line 1799 "comp.tab.c"
+#line 349 "comp.y"
+                            {  }
+#line 1828 "comp.tab.c"
     break;
 
   case 22:
-#line 327 "comp.y"
-                        {  }
-#line 1805 "comp.tab.c"
+#line 350 "comp.y"
+                            {  }
+#line 1834 "comp.tab.c"
     break;
 
   case 23:
-#line 328 "comp.y"
-                        {  }
-#line 1811 "comp.tab.c"
+#line 351 "comp.y"
+                            {  }
+#line 1840 "comp.tab.c"
     break;
 
   case 24:
-#line 329 "comp.y"
-                                           { (yyval.symbolval) = (yyvsp[-1].symbolval); }
-#line 1817 "comp.tab.c"
+#line 352 "comp.y"
+                                               { (yyval.symbolval) = (yyvsp[-1].symbolval); }
+#line 1846 "comp.tab.c"
     break;
 
   case 25:
-#line 333 "comp.y"
-                    { 
-                    identifier_flag = 1; (yyval.symbolval) = (yyvsp[0].id); 
-                    // First check if the symbol exists
-                    symbol* sym = get_symbol(sym_tab_stack, (yyvsp[0].id), false, true);
-                    
-                    // If the symbol is not found, error out
-                    if(sym == NULL){
-                        printf("ERROR: Symbol %s not defined on line %d\n", (yyvsp[0].id), line_num);
-                        exit(1);
-                    }
-                    else{
-                        printf("POP_MEM %d\n", sym->symbol_id);
-                    }
-                    }
-#line 1836 "comp.tab.c"
+#line 356 "comp.y"
+                        { 
+                        identifier_flag = 1; (yyval.symbolval) = (yyvsp[0].id); 
+                        // First check if the symbol exists
+                        symbol* sym = get_symbol(sym_tab_stack, (yyvsp[0].id), false, true);
+                        
+                        // If the symbol is not found, error out
+                        if(sym == NULL){
+                            printf("ERROR: Symbol %s not defined on line %d\n", (yyvsp[0].id), line_num);
+                            exit(1);
+                        }
+                        else{
+                            printf("POP_MEM %d\n", sym->symbol_id);
+                        }
+                        }
+#line 1865 "comp.tab.c"
     break;
 
   case 26:
-#line 347 "comp.y"
-                    { 
-                    printf("PUSH %d\n", (yyvsp[0].integer));
-                    //Create a new void pointer to store the value of the integer
-                    void* val = malloc(sizeof(int));
-                    //Copy the value of the integer to the void pointer
-                    memcpy(val, &(yyvsp[0].integer), sizeof(int));
-                    //Return the void pointer
-                    (yyval.symbolval) = val;
-                    }
-#line 1850 "comp.tab.c"
+#line 370 "comp.y"
+                        { 
+                        printf("PUSH %d\n", (yyvsp[0].integer));
+                        //Create a new void pointer to store the value of the integer
+                        void* val = malloc(sizeof(int));
+                        //Copy the value of the integer to the void pointer
+                        memcpy(val, &(yyvsp[0].integer), sizeof(int));
+                        //Return the void pointer
+                        (yyval.symbolval) = val;
+                        }
+#line 1879 "comp.tab.c"
     break;
 
   case 27:
-#line 356 "comp.y"
-                    { 
-                    printf("PUSH %f\n", (yyvsp[0].real));
-                    //Create a new void pointer to store the value of the real
-                    void* val = malloc(sizeof(double));
-                    //Copy the value of the real to the void pointer
-                    memcpy(val, &(yyvsp[0].real), sizeof(double));
-                    //Return the void pointer
-                    (yyval.symbolval) = val;
-                    }
-#line 1864 "comp.tab.c"
+#line 379 "comp.y"
+                        { 
+                        printf("PUSH %f\n", (yyvsp[0].real));
+                        //Create a new void pointer to store the value of the real
+                        void* val = malloc(sizeof(double));
+                        //Copy the value of the real to the void pointer
+                        memcpy(val, &(yyvsp[0].real), sizeof(double));
+                        //Return the void pointer
+                        (yyval.symbolval) = val;
+                        }
+#line 1893 "comp.tab.c"
     break;
 
   case 28:
-#line 365 "comp.y"
-                    { 
-                    printf("PUSH %d\n", (yyvsp[0].boolean)); 
-                    //Create a new void pointer to store the value of the boolean
-                    void* val = malloc(sizeof(bool));
-                    //Copy the value of the boolean to the void pointer
-                    memcpy(val, &(yyvsp[0].boolean), sizeof(bool));
-                    //Return the void pointer
-                    (yyval.symbolval) = val;
-                    }
-#line 1878 "comp.tab.c"
+#line 388 "comp.y"
+                        { 
+                        printf("PUSH %d\n", (yyvsp[0].boolean)); 
+                        //Create a new void pointer to store the value of the boolean
+                        void* val = malloc(sizeof(bool));
+                        //Copy the value of the boolean to the void pointer
+                        memcpy(val, &(yyvsp[0].boolean), sizeof(bool));
+                        //Return the void pointer
+                        (yyval.symbolval) = val;
+                        }
+#line 1907 "comp.tab.c"
     break;
 
   case 29:
-#line 374 "comp.y"
-                    { 
-                    printf("PUSH %s\n", (yyvsp[0].string));
-                    //Create a new void pointer to store the value of the string
-                    void* val = malloc(sizeof(char*));
-                    //Copy the value of the string to the void pointer
-                    memcpy(val, &(yyvsp[0].string), sizeof(char*));
-                    //Return the void pointer
-                    (yyval.symbolval) = val;
-                    }
-#line 1892 "comp.tab.c"
+#line 397 "comp.y"
+                        { 
+                        printf("PUSH %s\n", (yyvsp[0].string));
+                        //Create a new void pointer to store the value of the string
+                        void* val = malloc(sizeof(char*));
+                        //Copy the value of the string to the void pointer
+                        memcpy(val, &(yyvsp[0].string), sizeof(char*));
+                        //Return the void pointer
+                        (yyval.symbolval) = val;
+                        }
+#line 1921 "comp.tab.c"
     break;
 
   case 30:
-#line 386 "comp.y"
-                              { printf("ADD\n"); }
-#line 1898 "comp.tab.c"
+#line 409 "comp.y"
+                                  { printf("ADD\n"); }
+#line 1927 "comp.tab.c"
     break;
 
   case 31:
-#line 387 "comp.y"
-                              { printf("SUB\n"); }
-#line 1904 "comp.tab.c"
+#line 410 "comp.y"
+                                  { printf("SUB\n"); }
+#line 1933 "comp.tab.c"
     break;
 
   case 32:
-#line 388 "comp.y"
-                              { printf("MUL\n"); }
-#line 1910 "comp.tab.c"
+#line 411 "comp.y"
+                                  { printf("MUL\n"); }
+#line 1939 "comp.tab.c"
     break;
 
   case 33:
-#line 389 "comp.y"
-                              { printf("DIV\n"); }
-#line 1916 "comp.tab.c"
+#line 412 "comp.y"
+                                  { printf("DIV\n"); }
+#line 1945 "comp.tab.c"
     break;
 
   case 34:
-#line 390 "comp.y"
-                              { printf("MOD\n"); }
-#line 1922 "comp.tab.c"
+#line 413 "comp.y"
+                                  { printf("MOD\n"); }
+#line 1951 "comp.tab.c"
     break;
 
   case 35:
-#line 391 "comp.y"
-                              { printf("EXP\n"); }
-#line 1928 "comp.tab.c"
+#line 414 "comp.y"
+                                  { printf("EXP\n"); }
+#line 1957 "comp.tab.c"
     break;
 
   case 36:
-#line 395 "comp.y"
-                                { printf("NOT\n"); }
-#line 1934 "comp.tab.c"
+#line 418 "comp.y"
+                                    { printf("NOT\n"); }
+#line 1963 "comp.tab.c"
     break;
 
   case 37:
-#line 396 "comp.y"
-                                { printf("AND\n"); }
-#line 1940 "comp.tab.c"
+#line 419 "comp.y"
+                                    { printf("AND\n"); }
+#line 1969 "comp.tab.c"
     break;
 
   case 38:
-#line 397 "comp.y"
-                                { printf("OR\n"); }
-#line 1946 "comp.tab.c"
+#line 420 "comp.y"
+                                    { printf("OR\n"); }
+#line 1975 "comp.tab.c"
     break;
 
   case 39:
-#line 398 "comp.y"
-                                { printf("LT\n"); }
-#line 1952 "comp.tab.c"
+#line 421 "comp.y"
+                                    { printf("LT\n"); }
+#line 1981 "comp.tab.c"
     break;
 
   case 40:
-#line 399 "comp.y"
-                                { printf("GT\n"); }
-#line 1958 "comp.tab.c"
+#line 422 "comp.y"
+                                    { printf("GT\n"); }
+#line 1987 "comp.tab.c"
     break;
 
   case 41:
-#line 400 "comp.y"
-                                { printf("LEQ\n"); }
-#line 1964 "comp.tab.c"
+#line 423 "comp.y"
+                                    { printf("LEQ\n"); }
+#line 1993 "comp.tab.c"
     break;
 
   case 42:
-#line 401 "comp.y"
-                                { printf("GEQ\n"); }
-#line 1970 "comp.tab.c"
+#line 424 "comp.y"
+                                    { printf("GEQ\n"); }
+#line 1999 "comp.tab.c"
     break;
 
   case 43:
-#line 402 "comp.y"
-                                { printf("EQ\n"); }
-#line 1976 "comp.tab.c"
+#line 425 "comp.y"
+                                    { printf("EQ\n"); }
+#line 2005 "comp.tab.c"
     break;
 
   case 44:
-#line 403 "comp.y"
-                                { printf("NEQ\n"); }
-#line 1982 "comp.tab.c"
+#line 426 "comp.y"
+                                    { printf("NEQ\n"); }
+#line 2011 "comp.tab.c"
     break;
 
   case 45:
-#line 407 "comp.y"
-                                { }
-#line 1988 "comp.tab.c"
+#line 430 "comp.y"
+                                    { }
+#line 2017 "comp.tab.c"
     break;
 
   case 46:
-#line 408 "comp.y"
-                                {  }
-#line 1994 "comp.tab.c"
+#line 431 "comp.y"
+                                    {  }
+#line 2023 "comp.tab.c"
     break;
 
   case 47:
-#line 409 "comp.y"
-                                {  }
-#line 2000 "comp.tab.c"
+#line 432 "comp.y"
+                                    {  }
+#line 2029 "comp.tab.c"
     break;
 
   case 48:
-#line 410 "comp.y"
-                                {  }
-#line 2006 "comp.tab.c"
+#line 433 "comp.y"
+                                    {  }
+#line 2035 "comp.tab.c"
     break;
 
   case 49:
-#line 411 "comp.y"
-                                {  }
-#line 2012 "comp.tab.c"
+#line 434 "comp.y"
+                                    {  }
+#line 2041 "comp.tab.c"
     break;
 
   case 50:
-#line 412 "comp.y"
-                                {  }
-#line 2018 "comp.tab.c"
+#line 435 "comp.y"
+                                    {  }
+#line 2047 "comp.tab.c"
     break;
 
   case 51:
-#line 417 "comp.y"
+#line 440 "comp.y"
     {
         // How to hanle labels of the if statement:
         // increment the if_label_counter which is global
@@ -2032,11 +2061,11 @@ yyreduce:
         add_symbol(sym_tab_stack, "IF", TYPE_JUMP , NULL , line_num ,if_label_counter, false, false, false);
 
     }
-#line 2036 "comp.tab.c"
+#line 2065 "comp.tab.c"
     break;
 
   case 52:
-#line 431 "comp.y"
+#line 454 "comp.y"
     {
         // Search for the last symbol with name IF in the symbol table
         // Search from the top of the stack
@@ -2053,11 +2082,11 @@ yyreduce:
         }
 
     }
-#line 2057 "comp.tab.c"
+#line 2086 "comp.tab.c"
     break;
 
   case 53:
-#line 447 "comp.y"
+#line 470 "comp.y"
                {
         // Search for the last symbol with name IF in the symbol table
         // Search from the top of the stack
@@ -2074,11 +2103,11 @@ yyreduce:
         }
 
     }
-#line 2078 "comp.tab.c"
+#line 2107 "comp.tab.c"
     break;
 
   case 54:
-#line 463 "comp.y"
+#line 486 "comp.y"
           { 
         // Search for the last symbol with name IF in the symbol table
         // Search from the top of the stack
@@ -2095,11 +2124,11 @@ yyreduce:
         }
 
     }
-#line 2099 "comp.tab.c"
+#line 2128 "comp.tab.c"
     break;
 
   case 55:
-#line 483 "comp.y"
+#line 506 "comp.y"
     {
         /// $2 is the identifier of the counter variable
         // Create a new symbol for the counter variable and push it to the symbol table
@@ -2126,11 +2155,11 @@ yyreduce:
         }
 
     }
-#line 2130 "comp.tab.c"
+#line 2159 "comp.tab.c"
     break;
 
   case 56:
-#line 510 "comp.y"
+#line 533 "comp.y"
     {
         // Get the symbol for the counter variable
         symbol* sym = get_symbol(sym_tab_stack, (yyvsp[-7].id), false, false);
@@ -2147,11 +2176,11 @@ yyreduce:
         printf("JMP_FALSE END_FOR_%d\n", for_label_counter);
 
     }
-#line 2151 "comp.tab.c"
+#line 2180 "comp.tab.c"
     break;
 
   case 57:
-#line 528 "comp.y"
+#line 551 "comp.y"
     {
         // Will create a symbol with the name step_size_for_($for_label_counter) and type Int to store the terminal value
         // No need to check if the symbol is already defined in the symbol table
@@ -2166,11 +2195,11 @@ yyreduce:
         printf("PUSH_MEM %d\n", symbol_id);
 
     }
-#line 2170 "comp.tab.c"
+#line 2199 "comp.tab.c"
     break;
 
   case 58:
-#line 543 "comp.y"
+#line 566 "comp.y"
     {
  
         // Search for the last symbol with name FOR in the symbol table
@@ -2216,37 +2245,37 @@ yyreduce:
         // If the symbol is found, print the label for the end of the for block
         printf("END_FOR_%d:\n", for_symbol->symbol_id);
     }
-#line 2220 "comp.tab.c"
+#line 2249 "comp.tab.c"
     break;
 
   case 59:
-#line 591 "comp.y"
-               {
-        // Check if the symbol is defined in the symbol table, if not error out
-        symbol* sym = get_symbol(sym_tab_stack, (yyvsp[0].id), false, false);
-        if( sym == NULL){
-            printf("ERROR: Symbol %s not defined on line %d\n", (yyvsp[0].id), line_num);
-            exit(1);
+#line 614 "comp.y"
+                   {
+            // Check if the symbol is defined in the symbol table, if not error out
+            symbol* sym = get_symbol(sym_tab_stack, (yyvsp[0].id), false, false);
+            if( sym == NULL){
+                printf("ERROR: Symbol %s not defined on line %d\n", (yyvsp[0].id), line_num);
+                exit(1);
+            }
+            else{
+                // Write the assembly code
+                printf("POP_MEM %d\n", sym->symbol_id);
+            }
         }
-        else{
-            // Write the assembly code
-            printf("POP_MEM %d\n", sym->symbol_id);
-        }
-    }
-#line 2237 "comp.tab.c"
+#line 2266 "comp.tab.c"
     break;
 
   case 60:
-#line 603 "comp.y"
-            { 
-        // Write the assembly code
-        printf("PUSH %d\n", (yyvsp[0].integer));
-    }
-#line 2246 "comp.tab.c"
+#line 626 "comp.y"
+                { 
+            // Write the assembly code
+            printf("PUSH %d\n", (yyvsp[0].integer));
+        }
+#line 2275 "comp.tab.c"
     break;
 
   case 61:
-#line 610 "comp.y"
+#line 633 "comp.y"
                {
         // How to hanle labels of the while statement:
         // increment the while_label_counter which is global
@@ -2259,11 +2288,11 @@ yyreduce:
         // Create a new symbol for the while statement and push it to the symbol table
         add_symbol(sym_tab_stack, "WHILE", TYPE_JUMP , NULL , line_num ,while_label_counter, false, false, false);
     }
-#line 2263 "comp.tab.c"
+#line 2292 "comp.tab.c"
     break;
 
   case 62:
-#line 622 "comp.y"
+#line 645 "comp.y"
         {
         // Search for the last symbol with name WHILE in the symbol table
         // Search from the top of the stack
@@ -2279,11 +2308,11 @@ yyreduce:
             printf("JMP_FALSE END_WHILE_%d\n", sym->symbol_id);
         }
     }
-#line 2283 "comp.tab.c"
+#line 2312 "comp.tab.c"
     break;
 
   case 63:
-#line 637 "comp.y"
+#line 660 "comp.y"
          {
         // Search for the last symbol with name WHILE in the symbol table
         // Search from the top of the stack
@@ -2300,11 +2329,11 @@ yyreduce:
             printf("END_WHILE_%d:\n", sym->symbol_id);
         }
     }
-#line 2304 "comp.tab.c"
+#line 2333 "comp.tab.c"
     break;
 
   case 64:
-#line 656 "comp.y"
+#line 679 "comp.y"
                {
         // How to hanle labels of the while statement:
         // increment the while_label_counter which is global
@@ -2317,11 +2346,11 @@ yyreduce:
         // Create a new symbol for the while statement and push it to the symbol table
         add_symbol(sym_tab_stack, "WHILE", TYPE_JUMP , NULL , line_num ,while_label_counter, false, false, false);
     }
-#line 2321 "comp.tab.c"
+#line 2350 "comp.tab.c"
     break;
 
   case 65:
-#line 668 "comp.y"
+#line 691 "comp.y"
         {
         // Search for the last symbol with name WHILE in the symbol table
         // Search from the top of the stack
@@ -2337,11 +2366,11 @@ yyreduce:
             printf("JMP_TRUE END_WHILE_%d\n", sym->symbol_id);
         }
     }
-#line 2341 "comp.tab.c"
+#line 2370 "comp.tab.c"
     break;
 
   case 66:
-#line 683 "comp.y"
+#line 706 "comp.y"
          {
         // Search for the last symbol with name WHILE in the symbol table
         // Search from the top of the stack
@@ -2358,17 +2387,17 @@ yyreduce:
             printf("END_WHILE_%d:\n", sym->symbol_id);
         }
     }
-#line 2362 "comp.tab.c"
+#line 2391 "comp.tab.c"
     break;
 
   case 67:
-#line 703 "comp.y"
+#line 726 "comp.y"
     {  }
-#line 2368 "comp.tab.c"
+#line 2397 "comp.tab.c"
     break;
 
   case 68:
-#line 707 "comp.y"
+#line 730 "comp.y"
                 {
         switch_label_counter++;
         
@@ -2378,21 +2407,21 @@ yyreduce:
         add_symbol(sym_tab_stack, "SWITCH", TYPE_JUMP , NULL , line_num ,switch_label_counter, false, false, false);
 
     }
-#line 2382 "comp.tab.c"
+#line 2411 "comp.tab.c"
     break;
 
   case 69:
-#line 716 "comp.y"
+#line 739 "comp.y"
          {
         // Printf DUP
         printf("DUP\n");
 
     }
-#line 2392 "comp.tab.c"
+#line 2421 "comp.tab.c"
     break;
 
   case 70:
-#line 722 "comp.y"
+#line 745 "comp.y"
     {
         // Search for the last symbol with name SWITCH in the symbol table
         // Search from the top of the stack
@@ -2408,23 +2437,23 @@ yyreduce:
             printf("END_SWITCH_%d:\n", sym->symbol_id);
         }
     }
-#line 2412 "comp.tab.c"
+#line 2441 "comp.tab.c"
     break;
 
   case 71:
-#line 740 "comp.y"
+#line 763 "comp.y"
                                     {  }
-#line 2418 "comp.tab.c"
+#line 2447 "comp.tab.c"
     break;
 
   case 72:
-#line 742 "comp.y"
+#line 765 "comp.y"
     {  }
-#line 2424 "comp.tab.c"
+#line 2453 "comp.tab.c"
     break;
 
   case 73:
-#line 747 "comp.y"
+#line 770 "comp.y"
     {
         // Search for the last symbol with name SWITCH in the symbol table
         // Search from the top of the stack
@@ -2441,11 +2470,11 @@ yyreduce:
         }
 
     }
-#line 2445 "comp.tab.c"
+#line 2474 "comp.tab.c"
     break;
 
   case 74:
-#line 764 "comp.y"
+#line 787 "comp.y"
     { 
         // Search for the last symbol with name SWITCH in the symbol table
         // Search from the top of the stack
@@ -2461,11 +2490,11 @@ yyreduce:
             printf("JMP END_SWITCH_%d\n", sym->symbol_id);
         }
     }
-#line 2465 "comp.tab.c"
+#line 2494 "comp.tab.c"
     break;
 
   case 75:
-#line 780 "comp.y"
+#line 803 "comp.y"
     {
         // Print the assembly code for the comparison
         printf("EQ\n");
@@ -2495,11 +2524,11 @@ yyreduce:
             printf("JMP_FALSE END_CASE_%d_%d\n", sym->symbol_id, case_label_counter);
         }
     }
-#line 2499 "comp.tab.c"
+#line 2528 "comp.tab.c"
     break;
 
   case 76:
-#line 810 "comp.y"
+#line 833 "comp.y"
     {
         // After evaluating the block, jump to the end of the switch statement
         // Search for the last symbol with name SWITCH in the symbol table
@@ -2522,141 +2551,303 @@ yyreduce:
             printf("DUP\n");
         }
     }
-#line 2526 "comp.tab.c"
+#line 2555 "comp.tab.c"
     break;
 
   case 77:
-#line 835 "comp.y"
+#line 858 "comp.y"
                  {
         // Create a new symbol table for the if block and push it to the stack
         symTable* block_sym_tab = create_sym_table();
         push_sym_tab(sym_tab_stack, block_sym_tab);
 
     }
-#line 2537 "comp.tab.c"
+#line 2566 "comp.tab.c"
     break;
 
   case 78:
-#line 842 "comp.y"
+#line 865 "comp.y"
                   { 
         // After evaluating the block, pop the symbol table on top of the stack
         // First pop the symbol table on top of the stack
         pop_sym_tab(sym_tab_stack);
 
      }
-#line 2548 "comp.tab.c"
+#line 2577 "comp.tab.c"
     break;
 
   case 79:
-#line 851 "comp.y"
-                                                {  }
-#line 2554 "comp.tab.c"
+#line 874 "comp.y"
+                                                    {  }
+#line 2583 "comp.tab.c"
     break;
 
   case 80:
-#line 852 "comp.y"
-                                                { }
-#line 2560 "comp.tab.c"
+#line 875 "comp.y"
+                                                    { }
+#line 2589 "comp.tab.c"
     break;
 
   case 81:
-#line 856 "comp.y"
-                                            {  }
-#line 2566 "comp.tab.c"
+#line 879 "comp.y"
+                                                {  }
+#line 2595 "comp.tab.c"
     break;
 
   case 82:
-#line 857 "comp.y"
-                                            {  }
-#line 2572 "comp.tab.c"
+#line 880 "comp.y"
+                                                {  }
+#line 2601 "comp.tab.c"
     break;
 
   case 83:
-#line 858 "comp.y"
-                                            {  }
-#line 2578 "comp.tab.c"
+#line 881 "comp.y"
+                                                {  }
+#line 2607 "comp.tab.c"
     break;
 
   case 84:
-#line 862 "comp.y"
-                                                                                 { }
-#line 2584 "comp.tab.c"
+#line 886 "comp.y"
+    {
+        current_identifier = (yyvsp[-1].id);
+        printf("FUN %s:\n", (yyvsp[-1].id));
+    }
+#line 2616 "comp.tab.c"
     break;
 
   case 85:
-#line 866 "comp.y"
-                                        {}
-#line 2590 "comp.tab.c"
+#line 891 "comp.y"
+    { 
+
+        //Before continuing, I want to reverse the symbol_id for each symbol of the argument list
+        // Parameters are already stored in the symbol table before the symbol of the function
+        symTable* sym_tab = sym_tab_stack->sym_tabs[sym_tab_stack->num_sym_tabs-1];
+
+        // Create an array of integers to store the symbol ids of the parameters
+        int* param_ids = (int*)malloc(sizeof(int) * cvector_size((yyvsp[-2].type_list)));
+
+        // Iterate through the symbol table and store all the parameters in an array of symbols
+        for(int i = 0; i < cvector_size((yyvsp[-2].type_list)); i++){
+            param_ids[i] = sym_tab->symbols[sym_tab->num_symbols-1-i].symbol_id;
+        }
+
+        // Iterate again to reverse the symbol ids
+        int j = cvector_size((yyvsp[-2].type_list))-1;
+        for(int i = 0; i < cvector_size((yyvsp[-2].type_list)); i++){
+            sym_tab->symbols[sym_tab->num_symbols-1-i].symbol_id = param_ids[j];
+            j--;
+        }
+
+        // Create a new symbol for the function and push it to the symbol table
+        symbol_id++;
+        add_symbol_with_args(sym_tab_stack, current_identifier, TYPE_FUNC, NULL, line_num, symbol_id, false, false, true, (yyvsp[0].id), (yyvsp[-2].type_list) );
+
+    }
+#line 2647 "comp.tab.c"
     break;
 
   case 86:
-#line 867 "comp.y"
-                                        {}
-#line 2596 "comp.tab.c"
+#line 918 "comp.y"
+    {
+        // After evaluating the function, pop the symbol table on top of the stack
+        // First pop the symbol table on top of the stack
+        printf("RET\n");
+
+    }
+#line 2658 "comp.tab.c"
     break;
 
   case 87:
-#line 868 "comp.y"
-                                        {}
-#line 2602 "comp.tab.c"
+#line 927 "comp.y"
+                                        { (yyval.type_list) = NULL; }
+#line 2664 "comp.tab.c"
     break;
 
   case 88:
-#line 872 "comp.y"
-                                                    {  }
-#line 2608 "comp.tab.c"
+#line 928 "comp.y"
+                                         { (yyval.type_list) = (yyvsp[-2].type_list); cvector_push_back((yyval.type_list), (yyvsp[0].string)); }
+#line 2670 "comp.tab.c"
     break;
 
   case 89:
-#line 876 "comp.y"
-                                                    {  }
-#line 2614 "comp.tab.c"
+#line 929 "comp.y"
+                                         { (yyval.type_list) = (yyvsp[-1].type_list); }
+#line 2676 "comp.tab.c"
     break;
 
   case 90:
-#line 880 "comp.y"
-                        {}
-#line 2620 "comp.tab.c"
+#line 930 "comp.y"
+                                        { (yyval.type_list) = NULL; cvector_push_back((yyval.type_list), (yyvsp[0].string)); }
+#line 2682 "comp.tab.c"
     break;
 
   case 91:
-#line 881 "comp.y"
-                        {}
-#line 2626 "comp.tab.c"
+#line 935 "comp.y"
+                                                    { 
+
+        // First check if the name is already taken in the parameter list
+        symbol* sym = get_symbol(sym_tab_stack, (yyvsp[-2].id), true, false);
+
+        // If the symbol is not found, add it to the symbol table or is found but it is not a function parameter (set the flag to true while creation)
+        if(sym == NULL || sym->is_func == false){
+            // Check if the type is valid
+            // The $4 is the type of the variable but it is stored as a string in the token
+            // We match the string to the type and get the type as an integer
+            int type = get_type((yyvsp[0].id));
+            symbol_id++;
+            add_symbol(sym_tab_stack, (yyvsp[-2].id), type, NULL, line_num, symbol_id ,((yyvsp[-3].integer) == 0), false, true);
+
+            // Write an assembly command to sotre the value of the variable
+            printf("PUSH_MEM %d\n", symbol_id);
+        }
+        else{
+            printf("ERROR: Symbol %s already defined on line %d\n", (yyvsp[-2].id), sym->line_num);
+            exit(1);
+        }
+
+        (yyval.string) = (yyvsp[0].id);
+    }
+#line 2711 "comp.tab.c"
     break;
 
   case 92:
-#line 882 "comp.y"
-                                {}
-#line 2632 "comp.tab.c"
+#line 962 "comp.y"
+                 {
+
+        // Before creating a new symbol table for the function block, we need to store all the parameters in an array of symbols
+        // Parameters are already stored in the symbol table before the symbol of the function
+        // Get the symbol of the function to get the number of parameters (the last symbol directly in the last symbol table)
+        symTable* sym_tab = sym_tab_stack->sym_tabs[sym_tab_stack->num_sym_tabs-1];
+        symbol fun_sym = sym_tab->symbols[sym_tab->num_symbols-1];
+
+        // Delete the symbol of the function from the symbol table
+        sym_tab->num_symbols--;
+
+        // Create an array of symbols to store the parameters
+        symbol* params = (symbol*)malloc(sizeof(symbol) * fun_sym.num_parameters);
+
+        // Iterate through the symbol table and store all the parameters in an array of symbols
+        for(int i = 0; i < fun_sym.num_parameters; i++){
+            params[i] = sym_tab->symbols[sym_tab->num_symbols-1-i];
+            // Delete the parameters from the symbol table
+            sym_tab->num_symbols--;
+        }
+
+        // Insert the symbol of the function back to the symbol table
+        sym_tab->symbols[sym_tab->num_symbols] = fun_sym;
+        sym_tab->num_symbols++;
+
+        // Create a new symbol table for the if block and push it to the stack
+        symTable* block_sym_tab = create_sym_table();
+
+        // Push the parameters to the new symbol table
+        for(int i = 0; i < fun_sym.num_parameters; i++){
+            block_sym_tab->symbols[block_sym_tab->num_symbols] = params[i];
+            block_sym_tab->num_symbols++;
+        }
+
+        push_sym_tab(sym_tab_stack, block_sym_tab);
+
+    }
+#line 2753 "comp.tab.c"
     break;
 
   case 93:
-#line 886 "comp.y"
-                                                                         {  }
-#line 2638 "comp.tab.c"
+#line 1000 "comp.y"
+                  { 
+        // After evaluating the block, pop the symbol table on top of the stack
+        // First pop the symbol table on top of the stack
+        pop_sym_tab(sym_tab_stack);
+
+     }
+#line 2764 "comp.tab.c"
     break;
 
   case 94:
-#line 890 "comp.y"
-                                                        {  }
-#line 2644 "comp.tab.c"
+#line 1010 "comp.y"
+                                                    { 
+        //TODO: Check type checking for the arguments
+        // Get the symbol of the function
+        symbol* sym = get_symbol(sym_tab_stack, (yyvsp[-3].id), true, false);
+
+        // Check if the symbol is found and it is a function
+        if(sym != NULL && sym->is_func == true){
+            // Check if the number of arguments is the same as the number of parameters
+            if(sym->num_parameters == cvector_size((yyvsp[-1].type_list))){
+                // Iterate through the arguments and check if the types are the same
+                for(int i = 0; i < cvector_size((yyvsp[-1].type_list)); i++){
+                    // Get the type of the argument
+                    int arg_type = get_type((yyvsp[-1].type_list)[i]);
+                    // Get the type of the parameter
+                    int param_type = sym->parameter_list_types[i];
+
+                    // Check if the types are the same
+                    if(arg_type != param_type){
+                        printf("ERROR: Type mismatch in function call on line %d\n", line_num);
+                        exit(1);
+                    }
+                }
+
+                // Write an assembly command to call the function
+                printf("CALL %d\n", sym->symbol_id);
+            }
+            else{
+                printf("ERROR: Number of arguments in function call on line %d\n", line_num);
+                exit(1);
+            }
+        }
+        else{
+            printf("ERROR: Function %s not found on line %d\n", (yyvsp[-3].id), line_num);
+            exit(1);
+        }
+    }
+#line 2805 "comp.tab.c"
     break;
 
   case 95:
-#line 891 "comp.y"
-                                                        {  }
-#line 2650 "comp.tab.c"
+#line 1049 "comp.y"
+                        {(yyval.type_list)=NULL;}
+#line 2811 "comp.tab.c"
     break;
 
   case 96:
-#line 895 "comp.y"
+#line 1050 "comp.y"
+                         {(yyval.type_list)=NULL; cvector_push_back((yyval.type_list), (yyvsp[0].symbolval));}
+#line 2817 "comp.tab.c"
+    break;
+
+  case 97:
+#line 1051 "comp.y"
+                                {cvector_push_back((yyval.type_list), (yyvsp[0].symbolval));}
+#line 2823 "comp.tab.c"
+    break;
+
+  case 98:
+#line 1055 "comp.y"
+                                                                         {  }
+#line 2829 "comp.tab.c"
+    break;
+
+  case 99:
+#line 1059 "comp.y"
+                                                        {  }
+#line 2835 "comp.tab.c"
+    break;
+
+  case 100:
+#line 1060 "comp.y"
+                                                        {  }
+#line 2841 "comp.tab.c"
+    break;
+
+  case 101:
+#line 1064 "comp.y"
                                                         { }
-#line 2656 "comp.tab.c"
+#line 2847 "comp.tab.c"
     break;
 
 
-#line 2660 "comp.tab.c"
+#line 2851 "comp.tab.c"
 
       default: break;
     }
@@ -2888,7 +3079,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 899 "comp.y"
+#line 1068 "comp.y"
 
 
 
@@ -2952,20 +3143,64 @@ symTable* pop_sym_tab(symTableStack *sym_tab_stack){
     }
 }
 
-    // Define a function to add a symbol to the symbol table
-    void add_symbol(symTableStack* stack, char* name, int type, char* value, int line_num, int symbol_id ,bool is_const, bool is_enum, bool is_func)
-    {
+// Define a function to add a symbol to the symbol table
+void add_symbol(symTableStack* stack, char* name, int type, char* value, int line_num, int symbol_id ,bool is_const, bool is_enum, bool is_func){
 
+    // Check if the symbol table stack is empty
+    if(stack->num_sym_tabs == 0){
+        // If it is, Error out
+        printf("Error: Symbol table stack is empty\n");
+        return;
+    }
+
+    // Get the top symbol table from the stack
+    symTable* sym_tab = stack->sym_tabs[stack->num_sym_tabs - 1];
+
+    // Check if the symbol is already in the symbol table and it is not a jump (we store names of jumps (which is the keywords) in the symbol table)
+    for(int i = 0; i < sym_tab->num_symbols; i++){
+        // TODO: Maybe we can delete this check
+        if(0 && strcmp(sym_tab->symbols[i].name, name) == 0 && type != TYPE_JUMP ){
+            // If it is, Error out
+            printf("Error: Symbol %s already exists in symbol table\n", name);
+            return;
+        }
+    }
+
+    // copy the value to avoid dangling pointers
+    char* value_copy = copy_value(value);
+
+    // Create instance of symbol
+    symbol sym = {
+        .name = name,
+        .type = type,
+        .value = value_copy,
+        .line_num = line_num,
+        .symbol_id = symbol_id,
+        .is_const = is_const,
+        .is_enum = is_enum,
+        .is_func = is_func,
+    };
+
+    // Add the symbol to the symbol table
+    sym_tab->symbols[sym_tab->num_symbols] = sym;
+    sym_tab->num_symbols++;
+
+}
+
+// Define a function to add a symbol to the symbol table with a list of arguments (check if the symbol is a function)
+void add_symbol_with_args(symTableStack* stack, char* name, int type, char* value, int line_num, int symbol_id, bool is_const, bool is_enum, bool is_func, char * return_identifier, vtype(char*) parameter_list_types){
+    
+    int return_type = get_type(return_identifier);
         // Check if the symbol table stack is empty
         if(stack->num_sym_tabs == 0){
             // If it is, Error out
             printf("Error: Symbol table stack is empty\n");
             return;
         }
-
+    
         // Get the top symbol table from the stack
         symTable* sym_tab = stack->sym_tabs[stack->num_sym_tabs - 1];
-
+    
         // Check if the symbol is already in the symbol table and it is not a jump (we store names of jumps (which is the keywords) in the symbol table)
         for(int i = 0; i < sym_tab->num_symbols; i++){
             if(strcmp(sym_tab->symbols[i].name, name) == 0 && type != TYPE_JUMP ){
@@ -2974,9 +3209,29 @@ symTable* pop_sym_tab(symTableStack *sym_tab_stack){
                 return;
             }
         }
-
+    
         // copy the value to avoid dangling pointers
         char* value_copy = copy_value(value);
+    
+        // Check that all types are valid (TYPE_INT, TYPE_REAL, TYPE_STRING, TYPE_BOOL)
+        // First get the number of parameters from cvector
+        int num_parameters = cvector_size(parameter_list_types);
+        
+        // Then define an array of int to store the types of the parameters and get the types from the cvector while checking that they are valid
+        int * parameter_list_types_array = (int *)malloc(sizeof(int)*num_parameters);
+        for(int i = 0; i < num_parameters; i++){
+            parameter_list_types_array[i] = get_type(parameter_list_types[i]);
+            if(parameter_list_types_array[i] != TYPE_INT && parameter_list_types_array[i] != TYPE_REAL && parameter_list_types_array[i] != TYPE_STRING && parameter_list_types_array[i] != TYPE_BOOL){
+                printf("Error: Invalid parameter type\n");
+                return;
+            }
+        }
+
+        // Check that the return type is valid (TYPE_INT, TYPE_REAL, TYPE_STRING, TYPE_BOOL, TYPE_VOID)
+        if(return_type != TYPE_INT && return_type != TYPE_REAL && return_type != TYPE_STRING && return_type != TYPE_BOOL && return_type != TYPE_VOID){
+            printf("Error: Invalid return type\n");
+            return;
+        }
 
         // Create instance of symbol
         symbol sym = {
@@ -2988,163 +3243,168 @@ symTable* pop_sym_tab(symTableStack *sym_tab_stack){
             .is_const = is_const,
             .is_enum = is_enum,
             .is_func = is_func,
+            .return_type = return_type,
+            .num_parameters = num_parameters,
+            .parameter_list_types = parameter_list_types_array,
         };
-
+    
         // Add the symbol to the symbol table
         sym_tab->symbols[sym_tab->num_symbols] = sym;
         sym_tab->num_symbols++;
-
-    }
-
-    // Define a function to get a symbol from the symbol table
-    symbol* get_symbol(symTableStack* stack, char* name, bool reverse_search, bool search_parent){
-
-
-        // Check if the symbol table stack is empty
-        if(stack->num_sym_tabs == 0){
-            // If it is, Error out
-            printf("Error: Symbol table stack is empty\n");
-            return NULL;
-        }
-        // Loop over the stack until the symbol is found or the stack is empty
-        for(int i = stack->num_sym_tabs - 1; i >= 0; i--){
-
-            // Get the symbol table from the stack
-            symTable* sym_tab = stack->sym_tabs[i];
-
-            if (reverse_search){
-                // Check if the symbol is in the symbol table
-                for(int j = sym_tab->num_symbols - 1; j >= 0; j--){
-                    if(strcmp(sym_tab->symbols[j].name, name) == 0){
-                        // If it is, return the symbol
-                        return &sym_tab->symbols[j];
-                    }
-                }
-            }
-            else {
-                // Check if the symbol is in the symbol table
-                for(int j = 0; j < sym_tab->num_symbols; j++){
-                    if(strcmp(sym_tab->symbols[j].name, name) == 0){
-                        // If it is, return the symbol
-                        return &sym_tab->symbols[j];
-                    }
-                }
-            }
-            if (!search_parent){
-                break;
-            }
-        }
-
-
-        // If it is not, Error out
-        return NULL;
     
+}
+
+
+
+// Define a function to get a symbol from the symbol table
+symbol* get_symbol(symTableStack* stack, char* name, bool reverse_search, bool search_parent){
+
+
+    // Check if the symbol table stack is empty
+    if(stack->num_sym_tabs == 0){
+        // If it is, Error out
+        printf("Error: Symbol table stack is empty\n");
+        return NULL;
+    }
+    // Loop over the stack until the symbol is found or the stack is empty
+    for(int i = stack->num_sym_tabs - 1; i >= 0; i--){
+
+        // Get the symbol table from the stack
+        symTable* sym_tab = stack->sym_tabs[i];
+
+        if (reverse_search){
+            // Check if the symbol is in the symbol table
+            for(int j = sym_tab->num_symbols - 1; j >= 0; j--){
+                if(strcmp(sym_tab->symbols[j].name, name) == 0){
+                    // If it is, return the symbol
+                    return &sym_tab->symbols[j];
+                }
+            }
+        }
+        else {
+            // Check if the symbol is in the symbol table
+            for(int j = 0; j < sym_tab->num_symbols; j++){
+                if(strcmp(sym_tab->symbols[j].name, name) == 0){
+                    // If it is, return the symbol
+                    return &sym_tab->symbols[j];
+                }
+            }
+        }
+        if (!search_parent){
+            break;
+        }
     }
 
-    // Define a function to copy value of a symbol to another symbol
-    char* copy_value(char* value)
-    {
-        // Check if the value is null
-        if(value == NULL){
-            // If it is, return null
-            return NULL;
-        }
 
-        // Get the length of the value
-        int len = strlen(value);
+    // If it is not, Error out
+    return NULL;
 
-        // Allocate memory for the copy
-        char* copy = malloc(len + 1);
+}
 
-        // Copy the value
-        strcpy(copy, value);
-
-        // Return the copy
-        return copy;
+// Define a function to copy value of a symbol to another symbol
+char* copy_value(char* value)
+{
+    // Check if the value is null
+    if(value == NULL){
+        // If it is, return null
+        return NULL;
     }
 
-    // Define a function to check for assignment compatibility with a symbol
-    // It takes the assignment type as enum and the symbol to check
-    bool check_assignment(symbol* sym, char* type_name)
-    {
-        int type = get_type(type_name);
-        if (type == -1) {
-            // Check if the type_name is actually a number
-            return true;    //TODO: Handle type checking for numbers
-        }
-        // Check if the symbol is null
-        if(sym == NULL){
-            // If it is, return false
-            return false;
-        }
+    // Get the length of the value
+    int len = strlen(value);
 
-        // Check if the symbol is a constant
-        if(sym->is_const){
-            // If it is, error out
-            printf("Error: Cannot assign to constant\n");
-            exit(1);
-        }
+    // Allocate memory for the copy
+    char* copy = malloc(len + 1);
 
-        // Check if the symbol is an enum
-        if(sym->is_enum){
-            // If it is, error out
-            printf("Error: Cannot assign to enum\n");
-            exit(1);
-        }
+    // Copy the value
+    strcpy(copy, value);
 
-        // Check if the symbol is a function
-        if(sym->is_func){
-            // If it is, error out
-            printf("Error: Cannot assign to function\n");
-            exit(1);
-        }
+    // Return the copy
+    return copy;
+}
 
-        // Check if the symbol is a void
-        if(sym->type == TYPE_VOID){
-            // If it is, error out
-            printf("Error: Cannot assign to void\n");
-            exit(1);
-        }
-
-        // Check if the symbol is an integer
-        if(sym->type == TYPE_INT){
-            // If it is, check if the assignment type is an integer or real
-            if(type == TYPE_INT || type == TYPE_REAL){
-                // If it is, return true
-                return true;
-            }
-        }
-
-        // Check if the symbol is a real
-        if(sym->type == TYPE_REAL){
-            // If it is, check if the assignment type is an integer or real
-            if(type == TYPE_INT || type == TYPE_REAL){
-                // If it is, return true
-                return true;
-            }
-        }
-
-        // Check if the symbol is a string
-        if(sym->type == TYPE_STRING){
-            // If it is, check if the assignment type is a string
-            if(type == TYPE_STRING){
-                // If it is, return true
-                return true;
-            }
-        }
-
-        // Check if the symbol is a boolean
-        if(sym->type == TYPE_BOOL){
-            // If it is, check if the assignment type is a boolean
-            if(type == TYPE_BOOL){
-                // If it is, return true
-                return true;
-            }
-        }
-
-        // If it is not, return false
+// Define a function to check for assignment compatibility with a symbol
+// It takes the assignment type as enum and the symbol to check
+bool check_assignment(symbol* sym, char* type_name)
+{
+    int type = get_type(type_name);
+    if (type == -1) {
+        // Check if the type_name is actually a number
+        return true;    //TODO: Handle type checking for numbers
+    }
+    // Check if the symbol is null
+    if(sym == NULL){
+        // If it is, return false
         return false;
     }
+
+    // Check if the symbol is a constant
+    if(sym->is_const){
+        // If it is, error out
+        printf("Error: Cannot assign to constant\n");
+        exit(1);
+    }
+
+    // Check if the symbol is an enum
+    if(sym->is_enum){
+        // If it is, error out
+        printf("Error: Cannot assign to enum\n");
+        exit(1);
+    }
+
+    // Check if the symbol is a function
+    if(sym->is_func){
+        // If it is, error out
+        printf("Error: Cannot assign to function\n");
+        exit(1);
+    }
+
+    // Check if the symbol is a void
+    if(sym->type == TYPE_VOID){
+        // If it is, error out
+        printf("Error: Cannot assign to void\n");
+        exit(1);
+    }
+
+    // Check if the symbol is an integer
+    if(sym->type == TYPE_INT){
+        // If it is, check if the assignment type is an integer or real
+        if(type == TYPE_INT || type == TYPE_REAL){
+            // If it is, return true
+            return true;
+        }
+    }
+
+    // Check if the symbol is a real
+    if(sym->type == TYPE_REAL){
+        // If it is, check if the assignment type is an integer or real
+        if(type == TYPE_INT || type == TYPE_REAL){
+            // If it is, return true
+            return true;
+        }
+    }
+
+    // Check if the symbol is a string
+    if(sym->type == TYPE_STRING){
+        // If it is, check if the assignment type is a string
+        if(type == TYPE_STRING){
+            // If it is, return true
+            return true;
+        }
+    }
+
+    // Check if the symbol is a boolean
+    if(sym->type == TYPE_BOOL){
+        // If it is, check if the assignment type is a boolean
+        if(type == TYPE_BOOL){
+            // If it is, return true
+            return true;
+        }
+    }
+
+    // If it is not, return false
+    return false;
+}
 
 
 
