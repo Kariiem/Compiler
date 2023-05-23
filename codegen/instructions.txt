@@ -1,1 +1,6 @@
 _start:
+	PUSH 10
+	PUSH 0
+	PUSH 1
+	CALL _FUNCTION_fib_
+	STORE $15

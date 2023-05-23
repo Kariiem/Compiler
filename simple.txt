@@ -1,11 +1,11 @@
 module Main
 
-fun fib(val n:int) int {
+fun fib(val n:int,val a:int, val b:int) int {
     if n < 2 {
         n;
     } else {
-        fib(n-1) + (n-2);
+        fib(n-1,b,a+b);
     };
 }
 
-val x:int = fib(true);
+val x:int = fib(10,0,1);

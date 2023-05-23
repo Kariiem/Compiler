@@ -64,7 +64,7 @@ void walk_ast_fundecl_t(ast_fundecl_t const *fundecl, int *id) {
     symbol_t *param_symbol =
         create_symbol_t(param->param_name, SYM_TY_FUNC_PARAM, param, *id);
     insert_symbol(global_symbol_table, param_symbol);
-    DEBUG_EPRINTF("param %s, type %s\n", param->param_name, param->param_type);
+    // DEBUG_EPRINTF("param %s, type %s\n", param->param_name, param->param_type);
     ++(*id);
   }
   for (int i = ((int)cvector_size(fundecl->param_list)) - 1; i >= 0; --i) {
@@ -74,6 +74,13 @@ void walk_ast_fundecl_t(ast_fundecl_t const *fundecl, int *id) {
   }
   // FUNCTION body
   walk_ast_block_t(fundecl->body, id);
+  ast_expr_t *last_expr = get_last_block_expr(fundecl->body);
+  char const *last_expr_type = get_ast_expr_type(last_expr, child_scope);
+  if (strcmp(fundecl->return_type_name, last_expr_type)) {
+    REPORT_ERROR("Error: Function %s return type mismatch.\n",
+                  fundecl->fun_name);
+    exit(1);
+  }
   // FUNCTION epilogue
   GEN_INSTRUCTIONS("\tRETURN\n");
   pop_scope(&global_symbol_table);
