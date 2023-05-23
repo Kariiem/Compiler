@@ -2,7 +2,7 @@ module Main
 
 var y:int = 0;
 
-var z :bool= switch y {
+var z :bool= switch switch y { 1:{y;}} {
         1: {
             true;
         }
