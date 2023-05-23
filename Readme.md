@@ -8,6 +8,20 @@ Kareem Taha 2 9
 
 Yousef Gamal 2 39
 
+# Project Description
+
+This project is a compiler for a language called "Kak++" which is a subset of the Go language. The compiler is written in C and it generates assembly code.
+
+# Tools used
+
+- Flex
+- Bison
+- C
+- Makefile
+- Bash
+- Python
+- PyQt5
+
 # How to run
 
 #### To run the test.txt file
@@ -192,3 +206,17 @@ type Bool = MkInt {str:int, kak:KKK}
           ;
 
 ```
+
+# List of Quadrables
+
+- "_start" --> start of the program
+- "PUSH 1"  --> Is to push the number 1 to the stack
+- "CALL _FUNCTION_int_to_double_" --> Is to call the functions named "_FUNCTION_int_to_double_"
+- "STORE $7" --> Is to store the last value on the stack in the memory location $7
+- "_FUNCTION_fib_:" --> Is the label when you want to jump
+- "LOAD $7" --> Is to load from the memory location and push it into the stack
+- "JMPF _if_12_" --> Jump false which takes the value of the stack and check if it's false. It jumps to the label "_if_12_"
+- "JMP _if_12_" --> Will jump anyways to the label "_if_12_"
+- "RETURN" --> Return from the function you're in to the address of the pointer on the stack
+- "SUB" --> Operation that will take the last two values in the stack and compute the result (subtraction) and push it again on the stack.
+  - Same with "ADD", "LT"(less than), "GT", "EQ", "NEQ", "MUL", "DIV", "MOD", "EXP", "OR", "LEQ", "GEQ", "NOT" (this only takes one value not two) 
