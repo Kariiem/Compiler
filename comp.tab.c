@@ -2781,11 +2781,11 @@ yyreduce:
                     // Get the type of the parameter
                     int param_type = sym->parameter_list_types[i];
 
-                    // Check if the types are the same
-                    if(arg_type != param_type){
-                        printf("ERROR: Type mismatch in function call on line %d\n", line_num);
-                        exit(1);
-                    }
+                    // // Check if the types are the same
+                    // if(arg_type != param_type){
+                    //     printf("ERROR: Type mismatch in function call on line %d\n", line_num);
+                    //     exit(1);
+                    // }
                 }
 
                 // Write an assembly command to call the function

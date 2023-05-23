@@ -4,7 +4,14 @@ import iostream
 type BOOL = TRUE;
 val n: Int = 10;
 fun fib(val n:string, var p:int, val k:string) int {
-    n = "10";
+
+    if (n > 5)
+    {
+
+    }else {
+
+    };
+
 }
 n = fib("10", 5, "6");
 n = 1;

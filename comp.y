@@ -26,8 +26,8 @@
         int line_num;   // Line number of the symbol for debugging
         int symbol_id;     // ID of the symbol
         int * enum_values;  // Values of the enum
+        vtype(char*) enum_value_names; // Names of the enum values
         int num_enum_values;    // Number of values in the enum
-        int max_enum_values;    // Maximum number of values in the enum
         int return_type;    // Return type of the function
         int num_parameters; // Number of parameters of the function
         int * parameter_list_types; // Types of the parameters of the function
@@ -78,8 +78,11 @@
     // Define a function to add a symbol to the symbol table
     void add_symbol(symTableStack* stack, char* name, int type, char* value, int line_num, int symbol_id, bool is_const, bool is_enum, bool is_func);
 
+    // Define a function to add a symbol to the symbol table
+    void add_symbol_enum(symTableStack* stack, char* name, int type, char* value, int line_num, int symbol_id, bool is_const, bool is_enum, bool is_func, vtype(char*) enum_values);
+
     // Define a function to add a symbol to the symbol table but with a list of parameters
-    void add_symbol_with_args(symTableStack* stack, char* name, int type, char* value, int line_num, int symbol_id, bool is_const, bool is_enum, bool is_func, char * return_identifier, vtype(char*) parameter_list_types);
+    void add_symbol_with_args(symTableStack* stack, char* name, int type, char* value, int line_num, int symbol_id, bool is_const, bool is_enum, bool is_func, char * return_identifier, vtype(char*) enum_value_names);
 
     // Define a function to get a symbol from the symbol table
     // reverse_search is used to search the symbol table stack from top to bottom with default value false
@@ -241,6 +244,7 @@
 %type <type_list>  param_list
 %type <string> param
 %type <type_list>  arg_list
+%type <type_list>  constructor_list
 
 
 /* module Main */
@@ -1052,18 +1056,29 @@ arg_list:
     ;
     
 type_decl:
-    TOKEN_TYPE IDENTIFIER TOKEN_EQUAL constructor_list TOKEN_SEMICOLON   {  }
+    TOKEN_TYPE IDENTIFIER TOKEN_EQUAL constructor_list TOKEN_SEMICOLON   { 
+
+        // Check if the type is already defined in the symbol table
+        symbol* sym = get_symbol(sym_tab_stack, $2, false, false);
+
+        // If the symbol is not found, add it to the symbol table
+        if(sym == NULL){
+            // Check if the type is valid
+            symbol_id++;    // Actually no need
+            add_symbol_enum(sym_tab_stack, $2, type, NULL, line_num, symbol_id ,false, true, false, $4);
+        }
+type        else{
+            printf("ERROR: Type %s already defined on line %d\n", $2, sym->line_num);
+            exit(1);
+        }
+
+    }
     ;
 
 constructor_list:
-    constructor_field                                   {  }
-|   constructor_list TOKEN_PIPE constructor_field       {  }
+    IDENTIFIER                                   { $$=NULL; cvector_push_back($$, $1); }
+|   constructor_list TOKEN_PIPE IDENTIFIER       { cvector_push_back($$, $3); }
     ;
-
-constructor_field: 
-    IDENTIFIER                                          { }
-    ;
-
     
 %%
 
@@ -1176,69 +1191,112 @@ void add_symbol(symTableStack* stack, char* name, int type, char* value, int lin
 void add_symbol_with_args(symTableStack* stack, char* name, int type, char* value, int line_num, int symbol_id, bool is_const, bool is_enum, bool is_func, char * return_identifier, vtype(char*) parameter_list_types){
     
     int return_type = get_type(return_identifier);
-        // Check if the symbol table stack is empty
-        if(stack->num_sym_tabs == 0){
+    // Check if the symbol table stack is empty
+    if(stack->num_sym_tabs == 0){
+        // If it is, Error out
+        printf("Error: Symbol table stack is empty\n");
+        return;
+    }
+
+    // Get the top symbol table from the stack
+    symTable* sym_tab = stack->sym_tabs[stack->num_sym_tabs - 1];
+
+    // Check if the symbol is already in the symbol table and it is not a jump (we store names of jumps (which is the keywords) in the symbol table)
+    for(int i = 0; i < sym_tab->num_symbols; i++){
+        if(strcmp(sym_tab->symbols[i].name, name) == 0 && type != TYPE_JUMP ){
             // If it is, Error out
-            printf("Error: Symbol table stack is empty\n");
+            printf("Error: Symbol %s already exists in symbol table\n", name);
             return;
         }
-    
-        // Get the top symbol table from the stack
-        symTable* sym_tab = stack->sym_tabs[stack->num_sym_tabs - 1];
-    
-        // Check if the symbol is already in the symbol table and it is not a jump (we store names of jumps (which is the keywords) in the symbol table)
-        for(int i = 0; i < sym_tab->num_symbols; i++){
-            if(strcmp(sym_tab->symbols[i].name, name) == 0 && type != TYPE_JUMP ){
-                // If it is, Error out
-                printf("Error: Symbol %s already exists in symbol table\n", name);
-                return;
-            }
-        }
-    
-        // copy the value to avoid dangling pointers
-        char* value_copy = copy_value(value);
-    
-        // Check that all types are valid (TYPE_INT, TYPE_REAL, TYPE_STRING, TYPE_BOOL)
-        // First get the number of parameters from cvector
-        int num_parameters = cvector_size(parameter_list_types);
-        
-        // Then define an array of int to store the types of the parameters and get the types from the cvector while checking that they are valid
-        int * parameter_list_types_array = (int *)malloc(sizeof(int)*num_parameters);
-        for(int i = 0; i < num_parameters; i++){
-            parameter_list_types_array[i] = get_type(parameter_list_types[i]);
-            if(parameter_list_types_array[i] != TYPE_INT && parameter_list_types_array[i] != TYPE_REAL && parameter_list_types_array[i] != TYPE_STRING && parameter_list_types_array[i] != TYPE_BOOL){
-                printf("Error: Invalid parameter type\n");
-                return;
-            }
-        }
+    }
 
-        // Check that the return type is valid (TYPE_INT, TYPE_REAL, TYPE_STRING, TYPE_BOOL, TYPE_VOID)
-        if(return_type != TYPE_INT && return_type != TYPE_REAL && return_type != TYPE_STRING && return_type != TYPE_BOOL && return_type != TYPE_VOID){
-            printf("Error: Invalid return type\n");
+    // copy the value to avoid dangling pointers
+    char* value_copy = copy_value(value);
+
+    // Check that all types are valid (TYPE_INT, TYPE_REAL, TYPE_STRING, TYPE_BOOL)
+    // First get the number of parameters from cvector
+    int num_parameters = cvector_size(parameter_list_types);
+    
+    // Then define an array of int to store the types of the parameters and get the types from the cvector while checking that they are valid
+    int * parameter_list_types_array = (int *)malloc(sizeof(int)*num_parameters);
+    for(int i = 0; i < num_parameters; i++){
+        parameter_list_types_array[i] = get_type(parameter_list_types[i]);
+        if(parameter_list_types_array[i] != TYPE_INT && parameter_list_types_array[i] != TYPE_REAL && parameter_list_types_array[i] != TYPE_STRING && parameter_list_types_array[i] != TYPE_BOOL){
+            printf("Error: Invalid parameter type\n");
             return;
         }
+    }
 
-        // Create instance of symbol
-        symbol sym = {
-            .name = name,
-            .type = type,
-            .value = value_copy,
-            .line_num = line_num,
-            .symbol_id = symbol_id,
-            .is_const = is_const,
-            .is_enum = is_enum,
-            .is_func = is_func,
-            .return_type = return_type,
-            .num_parameters = num_parameters,
-            .parameter_list_types = parameter_list_types_array,
-        };
-    
-        // Add the symbol to the symbol table
-        sym_tab->symbols[sym_tab->num_symbols] = sym;
-        sym_tab->num_symbols++;
+    // Check that the return type is valid (TYPE_INT, TYPE_REAL, TYPE_STRING, TYPE_BOOL, TYPE_VOID)
+    if(return_type != TYPE_INT && return_type != TYPE_REAL && return_type != TYPE_STRING && return_type != TYPE_BOOL && return_type != TYPE_VOID){
+        printf("Error: Invalid return type\n");
+        return;
+    }
+
+    // Create instance of symbol
+    symbol sym = {
+        .name = name,
+        .type = type,
+        .value = value_copy,
+        .line_num = line_num,
+        .symbol_id = symbol_id,
+        .is_const = is_const,
+        .is_enum = is_enum,
+        .is_func = is_func,
+        .return_type = return_type,
+        .num_parameters = num_parameters,
+        .parameter_list_types = parameter_list_types_array,
+    };
+
+    // Add the symbol to the symbol table
+    sym_tab->symbols[sym_tab->num_symbols] = sym;
+    sym_tab->num_symbols++;
     
 }
 
+// Define a function to add a symbol to the symbol table
+void add_symbol_enum(symTableStack* stack, char* name, int type, char* value, int line_num, int symbol_id, bool is_const, bool is_enum, bool is_func, vtype(char*) enum_values){
+    // Check if the symbol table stack is empty
+    if(stack->num_sym_tabs == 0){
+        // If it is, Error out
+        printf("Error: Symbol table stack is empty\n");
+        return;
+    }
+
+    // Get the top symbol table from the stack
+    symTable* sym_tab = stack->sym_tabs[stack->num_sym_tabs - 1];
+
+    // Check if the symbol is already in the symbol table and it is not a jump (we store names of jumps (which is the keywords) in the symbol table)
+    for(int i = 0; i < sym_tab->num_symbols; i++){
+        // TODO: Maybe we can delete this check
+        if(0 && strcmp(sym_tab->symbols[i].name, name) == 0 && type != TYPE_JUMP ){
+            // If it is, Error out
+            printf("Error: Symbol %s already exists in symbol table\n", name);
+            return;
+        }
+    }
+
+    // copy the value to avoid dangling pointers
+    char* value_copy = copy_value(value);
+
+    // Create instance of symbol
+    symbol sym = {
+        .name = name,
+        .type = type,
+        .value = value_copy,
+        .line_num = line_num,
+        .symbol_id = symbol_id,
+        .is_const = is_const,
+        .is_enum = is_enum,
+        .is_func = is_func,
+        .enum_value_names = enum_values,
+    };
+
+    // Add the symbol to the symbol table
+    sym_tab->symbols[sym_tab->num_symbols] = sym;
+    sym_tab->num_symbols++;
+
+}
 
 
 // Define a function to get a symbol from the symbol table
