@@ -18,7 +18,8 @@ ast_if_t *create_ast_if_t(ast_expr_t *cond, ast_block_t *then_branch,
 void free_ast_if_t(ast_if_t **if_ptr) {
   DEBUG_EPRINTF("free ast_if_t\n");
   ast_if_t *if_ = *if_ptr;
-  if(if_==NULL) return;
+  if (if_ == NULL)
+    return;
   // DEBUG_ASSERT(if_, "if is NULL");
   free_ast_expr_t(&if_->cond);
   free_ast_block_t(&if_->then_branch);
@@ -35,29 +36,30 @@ void print_ast_if_t(ast_if_t const *if_, int indent) {
   print_ast_block_t(if_->else_branch, indent + 1);
 }
 
-void walk_ast_if_t(ast_if_t const *if_,  int *id) {
+void walk_ast_if_t(ast_if_t const *if_, int *id) {
   DEBUG_EPRINTF("walk ast_if_t\n");
   // the nested scope symbol table
   char const *cond_type = get_ast_expr_type(if_->cond, global_symbol_table);
   if (strcmp(cond_type, "bool")) {
-    REPORT_ERROR(RED "if condition must be of type bool\n" RESET);
+    REPORT_ERROR("Error: If condition expects a bool expression, got %s.\n",
+                 cond_type);
     exit(1);
   }
-  walk_ast_expr_t(if_->cond,  id);
+  walk_ast_expr_t(if_->cond, id);
   int label_id = *id;
-  //IF prolouge
+  // IF prolouge
   GEN_INSTRUCTIONS("\tJMPF _if_%d_\n", label_id);
   // Then branch
   push_scope(&global_symbol_table);
-  walk_ast_block_t(if_->then_branch,  id);
+  walk_ast_block_t(if_->then_branch, id);
   GEN_INSTRUCTIONS("\tJMP _if_end_%d_\n", label_id);
   GEN_INSTRUCTIONS("_if_%d_:\n", label_id);
   child_scope = global_symbol_table;
   pop_scope(&global_symbol_table);
   // Else branch
   push_scope(&global_symbol_table);
-  walk_ast_block_t(if_->else_branch,  id);
+  walk_ast_block_t(if_->else_branch, id);
   pop_scope(&global_symbol_table);
-  //IF epilouge
+  // IF epilouge
   GEN_INSTRUCTIONS("_if_end_%d_:\n", label_id);
 }

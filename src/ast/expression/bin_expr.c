@@ -40,8 +40,7 @@ void walk_ast_bin_expr_t(ast_bin_expr_t const *bin_expr, int *id) {
   char const *left_type = get_ast_expr_type(left, global_symbol_table);
   char const *right_type = get_ast_expr_type(right, global_symbol_table);
   if (strcmp(left_type, right_type)) {
-    REPORT_ERROR(RED "Type mismatch:" GRN
-                     "operator %s cannot operate on %s and %s, \n" RESET,
+    REPORT_ERROR( "Error: Type mismatch, operator %s cannot operate on %s and %s, \n",
                  map_int_to_operators(bin_expr->op), left_type, right_type);
     exit(1);
   }
@@ -52,16 +51,14 @@ void walk_ast_bin_expr_t(ast_bin_expr_t const *bin_expr, int *id) {
       bin_expr->op == EXPR_LT || bin_expr->op == EXPR_LEQ ||
       bin_expr->op == EXPR_GT || bin_expr->op == EXPR_GEQ) {
     if (strcmp(left_type, "int") && strcmp(left_type, "double")) {
-      REPORT_ERROR(RED "Type mismatch:" GRN
-                       "operator %s cannot operate on %s and %s, \n" RESET,
+      REPORT_ERROR("Error: Type mismatch, operator %s cannot operate on %s and %s, \n",
                    map_int_to_operators(bin_expr->op), left_type, right_type);
       exit(1);
     }
   }
-  if (bin_expr->op == EXPR_AND || bin_expr->op == EXPR_OR ) {
+  else if (bin_expr->op == EXPR_AND || bin_expr->op == EXPR_OR ) {
     if (strcmp(left_type, "bool")) {
-      REPORT_ERROR(RED "Type mismatch:" GRN
-                       "operator %s cannot operate on %s and %s, \n" RESET,
+      REPORT_ERROR( "Error: Type mismatch, operator %s cannot operate on %s and %s, \n" ,
                    map_int_to_operators(bin_expr->op), left_type, right_type);
       exit(1);
     }

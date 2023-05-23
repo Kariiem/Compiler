@@ -83,7 +83,8 @@ ast_expr_t *create_ast_expr_t(int const type, void *value) {
 void free_ast_expr_t(ast_expr_t **expr_ptr) {
   DEBUG_EPRINTF("free ast_expr_t\n");
   ast_expr_t *expr = *expr_ptr;
-  if(expr==NULL) return;
+  if (expr == NULL)
+    return;
   // DEBUG_ASSERT(expr, "expr is NULL\n");
 
   switch (expr->type) {
@@ -224,22 +225,26 @@ void print_ast_expr_t(ast_expr_t const *expr, int indent) {
   }
 }
 
-void walk_ast_expr_t(ast_expr_t const *expr,  int *id) {
+void walk_ast_expr_t(ast_expr_t const *expr, int *id) {
   DEBUG_EPRINTF("walk ast_expr_t\n");
   switch (expr->type) {
   default:
     DEBUG_ASSERT(false, "Unkown type %d", expr->type);
 
   case EXPR_IDENTIFIER: {
-    if(is_symbol_in_scope(global_symbol_table, expr->value.identifier)){
-      printf(BLU"symbol %s found in the top symbol table\n"RESET, expr->value.identifier);
-    }
+    // if(is_symbol_in_scope(global_symbol_table, expr->value.identifier)){
+    //   printf(BLU"symbol %s found in the top symbol table\n"RESET,
+    //   expr->value.identifier);
+    // }
     symbol_t *sym = get_symbol(global_symbol_table, expr->value.identifier);
     if (sym == NULL || sym->type != SYM_TY_TERM) {
-      REPORT_ERROR("Symbol %s not found\n", expr->value.identifier);
+      REPORT_ERROR("Error: Symbol %s is undefined\n", expr->value.identifier);
       exit(1);
     }
-
+    if (sym->value.term_val->value == NULL) {
+      REPORT_ERROR("Error: Uninitialized variable %s\n",
+                   expr->value.identifier);
+    }
     GEN_INSTRUCTIONS("\tLOAD $%d\n", sym->id);
     break;
   }
@@ -267,45 +272,47 @@ void walk_ast_expr_t(ast_expr_t const *expr,  int *id) {
   case EXPR_GEQ:
   case EXPR_EQ:
   case EXPR_NEQ: {
-    walk_ast_bin_expr_t(expr->value.binary_expr,  id);
+    walk_ast_bin_expr_t(expr->value.binary_expr, id);
     break;
   }
   case EXPR_NOT: {
-    char const *expr_type = get_ast_expr_type(expr->value.not_, global_symbol_table);
+    char const *expr_type =
+        get_ast_expr_type(expr->value.not_, global_symbol_table);
     if (strcmp(expr_type, "bool")) {
-      REPORT_ERROR("Expected bool, got %s\n", expr_type);
+      REPORT_ERROR("Error: Type mismatch, `not` expects bool, got %s\n",
+                   expr_type);
       exit(1);
     }
-    walk_ast_expr_t(expr->value.not_,  id);
+    walk_ast_expr_t(expr->value.not_, id);
     GEN_INSTRUCTIONS("%s\n", map_int_to_operators(expr->type));
     break;
   }
   // function call
   case EXPR_FUNCALL:
-    walk_ast_funcall_t(expr->value.funcall,  id);
+    walk_ast_funcall_t(expr->value.funcall, id);
     break;
   // compound expressions
   case EXPR_IF: {
     ++(*id);
-    walk_ast_if_t(expr->value.if_,  id);
+    walk_ast_if_t(expr->value.if_, id);
     break;
   }
   case EXPR_FOR:
     ++(*id);
-    walk_ast_for_t(expr->value.for_,  id);
+    walk_ast_for_t(expr->value.for_, id);
     break;
   case EXPR_WHILE:
   case EXPR_UNTIL:
     ++(*id);
-    walk_ast_while_t(expr->value.while_,  id);
+    walk_ast_while_t(expr->value.while_, id);
     break;
   case EXPR_DO:
     ++(*id);
-    walk_ast_do_t(expr->value.do_,  id);
+    walk_ast_do_t(expr->value.do_, id);
     break;
   case EXPR_SWITCH:
     ++(*id);
-    walk_ast_switch_t(expr->value.switch_,  id);
+    walk_ast_switch_t(expr->value.switch_, id);
     break;
   }
 }
@@ -349,8 +356,8 @@ char const *map_int_to_operators(int i) {
 char const *get_ast_expr_type(ast_expr_t *expr, symbol_table_t *sym_tab) {
   if (expr == NULL) {
 
-    REPORT_ERROR(RED
-                 "The last statement in a block must be an expression\n" RESET);
+    REPORT_ERROR(
+        "Error: The final statement in a block must be an expression\n");
     exit(1);
   }
   switch (expr->type) {
@@ -358,15 +365,17 @@ char const *get_ast_expr_type(ast_expr_t *expr, symbol_table_t *sym_tab) {
     DEBUG_ASSERT(false, "Unkown type %d", expr->type);
   case EXPR_IDENTIFIER: {
     symbol_t *sym = get_symbol(sym_tab, expr->value.identifier);
-    if (sym == NULL ) {
-      REPORT_ERROR("Error: Symbol %s not found\n", expr->value.identifier);
+    if (sym == NULL) {
+      REPORT_ERROR("Error: Symbol %s is not defined\n", expr->value.identifier);
       exit(1);
     }
-    if (sym->type != SYM_TY_TERM){
-      REPORT_ERROR("Error: Cannot Assign a non-term %s not found\n", expr->value.identifier);
+    if (sym->type != SYM_TY_TERM) {
+      REPORT_ERROR("Error: Non-Term symbol %s cannot be the rhs of an assignment statement.\n",
+                   expr->value.identifier);
       exit(1);
     }
-    printf("%s has type %s\n",expr->value.identifier,sym->value.term_val->decl_type);
+    printf("%s has type %s\n", expr->value.identifier,
+           sym->value.term_val->decl_type);
     return sym->value.term_val->decl_type;
   }
   case EXPR_INTEGER:

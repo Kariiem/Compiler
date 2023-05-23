@@ -1,39 +1,8 @@
 _start:
-	PUSH 0
-	STORE $1
 _switch_start_3_:
 _switch_start_4_:
-	LOAD $1
+	PUSH 1
 	PUSH 1
 	EQ
 	JMPT _switch_case_5_
 _switch_case_5_:
-	LOAD $1
-	JMP _switch_end_4_
-_switch_end_4_:
-	PUSH 1
-	EQ
-	JMPT _switch_case_4_
-_switch_start_6_:
-	LOAD $1
-	PUSH 1
-	EQ
-	JMPT _switch_case_7_
-_switch_case_7_:
-	LOAD $1
-	JMP _switch_end_6_
-_switch_end_6_:
-	PUSH 2
-	EQ
-	JMPT _switch_case_5_
-_switch_case_4_:
-	PUSH true
-	JMP _switch_end_3_
-_switch_case_5_:
-	PUSH true
-	JMP _switch_end_3_
-_switch_case_6_:
-	PUSH true
-	JMP _switch_end_3_
-_switch_end_3_:
-	STORE $2

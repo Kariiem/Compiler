@@ -1,7 +1,0 @@
-symbol name: z, type: SYM_TY_TERM, id: 2
-symbol name: y, type: SYM_TY_TERM, id: 1
-symbol name: string, type: SYM_TY_TYPE, id: 4
-symbol name: bool, type: SYM_TY_TYPE, id: 3
-symbol name: double, type: SYM_TY_TYPE, id: 2
-symbol name: int, type: SYM_TY_TYPE, id: 1
-symbol name: unit, type: SYM_TY_TYPE, id: 0

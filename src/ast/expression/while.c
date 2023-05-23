@@ -34,14 +34,15 @@ void walk_ast_while_t(ast_while_t const *while_, int *id) {
   DEBUG_EPRINTF("walk ast_while_t\n");
   char const *cond_type = get_ast_expr_type(while_->cond, global_symbol_table);
   if (strcmp(cond_type, "bool")) {
-    REPORT_ERROR(RED "while/until condition must be of type bool\n" RESET);
+    REPORT_ERROR("Error: While/Until condition must have type bool, got %s\n",
+                 cond_type);
     exit(1);
   }
   int label_id = *id;
   // WHILE prolouge
   push_scope(&global_symbol_table);
   GEN_INSTRUCTIONS("_while_%d_:\n", label_id);
-  walk_ast_expr_t(while_->cond,  id);
+  walk_ast_expr_t(while_->cond, id);
   GEN_INSTRUCTIONS("\tJMPF _while_end_%d_\n", label_id);
   // body
   walk_ast_block_t(while_->body, id);

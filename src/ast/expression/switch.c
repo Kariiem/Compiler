@@ -72,7 +72,7 @@ void walk_ast_switch_t(ast_switch_t const *switch_, int *id) {
       if (last_expr == NULL ||
           strcmp(switch_return_type,
                  get_ast_expr_type(last_expr, child_scope))) {
-        REPORT_ERROR("Error: switch case return type mismatch\n");
+        REPORT_ERROR("Error: Switch case return-type mismatch.\n");
         exit(1);
       }
       // CASE epilogue
@@ -83,7 +83,7 @@ void walk_ast_switch_t(ast_switch_t const *switch_, int *id) {
     GEN_INSTRUCTIONS("_switch_end_%d_:\n", label_id);
   }
   else {
-    REPORT_ERROR("Error: switch expression must be int,found %s\n",switch_expr_type);
+    REPORT_ERROR("Error: Switch expression must be int/enum,found %s\n",switch_expr_type);
     exit(1);
   }
 }

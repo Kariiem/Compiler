@@ -68,15 +68,15 @@ void walk_ast_term_decl_t(ast_term_decl_t const *term_decl, int *id) {
     //   push_scope(&global_symbol_table);
     // }
     walk_ast_expr_t(term_decl->value, id);
-    printf(BLU "symbol name: %s, symbol type: %s\n" RESET, term_decl->decl_name,
-           term_decl->decl_type);
+    // printf(BLU "symbol name: %s, symbol type: %s\n" RESET, term_decl->decl_name,
+    //        term_decl->decl_type);
 
     char const *term_sym_value_type =
         get_ast_expr_type(term_sym->value.term_val->value, child_scope);
     child_scope = global_symbol_table;
     printf("term_sym_value_type: %s\n", term_sym_value_type);
     if (strcmp(term_sym_value_type, term_decl->decl_type)) {
-      REPORT_ERROR(RED "type mismatch:" GRN "can not assign %s to %s\n" RESET,
+      REPORT_ERROR( "Error: Type mismatch, can not assign %s to %s\n" ,
                    term_sym_value_type, term_decl->decl_type);
       exit(1);
     }
