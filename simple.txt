@@ -1,20 +1,11 @@
 module Main
 
-type Bool = True 
-          | False;
+fun fib(val n:int) int {
+    if n < 2 {
+        n;
+    } else {
+        fib(n-1) + (n-2);
+    };
+}
 
-var y:int=4;
-
-var z :bool= 
-    switch True {
-        True: {
-            true;
-        }
-        False: {
-            true;
-        }
-        else:{
-            true;
-        }
-};
-
+val x:int = fib(true);

@@ -1,0 +1,19 @@
+_FUNCTION_fib_:
+	STORE $7
+	LOAD $7
+	PUSH 2
+	LT
+	JMPF _if_10_
+	LOAD $7
+	JMP _if_end_10_
+_if_10_:
+	LOAD $7
+	PUSH 1
+	SUB
+	CALL _FUNCTION_fib_
+	LOAD $7
+	PUSH 2
+	SUB
+	ADD
+_if_end_10_:
+	RETURN

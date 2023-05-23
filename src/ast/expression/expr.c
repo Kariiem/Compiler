@@ -237,11 +237,12 @@ void walk_ast_expr_t(ast_expr_t const *expr, int *id) {
     //   expr->value.identifier);
     // }
     symbol_t *sym = get_symbol(global_symbol_table, expr->value.identifier);
-    if (sym == NULL || sym->type != SYM_TY_TERM) {
+    if (sym == NULL ||
+        (sym->type != SYM_TY_TERM && sym->type != SYM_TY_FUNC_PARAM)) {
       REPORT_ERROR("Error: Symbol %s is undefined\n", expr->value.identifier);
       exit(1);
     }
-    if (sym->value.term_val->value == NULL) {
+    if (sym->type == SYM_TY_TERM && sym->value.term_val->value == NULL) {
       REPORT_ERROR("Error: Uninitialized variable %s\n",
                    expr->value.identifier);
     }
@@ -369,14 +370,18 @@ char const *get_ast_expr_type(ast_expr_t *expr, symbol_table_t *sym_tab) {
       REPORT_ERROR("Error: Symbol %s is not defined\n", expr->value.identifier);
       exit(1);
     }
-    if (sym->type != SYM_TY_TERM) {
-      REPORT_ERROR("Error: Non-Term symbol %s cannot be the rhs of an assignment statement.\n",
+    if (sym->type != SYM_TY_TERM && sym->type != SYM_TY_FUNC_PARAM) {
+      REPORT_ERROR("Error: Non-Term symbol %s cannot be the rhs of an "
+                   "assignment statement.\n",
                    expr->value.identifier);
       exit(1);
     }
-    printf("%s has type %s\n", expr->value.identifier,
-           sym->value.term_val->decl_type);
-    return sym->value.term_val->decl_type;
+    if (sym->type == SYM_TY_TERM) {
+      return sym->value.term_val->decl_type;
+    }
+    if (sym->type == SYM_TY_FUNC_PARAM) {
+      return sym->value.func_param_val->param_type;
+    }
   }
   case EXPR_INTEGER:
   case EXPR_INT: {

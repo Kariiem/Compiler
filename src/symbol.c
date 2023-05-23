@@ -20,6 +20,9 @@ symbol_t *create_symbol_t(char const *name, int type, void *value, int id) {
   case SYM_TY_TYPE:
     symbol->value.type_val = value;
     break;
+  case SYM_TY_FUNC_PARAM:
+    symbol->value.func_param_val = value;
+    break;
   }
   symbol->id = id;
   return symbol;
@@ -119,7 +122,7 @@ void pop_scope(symbol_table_t **head) {
 }
 
 void print_symbol_t(symbol_t *symbol, int indent) {
-  GEN_SYMBOL_TABLE("%*s",4*indent,"");
+  GEN_SYMBOL_TABLE("%*s", 4 * indent, "");
   switch (symbol->type) {
   case SYM_TY_TERM:
     // print_ast_term_decl_t(symbol->value.term_val, 0);
