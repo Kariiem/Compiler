@@ -77,7 +77,7 @@ void walk_ast_fundecl_t(ast_fundecl_t const *fundecl, int *id) {
   ast_expr_t *last_expr = get_last_block_expr(fundecl->body);
   char const *last_expr_type = get_ast_expr_type(last_expr, child_scope);
   if (strcmp(fundecl->return_type_name, last_expr_type)) {
-    REPORT_ERROR("Error: Function %s return type mismatch.\n",
+    ERROR("Error: Function %s return type mismatch.\n",
                   fundecl->fun_name);
     exit(1);
   }

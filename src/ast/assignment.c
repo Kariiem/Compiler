@@ -40,11 +40,11 @@ void walk_ast_assignment_t(ast_assignment_t const *assignment, int *id) {
   DEBUG_EPRINTF("walk ast_assignment_t\n");
   symbol_t *sym = get_symbol(global_symbol_table, assignment->identifier);
   if (sym == NULL) {
-    REPORT_ERROR("Error: Assignment to undeclared identifier\n");
+    ERROR("Error: Assignment to undeclared identifier\n");
     exit(1);
   }
   if (sym->type != SYM_TY_TERM && sym->type != SYM_TY_FUNC_PARAM) {
-    REPORT_ERROR("Error: Assignment to non-term identifier\n");
+    ERROR("Error: Assignment to non-term identifier\n");
     exit(1);
   }
   char const *term_type = sym->value.term_val->decl_type;
@@ -52,7 +52,7 @@ void walk_ast_assignment_t(ast_assignment_t const *assignment, int *id) {
   char const *expr_type =
       get_ast_expr_type(assignment->value, global_symbol_table);
   if (strcmp(term_type, expr_type)) {
-    REPORT_ERROR("Error: Assignment to identifier with wrong type\n");
+    ERROR("Error: Assignment to identifier with wrong type\n");
     exit(1);
   }
   if (sym->value.term_val->type == TERM_VAL) {
@@ -60,7 +60,7 @@ void walk_ast_assignment_t(ast_assignment_t const *assignment, int *id) {
     if (sym->value.term_val->value == NULL) {
       sym->value.term_val->value = assignment->value;
     } else {
-      REPORT_ERROR("Error: Assignment to val identifier\n");
+      ERROR("Error: Assignment to val identifier\n");
       exit(1);
     }
   } else {

@@ -41,11 +41,15 @@ void walk_ast_if_t(ast_if_t const *if_, int *id) {
   // the nested scope symbol table
   char const *cond_type = get_ast_expr_type(if_->cond, global_symbol_table);
   if (strcmp(cond_type, "bool")) {
-    REPORT_ERROR("Error: If condition expects a bool expression, got %s.\n",
-                 cond_type);
+    ERROR("Error: If condition expects a bool expression, got %s.\n",
+          cond_type);
     exit(1);
   }
   walk_ast_expr_t(if_->cond, id);
+  if (is_bool_expr_always_false(if_->cond, global_symbol_table)) {
+    WARNING("Warning: If condition is always false.\n");
+    print_ast_expr_t(if_->cond, 4);
+  }
   int label_id = *id;
   // IF prolouge
   GEN_INSTRUCTIONS("\tJMPF _if_%d_\n", label_id);

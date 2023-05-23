@@ -37,21 +37,21 @@ void walk_ast_funcall_t(ast_funcall_t const *funcall, int *id) {
   symbol_t *sym = get_symbol(global_symbol_table, funcall->fun_name);
   // name checking
   if (sym == NULL || sym->type != SYM_TY_FUNC) {
-    REPORT_ERROR("Error: %s is not a known function name.\n",
+    ERROR("Error: %s is not a known function name.\n",
                  funcall->fun_name);
     exit(1);
   }
   // arg count checking
   if (cvector_size(funcall->args) >
       cvector_size(sym->value.func_val->param_list)) {
-    REPORT_ERROR("Error: Function %s passed extra arguments.\n",
+    ERROR("Error: Function %s passed extra arguments.\n",
                  funcall->fun_name);
     exit(1);
   }
   // arg count checking
   if (cvector_size(funcall->args) <
       cvector_size(sym->value.func_val->param_list)) {
-    REPORT_ERROR("Error: Function %s passed few arguments.\n",
+    ERROR("Error: Function %s passed few arguments.\n",
                  funcall->fun_name);
     exit(1);
   }
@@ -59,7 +59,7 @@ void walk_ast_funcall_t(ast_funcall_t const *funcall, int *id) {
   for (int i = 0; i < cvector_size(funcall->args); i++) {
     if (strcmp(get_ast_expr_type(funcall->args[i], global_symbol_table),
                sym->value.func_val->param_list[i]->param_type)) {
-      REPORT_ERROR(
+      ERROR(
           "Error: Function %s passed argument of wrong type,for argument `%s`.\n",
           funcall->fun_name, sym->value.func_val->param_list[i]->param_name);
       exit(1);

@@ -26,7 +26,7 @@ void print_ast_bin_expr_t(ast_bin_expr_t const *bin_expr, int indent) {
   INDENT(indent);
   printf("ast_bin_expr_t\n");
   INDENT(indent + 1);
-  printf("op: %ld\n", bin_expr->op);
+  printf("op: %s\n", map_int_to_operators( bin_expr->op));
   print_ast_expr_t(bin_expr->left, indent + 1);
   print_ast_expr_t(bin_expr->right, indent + 1);
 }
@@ -40,7 +40,7 @@ void walk_ast_bin_expr_t(ast_bin_expr_t const *bin_expr, int *id) {
   char const *left_type = get_ast_expr_type(left, global_symbol_table);
   char const *right_type = get_ast_expr_type(right, global_symbol_table);
   if (strcmp(left_type, right_type)) {
-    REPORT_ERROR(
+    ERROR(
         "Error: Type mismatch, operator %s cannot operate on %s and %s, \n",
         map_int_to_operators(bin_expr->op), left_type, right_type);
     exit(1);
@@ -48,7 +48,7 @@ void walk_ast_bin_expr_t(ast_bin_expr_t const *bin_expr, int *id) {
 
   switch (bin_expr->op) {
   default: {
-    REPORT_ERROR("Error: Unknown operator %ld\n", bin_expr->op);
+    ERROR("Error: Unknown operator %ld\n", bin_expr->op);
     exit(1);
   }
   case EXPR_ADD:
@@ -62,7 +62,7 @@ void walk_ast_bin_expr_t(ast_bin_expr_t const *bin_expr, int *id) {
   case EXPR_LEQ:
   case EXPR_GEQ: {
     if (strcmp(left_type, "int") && strcmp(left_type, "double")) {
-      REPORT_ERROR(
+      ERROR(
           "Error: Type mismatch, operator %s cannot operate on %s and %s, \n",
           map_int_to_operators(bin_expr->op), left_type, right_type);
       exit(1);
@@ -72,7 +72,7 @@ void walk_ast_bin_expr_t(ast_bin_expr_t const *bin_expr, int *id) {
   case EXPR_AND:
   case EXPR_OR: {
     if (strcmp(left_type, "bool")) {
-      REPORT_ERROR(
+      ERROR(
           "Error: Type mismatch, operator %s cannot operate on %s and %s, \n",
           map_int_to_operators(bin_expr->op), left_type, right_type);
       exit(1);

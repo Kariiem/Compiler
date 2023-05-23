@@ -153,30 +153,35 @@ void free_ast_expr_t(ast_expr_t **expr_ptr) {
 void print_ast_expr_t(ast_expr_t const *expr, int indent) {
   INDENT(indent);
   printf("ast_expr_t\n");
-  INDENT(indent + 1);
   switch (expr->type) {
   default:
     DEBUG_ASSERT(false, "Unkown type %d", expr->type);
-
   case EXPR_IDENTIFIER:
+    INDENT(indent + 1);
     printf("identifier: %s\n", expr->value.identifier);
     break;
   case EXPR_INTEGER:
+    INDENT(indent + 1);
     printf("integer: %s\n", expr->value.string);
     break;
   case EXPR_INT:
+    INDENT(indent + 1);
     printf("int: %s\n", expr->value.string);
     break;
   case EXPR_REAL:
+    INDENT(indent + 1);
     printf("real: %s\n", expr->value.string);
     break;
   case EXPR_DOUBLE:
+    INDENT(indent + 1);
     printf("double: %s\n", expr->value.string);
     break;
   case EXPR_BOOL:
+    INDENT(indent + 1);
     printf("bool: %s\n", expr->value.string);
     break;
   case EXPR_STRING:
+    INDENT(indent + 1);
     printf("string: %s\n", expr->value.string);
     break;
   // binary expressions
@@ -239,12 +244,11 @@ void walk_ast_expr_t(ast_expr_t const *expr, int *id) {
     symbol_t *sym = get_symbol(global_symbol_table, expr->value.identifier);
     if (sym == NULL ||
         (sym->type != SYM_TY_TERM && sym->type != SYM_TY_FUNC_PARAM)) {
-      REPORT_ERROR("Error: Symbol %s is undefined\n", expr->value.identifier);
+      ERROR("Error: Symbol %s is undefined\n", expr->value.identifier);
       exit(1);
     }
     if (sym->type == SYM_TY_TERM && sym->value.term_val->value == NULL) {
-      REPORT_ERROR("Error: Uninitialized variable %s\n",
-                   expr->value.identifier);
+      ERROR("Error: Uninitialized variable %s\n", expr->value.identifier);
     }
     GEN_INSTRUCTIONS("\tLOAD $%d\n", sym->id);
     break;
@@ -280,12 +284,11 @@ void walk_ast_expr_t(ast_expr_t const *expr, int *id) {
     char const *expr_type =
         get_ast_expr_type(expr->value.not_, global_symbol_table);
     if (strcmp(expr_type, "bool")) {
-      REPORT_ERROR("Error: Type mismatch, `not` expects bool, got %s\n",
-                   expr_type);
+      ERROR("Error: Type mismatch, `not` expects bool, got %s\n", expr_type);
       exit(1);
     }
     walk_ast_expr_t(expr->value.not_, id);
-    GEN_INSTRUCTIONS("%s\n", map_int_to_operators(expr->type));
+    GEN_INSTRUCTIONS("\t%s\n", map_int_to_operators(expr->type));
     break;
   }
   // function call
@@ -357,8 +360,7 @@ char const *map_int_to_operators(int i) {
 char const *get_ast_expr_type(ast_expr_t *expr, symbol_table_t *sym_tab) {
   if (expr == NULL) {
 
-    REPORT_ERROR(
-        "Error: The final statement in a block must be an expression\n");
+    ERROR("Error: The final statement in a block must be an expression\n");
     exit(1);
   }
   switch (expr->type) {
@@ -367,13 +369,13 @@ char const *get_ast_expr_type(ast_expr_t *expr, symbol_table_t *sym_tab) {
   case EXPR_IDENTIFIER: {
     symbol_t *sym = get_symbol(sym_tab, expr->value.identifier);
     if (sym == NULL) {
-      REPORT_ERROR("Error: Symbol %s is not defined\n", expr->value.identifier);
+      ERROR("Error: Symbol %s is not defined\n", expr->value.identifier);
       exit(1);
     }
     if (sym->type != SYM_TY_TERM && sym->type != SYM_TY_FUNC_PARAM) {
-      REPORT_ERROR("Error: Non-Term symbol %s cannot be the rhs of an "
-                   "assignment statement.\n",
-                   expr->value.identifier);
+      ERROR("Error: Non-Term symbol %s cannot be the rhs of an "
+            "assignment statement.\n",
+            expr->value.identifier);
       exit(1);
     }
     if (sym->type == SYM_TY_TERM) {
@@ -449,5 +451,134 @@ char const *get_ast_expr_type(ast_expr_t *expr, symbol_table_t *sym_tab) {
         get_last_block_expr(expr->value.switch_->cases[0]->body);
     return get_ast_expr_type(last_expr, sym_tab);
   }
+  }
+}
+
+bool is_bool_expr_always_false(ast_expr_t *expr, symbol_table_t *sym_tab) {
+  switch (expr->type) {
+  default:
+    DEBUG_ASSERT(false, "Unkown type %d", expr->type);
+  case EXPR_IDENTIFIER: {
+    symbol_t *sym = get_symbol(sym_tab, expr->value.identifier);
+    if (is_expr_const(expr, sym_tab)) {
+      return is_bool_expr_always_false(sym->value.term_val->value, sym_tab);
+    }
+    return false;
+  }
+  case EXPR_BOOL: {
+    return strcmp(expr->value.string, "false") == 0;
+  }
+  case EXPR_AND: {
+    return is_bool_expr_always_false(expr->value.binary_expr->left, sym_tab) ||
+           is_bool_expr_always_false(expr->value.binary_expr->right, sym_tab);
+  }
+  case EXPR_OR: {
+    return is_bool_expr_always_false(expr->value.binary_expr->left, sym_tab) &&
+           is_bool_expr_always_false(expr->value.binary_expr->right, sym_tab);
+  }
+  case EXPR_LT: {
+    if (is_expr_const(expr->value.binary_expr->left, global_symbol_table) &&
+        is_expr_const(expr->value.binary_expr->right, global_symbol_table)) {
+      return atoi(expr->value.binary_expr->left->value.string) >=
+             atoi(expr->value.binary_expr->right->value.string);
+    }
+    return false;
+  }
+  case EXPR_GT: {
+    if (is_expr_const(expr->value.binary_expr->left, global_symbol_table) &&
+        is_expr_const(expr->value.binary_expr->right, global_symbol_table)) {
+      return atoi(expr->value.binary_expr->left->value.string) <=
+             atoi(expr->value.binary_expr->right->value.string);
+    }
+    return false;
+  }
+  case EXPR_LEQ: {
+    if (is_expr_const(expr->value.binary_expr->left, global_symbol_table) &&
+        is_expr_const(expr->value.binary_expr->right, global_symbol_table)) {
+      return atoi(expr->value.binary_expr->left->value.string) >
+             atoi(expr->value.binary_expr->right->value.string);
+    }
+    return false;
+  }
+  case EXPR_GEQ: {
+    if (is_expr_const(expr->value.binary_expr->left, global_symbol_table) &&
+        is_expr_const(expr->value.binary_expr->right, global_symbol_table)) {
+      return atoi(expr->value.binary_expr->left->value.string) <
+             atoi(expr->value.binary_expr->right->value.string);
+    }
+  }
+  case EXPR_EQ: {
+    if (is_expr_const(expr->value.binary_expr->left, global_symbol_table) &&
+        is_expr_const(expr->value.binary_expr->right, global_symbol_table)) {
+      return strcmp(expr->value.binary_expr->left->value.string,
+                    expr->value.binary_expr->right->value.string);
+    }
+    return false;
+  }
+  case EXPR_NEQ: {
+    if (is_expr_const(expr->value.binary_expr->left, global_symbol_table) &&
+        is_expr_const(expr->value.binary_expr->right, global_symbol_table)) {
+      return strcmp(expr->value.binary_expr->left->value.string,
+                    expr->value.binary_expr->right->value.string) == 0;
+    }
+    return false;
+  }
+  case EXPR_NOT: {
+    return !is_bool_expr_always_false(expr->value.not_, sym_tab);
+  }
+  case EXPR_FUNCALL:
+  case EXPR_IF:
+  case EXPR_FOR:
+  case EXPR_WHILE:
+  case EXPR_UNTIL:
+  case EXPR_DO:
+  case EXPR_SWITCH:
+    return false;
+  }
+}
+
+static bool is_expr_const(ast_expr_t *expr, symbol_table_t *sym_tab) {
+  switch (expr->type) {
+  default:
+    DEBUG_ASSERT(false, "Unknown type %d", expr->type);
+  case EXPR_IDENTIFIER: {
+    symbol_t *sym = get_symbol(sym_tab, expr->value.identifier);
+    if (sym->type == SYM_TY_TERM && sym->value.term_val->type == TERM_VAL)
+    /* && sym->value.term_val->value */ {
+      return is_expr_const(sym->value.term_val->value, sym_tab);
+    }
+  }
+  case EXPR_INTEGER:
+  case EXPR_DOUBLE:
+  case EXPR_REAL:
+  case EXPR_INT:
+  case EXPR_BOOL:
+  case EXPR_STRING:
+    return true;
+  case EXPR_ADD:
+  case EXPR_SUB:
+  case EXPR_MUL:
+  case EXPR_DIV:
+  case EXPR_MOD:
+  case EXPR_EXP:
+  case EXPR_AND:
+  case EXPR_OR:
+  case EXPR_LT:
+  case EXPR_GT:
+  case EXPR_LEQ:
+  case EXPR_GEQ:
+  case EXPR_EQ:
+  case EXPR_NEQ:
+  case EXPR_NOT:
+    return is_expr_const(expr->value.binary_expr->left, sym_tab) &&
+           is_expr_const(expr->value.binary_expr->right, sym_tab);
+  case EXPR_FUNCALL:
+  case EXPR_IF:
+  case EXPR_FOR:
+  case EXPR_WHILE:
+  case EXPR_UNTIL:
+  case EXPR_DO:
+  case EXPR_SWITCH:
+    return false;
   }
 }

@@ -3,6 +3,7 @@
 #include "../utils.h"
 #include "bin_expr.h"
 #include "block.h"
+#include "block_expr.h"
 #include "case.h"
 #include "expr.h"
 #include <stdlib.h>
@@ -51,8 +52,23 @@ void walk_ast_switch_t(ast_switch_t const *switch_, int *id) {
     GEN_INSTRUCTIONS("_switch_start_%d_:\n", label_id);
     // walk_ast_expr_t(switch_->enum_expr, id);
 
-    ast_bin_expr_t *case_expr =
-        create_ast_bin_expr_t(switch_->enum_expr, NULL, EXPR_EQ);
+    // The following lines creates a shared temporary variable for the enum
+    // expression
+    char const *enum_expr_type =
+        get_ast_expr_type(switch_->enum_expr, global_symbol_table);
+    ast_term_decl_t *enum_expr_term = create_ast_term_decl_t(
+        TERM_VAL, "switch_case_term", enum_expr_type, switch_->enum_expr);
+    symbol_t *enum_expr_symbol =
+        create_symbol_t("switch_case_term", SYM_TY_TERM, enum_expr_term, *id);
+    
+    // Create a binary expression with the case expr as the left operand
+    ast_bin_expr_t *case_expr = create_ast_bin_expr_t(
+        create_ast_expr_t(EXPR_IDENTIFIER, enum_expr_symbol->name), 
+        NULL,
+        EXPR_EQ);
+    push_scope(&global_symbol_table);
+    // this inserts the enum expression temporary variable into the case scope
+    walk_ast_term_decl_t(enum_expr_term, id);
     for (int i = 0; i < cvector_size(switch_->cases); ++i) {
       if (switch_->cases[i]->case_expr) {
         case_expr->right = switch_->cases[i]->case_expr;
@@ -60,6 +76,8 @@ void walk_ast_switch_t(ast_switch_t const *switch_, int *id) {
         GEN_INSTRUCTIONS("\tJMPT _switch_case_%d_\n", label_id + i + 1);
       }
     }
+    pop_scope(&global_symbol_table);
+
     //--------------------------------------------
     ast_expr_t *last_expr = get_last_block_expr(switch_->cases[0]->body);
     char const *switch_return_type =
@@ -74,7 +92,7 @@ void walk_ast_switch_t(ast_switch_t const *switch_, int *id) {
       if (last_expr == NULL ||
           strcmp(switch_return_type,
                  get_ast_expr_type(last_expr, child_scope))) {
-        REPORT_ERROR("Error: Switch case return-type mismatch.\n");
+        ERROR("Error: Switch case return-type mismatch.\n");
         exit(1);
       }
       // CASE epilogue
@@ -84,7 +102,7 @@ void walk_ast_switch_t(ast_switch_t const *switch_, int *id) {
     }
     GEN_INSTRUCTIONS("_switch_end_%d_:\n", label_id);
   } else {
-    REPORT_ERROR(
+    ERROR(
         "Error: Switch expression must be int or user-defined enum, found %s\n",
         switch_expr_type);
     exit(1);

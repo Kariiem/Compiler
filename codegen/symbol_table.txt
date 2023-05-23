@@ -1,5 +1,6 @@
-            symbol name: x, type: SYM_TY_TERM, id: 15
-symbol name: fib, type: SYM_TY_FUNC, id: 6
+        symbol name: switch_case_term, type: SYM_TY_TERM, id: 9
+    symbol name: switch_case_term, type: SYM_TY_TERM, id: 8
+symbol name: x, type: SYM_TY_TERM, id: 7
 symbol name: string, type: SYM_TY_TYPE, id: 4
 symbol name: bool, type: SYM_TY_TYPE, id: 3
 symbol name: double, type: SYM_TY_TYPE, id: 2

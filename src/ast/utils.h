@@ -41,9 +41,14 @@
     }                                                                          \
   } while (0)
 
-#define REPORT_ERROR(...)                                                      \
+#define ERROR(...)                                                             \
   do {                                                                         \
     fprintf(stderr, __VA_ARGS__);                                              \
     exit(1);                                                                   \
+  } while (0)
+
+#define WARNING(...)                                                           \
+  do {                                                                         \
+    fprintf(stderr, __VA_ARGS__);                                              \
   } while (0)
 #endif //__UTILS__

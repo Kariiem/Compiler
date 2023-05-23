@@ -38,8 +38,8 @@ void walk_ast_block_t(ast_block_t const *block,
 ast_expr_t *get_last_block_expr(ast_block_t *block_expr) {
   int vsize = cvector_size(block_expr->block_expr_list);
   if ( vsize && block_expr->block_expr_list[vsize - 1]->type == EXPR) {
-    printf("last block expr is expr\n");
-    print_ast_expr_t(block_expr->block_expr_list[vsize - 1]->value.expr,5);
+    DEBUG_EPRINTF("last block expr is expr\n");
+    // print_ast_expr_t(block_expr->block_expr_list[vsize - 1]->value.expr,5);
     return block_expr->block_expr_list[vsize - 1]->value.expr;
   }
   return NULL;

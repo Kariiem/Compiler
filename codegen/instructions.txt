@@ -1,6 +1,37 @@
 _start:
-	PUSH 10
-	PUSH 0
+_switch_start_8_:
+_switch_start_9_:
 	PUSH 1
-	CALL _FUNCTION_fib_
-	STORE $15
+	STORE $9
+	LOAD $9
+	PUSH 1
+	EQ
+	JMPT _switch_case_10_
+	LOAD $9
+	PUSH 2
+	EQ
+	JMPT _switch_case_11_
+_switch_case_10_:
+	PUSH 1
+	JMP _switch_end_9_
+_switch_case_11_:
+	PUSH 2
+	JMP _switch_end_9_
+_switch_end_9_:
+	STORE $8
+	LOAD $8
+	PUSH 1
+	EQ
+	JMPT _switch_case_9_
+	LOAD $8
+	PUSH 2
+	EQ
+	JMPT _switch_case_10_
+_switch_case_9_:
+	PUSH 1
+	JMP _switch_end_8_
+_switch_case_10_:
+	PUSH 2
+	JMP _switch_end_8_
+_switch_end_8_:
+	STORE $7
