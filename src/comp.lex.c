@@ -655,7 +655,7 @@ static const flex_int16_t yy_rule_linenum[50] =
   #include <stdlib.h>                                                           
   #include <string.h>
   #include "comp.tab.h"                                                   
-  #include "utils.h"
+  #include "./utils.h"
 
   #define YY_USER_ACTION                                               \
       yylloc->first_line = yylloc->last_line;                          \

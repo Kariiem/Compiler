@@ -82,6 +82,6 @@ char const *get_ast_expr_type(ast_expr_t *expr, symbol_table_t *sym_tab);
 char const *map_int_to_operators(int i);
 
 bool is_bool_expr_always_false(ast_expr_t*expr,symbol_table_t*sym_tab);
-static bool is_expr_const(ast_expr_t*expr,symbol_table_t*sym_tab);
+bool is_expr_const(ast_expr_t*expr,symbol_table_t*sym_tab);
 
 #endif // __AST_NODE_EXPR__
