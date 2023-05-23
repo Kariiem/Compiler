@@ -10,7 +10,7 @@
   #include <stdlib.h>                                                           
   #include <string.h>
   #include "comp.tab.h"                                                   
-  #include "utils.h"
+  #include "./utils.h"
 
   #define YY_USER_ACTION                                               \
       yylloc->first_line = yylloc->last_line;                          \
